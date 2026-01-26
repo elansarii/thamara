@@ -85,11 +85,28 @@ convert public/thamara_logo.svg -resize 512x512 public/icon-512.png
 
 ## PWA Features
 
-✓ **Offline Support** - Works without internet
+✓ **Offline Support** - Works without internet after first visit
+✓ **Map Caching** - Map tiles and agro-pack data cached automatically
 ✓ **Installable** - Add to home screen on Android
 ✓ **Fast Loading** - Cached for instant load
 ✓ **Auto Updates** - Service worker updates automatically
 ✓ **App-like Feel** - Runs in standalone mode
+
+## How Offline Maps Work
+
+The service worker uses a smart caching strategy:
+
+1. **Agro-pack data** - Pre-cached on install (manifest.json, plantability.geojson)
+2. **Map tiles** - Cached as you browse the map (first visit)
+3. **App pages** - Cached as you navigate
+
+**To use the map offline:**
+1. Open the map page while online (visit `/map`)
+2. Pan around the area you want to cache
+3. Zoom in/out to cache different zoom levels
+4. Go offline - cached tiles will still display!
+
+The more you explore the map while online, the more tiles are cached for offline use.
 
 ## Troubleshooting
 
