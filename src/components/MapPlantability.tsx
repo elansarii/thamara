@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Info, X, Navigation, AlertTriangle, MapPin } from "lucide-react";
+import { Info, X, Navigation, AlertTriangle, MapPin, Droplets } from "lucide-react";
 import {
   AgroPackManifest,
   PlantabilityGeoJSON,
@@ -15,12 +15,28 @@ import { usePlotStore } from "@/lib/plotStore";
 import { ROUTES } from "@/lib/routes";
 import { getAllSeedSources, getSeedSourcesForCrop, getSourceTypeLabel, getDaysSinceConfirmation, type SeedSource } from "@/data/seedSources";
 import { getCropById } from "@/data/crops";
+import {
+  getAllWaterPoints,
+  initializeWaterPoints,
+  getWaterPointTypeLabel,
+  getStatusLabel,
+  type WaterPoint,
+} from "@/lib/waterPointsDb";
+
+// Helper function to get color based on reliability score
+function getReliabilityColor(score: number): string {
+  if (score > 70) return "#10b981"; // green
+  if (score >= 40) return "#f59e0b"; // yellow/amber
+  if (score > 0) return "#ef4444"; // red
+  return "#6b7280"; // gray for unknown
+}
 
 export default function MapPlantability() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const marker = useRef<maplibregl.Marker | null>(null);
   const seedMarkers = useRef<maplibregl.Marker[]>([]);
+  const waterMarkers = useRef<maplibregl.Marker[]>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setDraftPlot } = usePlotStore();
@@ -33,10 +49,27 @@ export default function MapPlantability() {
     feature: PlantabilityFeature | null;
   } | null>(null);
   const [selectedSeedSource, setSelectedSeedSource] = useState<SeedSource | null>(null);
+  const [selectedWaterPoint, setSelectedWaterPoint] = useState<WaterPoint | null>(null);
   const [mapError, setMapError] = useState(false);
   const [showSeedSources, setShowSeedSources] = useState(false);
+  const [showWaterPoints, setShowWaterPoints] = useState(false);
   const [showPlantability, setShowPlantability] = useState(true);
   const [filterCropId, setFilterCropId] = useState<string | null>(null);
+  const [waterPoints, setWaterPoints] = useState<WaterPoint[]>([]);
+
+  // Load water points from database
+  useEffect(() => {
+    const loadWaterPoints = async () => {
+      try {
+        await initializeWaterPoints();
+        const points = await getAllWaterPoints();
+        setWaterPoints(points);
+      } catch (error) {
+        console.error("Failed to load water points:", error);
+      }
+    };
+    loadWaterPoints();
+  }, []);
 
   useEffect(() => {
     // Check for seed layer parameter
@@ -44,7 +77,7 @@ export default function MapPlantability() {
     if (layer === 'seeds') {
       setShowSeedSources(true);
       setShowPlantability(false);
-      
+
       // Check for specific crop filter
       const cropId = sessionStorage.getItem('thamara_seed_search_crop');
       if (cropId) {
@@ -278,6 +311,73 @@ export default function MapPlantability() {
     }
   }, [showSeedSources, filterCropId]);
 
+  // Render water point markers
+  useEffect(() => {
+    if (!map.current || !showWaterPoints) {
+      // Remove existing markers
+      waterMarkers.current.forEach(m => m.remove());
+      waterMarkers.current = [];
+      return;
+    }
+
+    // Clear existing markers
+    waterMarkers.current.forEach(m => m.remove());
+    waterMarkers.current = [];
+
+    // Add markers for each water point
+    waterPoints.forEach(point => {
+      const el = document.createElement('div');
+      el.className = 'water-point-marker';
+
+      // Color based on reliabilityScore
+      const color = getReliabilityColor(point.reliabilityScore);
+
+      el.style.cssText = `
+        width: 32px;
+        height: 32px;
+        background-color: ${color};
+        border: 3px solid white;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      `;
+
+      // Add droplet icon
+      const icon = document.createElement('div');
+      icon.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+        </svg>
+      `;
+      el.appendChild(icon);
+
+      const markerInstance = new maplibregl.Marker({ element: el })
+        .setLngLat([point.coordinates[0], point.coordinates[1]])
+        .addTo(map.current!);
+
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setSelectedWaterPoint(point);
+        setSelectedZone(null);
+        setSelectedSeedSource(null);
+      });
+
+      waterMarkers.current.push(markerInstance);
+    });
+
+    // Fit bounds to show all markers if we have them
+    if (waterPoints.length > 0 && !showSeedSources) {
+      const bounds = new maplibregl.LngLatBounds();
+      waterPoints.forEach(point =>
+        bounds.extend([point.coordinates[0], point.coordinates[1]])
+      );
+      map.current.fitBounds(bounds, { padding: 50, maxZoom: 12 });
+    }
+  }, [showWaterPoints, waterPoints, showSeedSources]);
+
   // Toggle plantability layer visibility
   useEffect(() => {
     if (!map.current || !map.current.getLayer('plantability-fill')) return;
@@ -366,6 +466,20 @@ export default function MapPlantability() {
           />
           <span className="text-gray-700">Seed Sources</span>
         </label>
+        <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showWaterPoints}
+            onChange={e => {
+              setShowWaterPoints(e.target.checked);
+              if (!e.target.checked) {
+                setSelectedWaterPoint(null);
+              }
+            }}
+            className="rounded"
+          />
+          <span className="text-gray-700">Water Points</span>
+        </label>
         {showSeedSources && filterCropId && (
           <div className="text-xs text-gray-600 border-t pt-2">
             Showing: {getCropById(filterCropId)?.commonName}
@@ -407,7 +521,7 @@ export default function MapPlantability() {
         </div>
       )}
 
-      {showSeedSources && (
+      {showSeedSources && !showWaterPoints && (
         <div className="absolute bottom-6 right-4 bg-white rounded-lg shadow-lg p-4">
           <h3 className="font-semibold text-sm mb-3 text-gray-900 flex items-center gap-2">
             <MapPin className="w-4 h-4 text-green-600" />
@@ -429,6 +543,36 @@ export default function MapPlantability() {
               style={{ borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)' }}
             />
             <span className="text-xs text-gray-600">Seed source pin</span>
+          </div>
+        </div>
+      )}
+
+      {showWaterPoints && (
+        <div className="absolute bottom-6 right-4 bg-white rounded-lg shadow-lg p-4">
+          <h3 className="font-semibold text-sm mb-3 text-gray-900 flex items-center gap-2">
+            <Droplets className="w-4 h-4 text-blue-600" />
+            Water Points
+          </h3>
+          <div className="text-sm text-gray-700 mb-3">
+            <p>{waterPoints.length} sources found</p>
+          </div>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-green-500 rounded-full" />
+              <span className="text-gray-700">&gt;70% - High</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-amber-500 rounded-full" />
+              <span className="text-gray-700">40-70% - Medium</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-red-500 rounded-full" />
+              <span className="text-gray-700">&lt;40% - Low</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-gray-500 rounded-full" />
+              <span className="text-gray-700">Unknown</span>
+            </div>
           </div>
         </div>
       )}
@@ -684,6 +828,108 @@ export default function MapPlantability() {
                     `${selectedSeedSource.lat},${selectedSeedSource.lng}`
                   );
                   alert('Location copied to clipboard!');
+                }
+              }}
+              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+            >
+              Copy Location
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Water Point Info Panel */}
+      {selectedWaterPoint && (
+        <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto">
+          <div className="flex justify-between items-start mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Droplets className="w-5 h-5 text-blue-600" />
+              Water Point
+            </h2>
+            <button
+              onClick={() => setSelectedWaterPoint(null)}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Name and Type */}
+          <div className="mb-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-1">
+              {selectedWaterPoint.name}
+            </h3>
+            <span className="inline-block text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+              {getWaterPointTypeLabel(selectedWaterPoint.type)}
+            </span>
+          </div>
+
+          {/* Status */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm text-gray-600">Status:</span>
+              <span
+                className={`text-sm font-semibold px-2 py-1 rounded ${
+                  selectedWaterPoint.status === "available"
+                    ? "bg-green-100 text-green-800"
+                    : selectedWaterPoint.status === "limited"
+                    ? "bg-amber-100 text-amber-800"
+                    : selectedWaterPoint.status === "unavailable"
+                    ? "bg-red-100 text-red-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
+                {getStatusLabel(selectedWaterPoint.status)}
+              </span>
+            </div>
+          </div>
+
+          {/* Reliability */}
+          <div className="mb-4">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-600">Reliability</span>
+              <span className="font-semibold text-gray-900">
+                {selectedWaterPoint.reliabilityScore}/100
+              </span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full ${
+                  selectedWaterPoint.reliabilityScore >= 70
+                    ? "bg-green-500"
+                    : selectedWaterPoint.reliabilityScore >= 40
+                    ? "bg-yellow-500"
+                    : "bg-red-500"
+                }`}
+                style={{ width: `${selectedWaterPoint.reliabilityScore}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Last Confirmed */}
+          <div className="mb-4 text-sm">
+            <span className="text-gray-600">Last confirmed:</span>
+            <span className="ml-2 font-medium text-gray-900">
+              {selectedWaterPoint.lastConfirmed.toLocaleDateString()}
+            </span>
+          </div>
+
+          {/* Location */}
+          <div className="mb-4 text-xs text-gray-500">
+            <Navigation className="w-3 h-3 inline mr-1" />
+            {selectedWaterPoint.coordinates[1].toFixed(6)},{" "}
+            {selectedWaterPoint.coordinates[0].toFixed(6)}
+          </div>
+
+          {/* Actions */}
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                if (navigator.clipboard) {
+                  navigator.clipboard.writeText(
+                    `${selectedWaterPoint.coordinates[1]},${selectedWaterPoint.coordinates[0]}`
+                  );
+                  alert("Location copied to clipboard!");
                 }
               }}
               className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"

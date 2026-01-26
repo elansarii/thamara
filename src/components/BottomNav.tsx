@@ -2,24 +2,24 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Map, BookOpen, Handshake, Truck } from 'lucide-react';
+import { Map, BookOpen, Handshake, Droplets } from 'lucide-react';
 import { BOTTOM_NAV_ITEMS } from '@/lib/routes';
 
 const iconMap = {
   Map,
   BookOpen,
   Handshake,
-  Truck,
+  Droplets,
 };
 
 export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav 
-      className="h-20 flex items-center justify-around border-t backdrop-blur-sm"
-      style={{ 
-        background: 'var(--thamara-surface)', 
+    <nav
+      className="sticky bottom-0 h-20 flex items-center justify-around border-t backdrop-blur-sm z-50"
+      style={{
+        background: 'var(--thamara-surface)',
         borderColor: 'var(--thamara-border)',
         boxShadow: '0 -1px 3px 0 rgba(0, 0, 0, 0.05)'
       }}

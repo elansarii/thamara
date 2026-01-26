@@ -24,7 +24,7 @@ export const BOTTOM_NAV_ITEMS: NavItem[] = [
   { id: 'map', label: 'Map', icon: 'Map', route: ROUTES.MAP },
   { id: 'guide', label: 'Guide', icon: 'BookOpen', route: ROUTES.CROP_PLAN },
   { id: 'exchange', label: 'Exchange', icon: 'Handshake', route: ROUTES.EXCHANGE },
-  { id: 'drops', label: 'Drops', icon: 'Truck', route: ROUTES.DROPS },
+  { id: 'water', label: 'Water', icon: 'Droplets', route: ROUTES.WATER },
 ];
 
 export const FAB_ROUTE = ROUTES.LOG_PLOT;
