@@ -21,8 +21,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className="h-full flex flex-col" style={{ background: 'var(--thamara-bg)' }}>
       <TopBar />
 
-      {/* Main content area with scroll */}
-      <main className="flex-1 overflow-y-auto relative" style={{ minHeight: 0 }}>
+      {/* Main content area with scroll - Add padding for fixed navbars */}
+      <main className="flex-1 overflow-y-auto relative" style={{ minHeight: 0, paddingTop: '4rem', paddingBottom: '5rem' }}>
         {children}
 
         {/* FAB - Floating Action Button - Only show on home screen */}
