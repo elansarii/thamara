@@ -7,7 +7,13 @@ import { usePlotStore } from '@/lib/plotStore';
 import { assess } from '@/lib/assessment';
 
 export default function HomePage() {
-  const { lastPlot } = usePlotStore();
+  const { lastPlot, plots, waterPoints } = usePlotStore();
+  
+  // Calculate impact metrics
+  const totalPlots = plots.length;
+  const totalArea = plots.reduce((sum, plot) => sum + (plot.areaM2 || 0), 0);
+  const totalAreaHa = (totalArea / 10000).toFixed(2);
+  
   return (
     <div className="p-5 pb-28 space-y-7">
       {/* Greeting Section with modern typography */}
@@ -154,9 +160,9 @@ export default function HomePage() {
           />
         </div>
         <div className="grid grid-cols-3 gap-6">
-          <ImpactStat label="Plots logged" value="0" />
-          <ImpactStat label="Area" value="0 ha" />
-          <ImpactStat label="Water points" value="0" />
+          <ImpactStat label="Plots logged" value={totalPlots.toString()} />
+          <ImpactStat label="Area" value={`${totalAreaHa} ha`} />
+          <ImpactStat label="Water points" value={waterPoints.toString()} />
         </div>
       </section>
 

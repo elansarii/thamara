@@ -1,0 +1,159 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [34.420, 31.500],
+          [34.435, 31.498],
+          [34.445, 31.505],
+          [34.448, 31.515],
+          [34.438, 31.520],
+          [34.422, 31.518],
+          [34.418, 31.508],
+          [34.420, 31.500]
+        ]]
+      },
+      "properties": {
+        "name": "North Gaza Farm A",
+        "areaM2": 18500,
+        "class": "farmable",
+        "confidence": 85,
+        "baseline_source": "FAO-UNOSAT (demo)",
+        "baseline_date": "2026-01-10",
+        "notes": "Northern agricultural zone - minimal observed disturbance"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [34.450, 31.480],
+          [34.465, 31.478],
+          [34.478, 31.485],
+          [34.482, 31.495],
+          [34.475, 31.505],
+          [34.460, 31.508],
+          [34.448, 31.498],
+          [34.445, 31.488],
+          [34.450, 31.480]
+        ]]
+      },
+      "properties": {
+        "name": "Beit Hanoun Field",
+        "areaM2": 25300,
+        "class": "restorable",
+        "confidence": 68,
+        "baseline_source": "FAO-UNOSAT (demo)",
+        "baseline_date": "2026-01-10",
+        "notes": "Peri-urban farmland with moderate disturbance patterns"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [34.290, 31.310],
+          [34.305, 31.308],
+          [34.315, 31.315],
+          [34.318, 31.325],
+          [34.310, 31.335],
+          [34.295, 31.338],
+          [34.285, 31.330],
+          [34.288, 31.318],
+          [34.290, 31.310]
+        ]]
+      },
+      "properties": {
+        "name": "Khan Yunis West Farm",
+        "areaM2": 23400,
+        "class": "farmable",
+        "confidence": 79,
+        "baseline_source": "FAO-UNOSAT (demo)",
+        "baseline_date": "2026-01-10",
+        "notes": "Western agricultural zone with recovery potential"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [34.485, 31.528],
+          [34.500, 31.526],
+          [34.510, 31.533],
+          [34.513, 31.543],
+          [34.505, 31.553],
+          [34.490, 31.555],
+          [34.480, 31.547],
+          [34.483, 31.535],
+          [34.485, 31.528]
+        ]]
+      },
+      "properties": {
+        "name": "Jabalia Agricultural",
+        "areaM2": 26800,
+        "class": "restorable",
+        "confidence": 66,
+        "baseline_source": "FAO-UNOSAT (demo)",
+        "baseline_date": "2026-01-10",
+        "notes": "Northern zone requiring moderate restoration"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [34.350, 31.450],
+          [34.362, 31.448],
+          [34.370, 31.455],
+          [34.368, 31.465],
+          [34.358, 31.470],
+          [34.348, 31.468],
+          [34.345, 31.458],
+          [34.350, 31.450]
+        ]]
+      },
+      "properties": {
+        "name": "Central Mixed Zone",
+        "areaM2": 16700,
+        "class": "restorable",
+        "confidence": 55,
+        "baseline_source": "FAO-UNOSAT (demo)",
+        "baseline_date": "2026-01-10",
+        "notes": "Mixed-use area with partial cropland recovery potential"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [34.320, 31.380],
+          [34.335, 31.378],
+          [34.345, 31.385],
+          [34.348, 31.395],
+          [34.340, 31.405],
+          [34.325, 31.408],
+          [34.315, 31.400],
+          [34.318, 31.388],
+          [34.320, 31.380]
+        ]]
+      },
+      "properties": {
+        "name": "Gaza City Southwest",
+        "areaM2": 19800,
+        "class": "restorable",
+        "confidence": 64,
+        "baseline_source": "FAO-UNOSAT (demo)",
+        "baseline_date": "2026-01-10",
+        "notes": "Urban fringe with mixed recovery signals"
+      }
+    }
+  ]
+}

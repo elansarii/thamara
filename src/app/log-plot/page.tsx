@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Save, Navigation, Upload, Sparkles, Loader2 } from "lucide-react";
@@ -10,21 +10,32 @@ import { ROUTES } from "@/lib/routes";
 
 export default function LogPlotPage() {
   const router = useRouter();
-  const { lastPlot, setLastPlot } = usePlotStore();
+  const { lastPlot, addPlot, draftPlot, setDraftPlot } = usePlotStore();
   const [step, setStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [plot, setPlot] = useState<PlotDraft>(
-    lastPlot || {
-      locationMethod: "none",
-      salinity: "unknown",
-      contamination: "unknown",
-      debris: "unknown",
-      waterAccess: "unknown",
+  
+  // Merge draftPlot from map if available
+  const initialPlot: PlotDraft = {
+    locationMethod: "none",
+    salinity: "unknown",
+    contamination: "unknown",
+    debris: "unknown",
+    waterAccess: "unknown",
+    ...(lastPlot || {}),
+    ...(draftPlot || {}),
+  };
+  
+  const [plot, setPlot] = useState<PlotDraft>(initialPlot);
+  
+  // Clear draft after loading (in effect to avoid setState during render)
+  useEffect(() => {
+    if (draftPlot) {
+      setDraftPlot(null);
     }
-  );
+  }, [draftPlot, setDraftPlot]);
 
   const updatePlot = (updates: Partial<PlotDraft>) => {
     setPlot((prev) => ({ ...prev, ...updates }));
@@ -34,7 +45,7 @@ export default function LogPlotPage() {
     setIsSubmitting(true);
     // Simulate AI processing assessment
     setTimeout(() => {
-      setLastPlot(plot);
+      addPlot(plot);
       setIsSubmitting(false);
       router.push(ROUTES.ASSESSMENT);
     }, 2500);

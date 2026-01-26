@@ -1,0 +1,9 @@
+{
+  "pack_id": "demo-gaza-v1",
+  "version": "1.0.0",
+  "updated_at": "2026-01-15",
+  "source_name": "FAO-UNOSAT Demo Pack",
+  "source_desc": "Synthetic plantability layer for Gaza Strip demonstrating AI-informed cropland assessment",
+  "bbox": [34.216, 31.216, 34.574, 31.593],
+  "notes": "Demo data for MVP. Coverage is limited to selected areas within Gaza City and Khan Yunis regions."
+}
