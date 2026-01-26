@@ -4,10 +4,10 @@ import { Wifi, WifiOff, Battery, Globe, Volume2 } from 'lucide-react';
 
 export default function TopBar() {
   return (
-    <header 
-      className="fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-5 border-b backdrop-blur-sm"
-      style={{ 
-        background: 'var(--thamara-surface)', 
+    <header
+      className="absolute top-0 left-0 right-0 h-16 flex items-center justify-between px-5 border-b backdrop-blur-sm"
+      style={{
+        background: 'var(--thamara-surface)',
         borderColor: 'var(--thamara-border)',
         boxShadow: 'var(--thamara-shadow-sm)',
         zIndex: 100

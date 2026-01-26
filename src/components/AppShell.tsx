@@ -29,7 +29,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {isHome && (
           <Link
             href={FAB_ROUTE}
-            className="fixed bottom-24 right-6 w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 group"
+            className="absolute bottom-24 right-6 w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 group"
             style={{
               background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
               boxShadow: '0 8px 16px -4px rgba(124, 179, 66, 0.4), 0 4px 8px -2px rgba(0, 0, 0, 0.1)',
