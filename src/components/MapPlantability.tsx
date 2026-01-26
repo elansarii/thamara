@@ -57,6 +57,26 @@ export default function MapPlantability() {
   const [filterCropId, setFilterCropId] = useState<string | null>(null);
   const [waterPoints, setWaterPoints] = useState<WaterPoint[]>([]);
 
+  // Hide bottom navbar when any info panel is open
+  useEffect(() => {
+    const bottomNav = document.getElementById('bottom-nav');
+    if (bottomNav) {
+      if (selectedZone || selectedSeedSource || selectedWaterPoint) {
+        bottomNav.style.display = 'none';
+      } else {
+        bottomNav.style.display = 'flex';
+      }
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      const bottomNav = document.getElementById('bottom-nav');
+      if (bottomNav) {
+        bottomNav.style.display = 'flex';
+      }
+    };
+  }, [selectedZone, selectedSeedSource, selectedWaterPoint]);
+
   // Load water points from database
   useEffect(() => {
     const loadWaterPoints = async () => {
@@ -426,7 +446,7 @@ export default function MapPlantability() {
 
       {/* Map Error Banner */}
       {mapError && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2">
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2">
           <AlertTriangle className="w-4 h-4" />
           Map tiles offline; overlay data still available
         </div>
@@ -435,13 +455,13 @@ export default function MapPlantability() {
       {/* Layer Info Button */}
       <button
         onClick={() => setShowManifest(true)}
-        className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50 transition"
+        className="absolute top-20 right-4 bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50 transition"
       >
         <Info className="w-5 h-5 text-gray-700" />
       </button>
 
       {/* Layer Toggles */}
-      <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-3 space-y-2">
+      <div className="absolute top-20 left-4 bg-white rounded-lg shadow-lg p-3 space-y-2">
         <label className="flex items-center gap-2 text-sm cursor-pointer">
           <input
             type="checkbox"

@@ -131,7 +131,7 @@ function CropResultsContent() {
       </div>
       
       {/* Results */}
-      <div className="p-4 space-y-4 pb-24">
+      <div className="p-4 space-y-4 pb-32">
         <h2 className="font-semibold" style={{ color: 'var(--thamara-text-primary)' }}>
           Top Recommendations
         </h2>
@@ -267,10 +267,10 @@ function CropCard({
     >
       {/* Content */}
       <div className="p-4 space-y-3">
-        {/* Header with image and title */}
+        {/* Header with title */}
         <div className="flex gap-3">
-          {/* Image */}
-          {enriched?.imageUrl && (
+          {/* Image - Hidden as images aren't loading */}
+          {/* {enriched?.imageUrl && (
             <div 
               className="relative flex-shrink-0 rounded-lg overflow-hidden"
               style={{ 
@@ -279,14 +279,13 @@ function CropCard({
                 background: 'var(--thamara-bg-secondary)'
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={enriched.imageUrl}
                 alt={crop.commonName}
                 className="w-full h-full object-cover"
               />
             </div>
-          )}
+          )} */}
           
           {/* Title and badges */}
           <div className="flex-1 min-w-0">
