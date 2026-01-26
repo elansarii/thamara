@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/* Thamara Modern Color Scheme - Professional & Accessible */
+:root {
+  /* Primary Colors - Forest Green (Professional agricultural identity) */
+  --thamara-primary-900: #1A3A0F;
+  --thamara-primary-700: #2D5016;
+  --thamara-primary-600: #3A7D44;
+  --thamara-primary-500: #4A7C59;
+  --thamara-primary-400: #6B8E70;
+  --thamara-primary-300: #8BA888;
+  --thamara-primary-200: #B5D4B0;
+  --thamara-primary-100: #D8EDD5;
+  --thamara-primary-50: #F0F8EE;
+
+  /* Secondary Colors - Sage & Earth Tones */
+  --thamara-secondary-700: #556B2F;
+  --thamara-secondary-500: #6B8E70;
+  --thamara-secondary-300: #8BA888;
+  --thamara-secondary-100: #C8D9C4;
+
+  /* Accent Colors - Fresh Lime (CTAs & Actions) */
+  --thamara-accent-700: #5A9216;
+  --thamara-accent-600: #6BA31E;
+  --thamara-accent-500: #7CB342;
+  --thamara-accent-400: #8BC34A;
+  --thamara-accent-300: #AED581;
+  
+  /* Status Colors */
+  --thamara-success: #6B8E70;
+  --thamara-warning: #F5A623;
+  --thamara-error: #C86432;
+  --thamara-info: #4A90E2;
+
+  /* Neutral Colors - Warm & Professional */
+  --thamara-bg: #FAF9F6;
+  --thamara-bg-secondary: #F5F3EF;
+  --thamara-surface: #FFFFFF;
+  --thamara-surface-hover: #F8F8F8;
+  --thamara-border: #E5E3DF;
+  --thamara-border-light: #F0EFE9;
+  --thamara-divider: #E8E6E0;
+
+  /* Text Colors - High Contrast */
+  --thamara-text-primary: #2C2C2C;
+  --thamara-text-secondary: #5A5A5A;
+  --thamara-text-muted: #757575;
+  --thamara-text-disabled: #ABABAB;
+  --thamara-text-on-primary: #FFFFFF;
+  --thamara-text-on-accent: #FFFFFF;
+
+  /* Shadows & Elevation */
+  --thamara-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --thamara-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --thamara-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --thamara-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Spacing & Border Radius */
+  --thamara-radius-sm: 6px;
+  --thamara-radius-md: 10px;
+  --thamara-radius-lg: 16px;
+  --thamara-radius-xl: 20px;
+  --thamara-radius-full: 9999px;
+
+  /* Legacy compatibility aliases */
+  --thamara-seedlight: var(--thamara-primary-100);
+  --thamara-sprout: var(--thamara-primary-400);
+  --thamara-field: var(--thamara-primary-700);
+  --thamara-canopy: var(--thamara-primary-600);
+  --thamara-soil: var(--thamara-primary-900);
+  --thamara-text: var(--thamara-text-primary);
+}
+
+/* Mobile frame background */
+body {
+  background: #2a2a2a;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--thamara-text);
+}
