@@ -15,7 +15,7 @@ export default function HomePage() {
   const totalAreaHa = (totalArea / 10000).toFixed(2);
   
   return (
-    <div className="p-5 pb-28 space-y-7">
+    <div className="p-5 pb-6 space-y-7">
       {/* Greeting Section with modern typography */}
       <section className="pt-3">
         <h1 
