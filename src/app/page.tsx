@@ -1,8 +1,13 @@
+"use client";
+
 import Link from 'next/link';
-import { MapPin, Sprout, Droplet, Users, TrendingUp, MapPinned, Plus } from 'lucide-react';
+import { MapPin, Sprout, Droplet, Users, TrendingUp, MapPinned, Plus, ClipboardCheck } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
+import { usePlotStore } from '@/lib/plotStore';
+import { assess } from '@/lib/assessment';
 
 export default function HomePage() {
+  const { lastPlot } = usePlotStore();
   return (
     <div className="p-5 pb-28 space-y-7">
       {/* Greeting Section with modern typography */}
@@ -47,6 +52,83 @@ export default function HomePage() {
           href={ROUTES.EXCHANGE}
           gradient="from-orange-500 to-orange-600"
         />
+      </section>
+
+      {/* Last Logged Plot Card */}
+      <section 
+        className="rounded-2xl p-6 border transition-all hover:shadow-md"
+        style={{ 
+          background: 'var(--thamara-surface)', 
+          borderColor: 'var(--thamara-border)',
+          boxShadow: 'var(--thamara-shadow-sm)'
+        }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 
+            className="text-xl font-bold"
+            style={{ color: 'var(--thamara-text-primary)' }}
+          >
+            Last Logged Plot
+          </h2>
+          <ClipboardCheck 
+            size={20} 
+            strokeWidth={2.5}
+            style={{ color: 'var(--thamara-accent-500)' }}
+          />
+        </div>
+        {lastPlot ? (
+          <div className="space-y-3">
+            <div>
+              <div 
+                className="text-lg font-semibold mb-1"
+                style={{ color: 'var(--thamara-text-primary)' }}
+              >
+                {lastPlot.name || "Unnamed Plot"}
+              </div>
+              {lastPlot.areaM2 && (
+                <div 
+                  className="text-sm"
+                  style={{ color: 'var(--thamara-text-secondary)' }}
+                >
+                  {(lastPlot.areaM2 / 10000).toFixed(2)} ha
+                </div>
+              )}
+            </div>
+            <div>
+              <StatusBadge status={assess(lastPlot).status} />
+            </div>
+            <Link
+              href={ROUTES.ASSESSMENT}
+              className="block w-full py-2.5 rounded-xl text-center text-sm font-semibold transition-all hover:opacity-80"
+              style={{ 
+                background: 'var(--thamara-accent-500)',
+                color: 'white'
+              }}
+            >
+              View Assessment
+            </Link>
+          </div>
+        ) : (
+          <div className="text-center py-4">
+            <p 
+              className="text-sm mb-3"
+              style={{ color: 'var(--thamara-text-muted)' }}
+            >
+              No plots logged yet
+            </p>
+            <Link
+              href={ROUTES.LOG_PLOT}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-80"
+              style={{ 
+                background: 'var(--thamara-accent-500)',
+                color: 'white'
+              }}
+            >
+              <Plus size={16} strokeWidth={2.5} />
+              Log Your First Plot
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* My Impact Card - Enhanced visual hierarchy */}
@@ -177,5 +259,27 @@ function ImpactStat({ label, value }: { label: string; value: string }) {
         {label}
       </div>
     </div>
+  );
+}
+
+// Status Badge Component
+function StatusBadge({ status }: { status: "Farmable" | "Restorable" | "Damaged" }) {
+  const colors = {
+    Farmable: { bg: '#dcfce7', text: '#15803d', border: '#86efac' },
+    Restorable: { bg: '#fef3c7', text: '#b45309', border: '#fcd34d' },
+    Damaged: { bg: '#fee2e2', text: '#b91c1c', border: '#fca5a5' },
+  };
+  
+  return (
+    <span 
+      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border"
+      style={{ 
+        background: colors[status].bg,
+        color: colors[status].text,
+        borderColor: colors[status].border
+      }}
+    >
+      {status}
+    </span>
   );
 }

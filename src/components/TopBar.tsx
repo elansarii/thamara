@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { Wifi, WifiOff, Battery, Globe, Volume2 } from 'lucide-react';
 
 export default function TopBar() {
@@ -12,7 +13,7 @@ export default function TopBar() {
       }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2 cursor-pointer">
         <Image 
           src="/thamara_logo.svg" 
           alt="Thamara" 
@@ -20,7 +21,7 @@ export default function TopBar() {
           height={110}
           className="object-contain"
         />
-      </div>
+      </Link>
 
       {/* Status badges - Modern pill design */}
       <div className="flex items-center gap-2.5">

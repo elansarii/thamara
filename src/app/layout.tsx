@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import AppFrame from "@/components/AppFrame";
 import AppShell from "@/components/AppShell";
+import { PlotProvider } from "@/lib/plotStore";
 
 export const metadata: Metadata = {
   title: "Thamara - Farm Recovery & Coordination",
@@ -16,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
-        <AppFrame>
-          <AppShell>{children}</AppShell>
-        </AppFrame>
+        <PlotProvider>
+          <AppFrame>
+            <AppShell>{children}</AppShell>
+          </AppFrame>
+        </PlotProvider>
       </body>
     </html>
   );
