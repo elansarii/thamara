@@ -311,7 +311,7 @@ export default function WaterPointMap() {
           </button>
 
           {/* Legend */}
-          <div className="absolute bottom-6 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
+          <div className="absolute bottom-24 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
             <h3 className="font-semibold text-sm mb-3 text-gray-900">Reliability</h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">

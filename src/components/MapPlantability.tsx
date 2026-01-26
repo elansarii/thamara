@@ -495,7 +495,7 @@ export default function MapPlantability() {
 
       {/* Legend */}
       {showPlantability && (
-        <div className="absolute bottom-6 right-4 bg-white rounded-lg shadow-lg p-4">
+        <div className="absolute bottom-24 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
           <h3 className="font-semibold text-sm mb-3 text-gray-900">
             Plantability
           </h3>
@@ -522,7 +522,7 @@ export default function MapPlantability() {
       )}
 
       {showSeedSources && !showWaterPoints && (
-        <div className="absolute bottom-6 right-4 bg-white rounded-lg shadow-lg p-4">
+        <div className="absolute bottom-24 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
           <h3 className="font-semibold text-sm mb-3 text-gray-900 flex items-center gap-2">
             <MapPin className="w-4 h-4 text-green-600" />
             Seed Sources
@@ -548,7 +548,7 @@ export default function MapPlantability() {
       )}
 
       {showWaterPoints && (
-        <div className="absolute bottom-6 right-4 bg-white rounded-lg shadow-lg p-4">
+        <div className="absolute bottom-24 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
           <h3 className="font-semibold text-sm mb-3 text-gray-900 flex items-center gap-2">
             <Droplets className="w-4 h-4 text-blue-600" />
             Water Points

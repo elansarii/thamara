@@ -18,11 +18,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col" style={{ background: 'var(--thamara-bg)' }}>
+    <div className="flex flex-col" style={{ background: 'var(--thamara-bg)', height: '100%' }}>
       <TopBar />
 
-      {/* Main content area with scroll */}
-      <main className="flex-1 overflow-y-auto relative" style={{ minHeight: 0 }}>
+      {/* Main content area with scroll - padding bottom for fixed nav */}
+      <main className="flex-1 overflow-y-auto relative" style={{ minHeight: 0, paddingBottom: '5rem' }}>
         {children}
 
         {/* FAB - Floating Action Button - Only show on home screen */}
