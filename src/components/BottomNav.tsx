@@ -17,7 +17,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="sticky bottom-0 h-20 flex items-center justify-around border-t backdrop-blur-sm z-50"
+      className="h-20 flex items-center justify-around border-t backdrop-blur-sm flex-shrink-0"
       style={{
         background: 'var(--thamara-surface)',
         borderColor: 'var(--thamara-border)',
