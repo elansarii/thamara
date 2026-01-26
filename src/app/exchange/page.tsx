@@ -176,38 +176,55 @@ export default function ExchangePage() {
   
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--thamara-bg)' }}>
-      {/* Header */}
-      <div className="flex-shrink-0 px-5 pt-5 pb-4 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-              Exchange Hub
-            </h1>
-            <p className="text-sm" style={{ color: 'var(--thamara-text-secondary)' }}>
-              Swap inputs. Find help. Coordinate locally.
-            </p>
-          </div>
-          <div
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold"
-            style={{
-              background: 'var(--thamara-primary-50)',
-              color: 'var(--thamara-primary-700)',
-              borderRadius: 'var(--thamara-radius-full)',
-              border: '1px solid var(--thamara-primary-200)',
-            }}
-          >
-            <ShieldCheck size={12} strokeWidth={2.5} />
-            <span>Offline-ready</span>
+      {/* Sticky Header - Minimal */}
+      <div className="sticky top-0 z-10 flex-shrink-0 px-4 py-3 border-b shadow-sm" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <h1 className="text-xl font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
+            Exchange Hub
+          </h1>
+          <div className="flex items-center gap-2">
+            <div
+              className="flex items-center gap-1 px-2 py-1 text-xs font-semibold whitespace-nowrap"
+              style={{
+                background: 'var(--thamara-primary-50)',
+                color: 'var(--thamara-primary-700)',
+                borderRadius: 'var(--thamara-radius-full)',
+                border: '1px solid var(--thamara-primary-200)',
+              }}
+            >
+              <ShieldCheck size={11} strokeWidth={2.5} />
+              <span className="hidden sm:inline">Offline</span>
+            </div>
+            <div className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>
+              {displayedListings.length}
+            </div>
           </div>
         </div>
         
-        <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>
-          Last sync: Not available in MVP
-        </p>
+        {/* Search bar */}
+        <div className="relative">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2"
+            style={{ color: 'var(--thamara-text-muted)' }}
+          />
+          <input
+            type="text"
+            placeholder={mode === 'inputs' ? 'Search seeds, tools...' : mode === 'labor' ? 'Search services...' : 'Search hubs...'}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border"
+            style={{
+              background: 'var(--thamara-bg)',
+              borderColor: 'var(--thamara-border)',
+              color: 'var(--thamara-text-primary)',
+            }}
+          />
+        </div>
       </div>
       
-      {/* Mode tabs */}
-      <div className="flex-shrink-0 px-5 py-3 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+      {/* Mode tabs - Non-sticky */}
+      <div className="flex-shrink-0 px-4 py-2 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
         <div className="flex gap-2">
           {(Object.keys(MODE_CONFIGS) as ListingMode[]).map((m) => {
             const config = MODE_CONFIGS[m];
@@ -222,176 +239,123 @@ export default function ExchangePage() {
                   setCategoryFilter('all');
                   setTypeFilter(undefined);
                 }}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all"
                 style={{
                   background: isActive ? 'var(--thamara-primary-500)' : 'var(--thamara-bg-secondary)',
                   color: isActive ? 'var(--thamara-text-on-primary)' : 'var(--thamara-text-secondary)',
                 }}
               >
-                <Icon size={16} strokeWidth={2.5} />
-                {config.label}
+                <Icon size={14} strokeWidth={2.5} />
+                <span className="hidden sm:inline">{config.label}</span>
               </button>
             );
           })}
         </div>
       </div>
       
-      {/* Search & Filters */}
-      <div className="flex-shrink-0 px-5 py-3 space-y-3 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
-        {/* Search bar */}
-        <div className="relative">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2"
-            style={{ color: 'var(--thamara-text-muted)' }}
-          />
-          <input
-            type="text"
-            placeholder={mode === 'inputs' ? 'Search seeds, tools...' : mode === 'labor' ? 'Search services...' : 'Search hubs...'}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border"
-            style={{
-              background: 'var(--thamara-bg)',
-              borderColor: 'var(--thamara-border)',
-              color: 'var(--thamara-text-primary)',
-            }}
-          />
-        </div>
-        
-        {/* Filter chips */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {/* Type filter (not for hubs) */}
-          {mode !== 'hubs' && (
-            <>
-              <button
-                onClick={() => setTypeFilter(typeFilter === 'offer' ? undefined : 'offer')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all flex-shrink-0"
-                style={{
-                  background: typeFilter === 'offer' ? 'var(--thamara-accent-500)' : 'var(--thamara-bg-secondary)',
-                  color: typeFilter === 'offer' ? 'var(--thamara-text-on-accent)' : 'var(--thamara-text-secondary)',
-                }}
-              >
-                <TrendingUp size={12} strokeWidth={2.5} />
-                Offers
-              </button>
-              <button
-                onClick={() => setTypeFilter(typeFilter === 'request' ? undefined : 'request')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all flex-shrink-0"
-                style={{
-                  background: typeFilter === 'request' ? 'var(--thamara-accent-500)' : 'var(--thamara-bg-secondary)',
-                  color: typeFilter === 'request' ? 'var(--thamara-text-on-accent)' : 'var(--thamara-text-secondary)',
-                }}
-              >
-                <AlertTriangle size={12} strokeWidth={2.5} />
-                Requests
-              </button>
-            </>
-          )}
-          
-          {/* Category chips */}
-          {MODE_CONFIGS[mode].categories.slice(1).map((cat) => {
-            const Icon = cat.icon;
-            const isActive = categoryFilter === cat.value;
+      {/* Filters - Collapsible, Non-sticky */}
+      <div className="flex-shrink-0 px-4 py-2 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-bg)' }}>
+        <div className="flex items-center gap-2 mb-2">
+          <Filter size={14} style={{ color: 'var(--thamara-text-muted)' }} />
+          <span className="text-xs font-semibold" style={{ color: 'var(--thamara-text-muted)' }}>
+            Filters:
+          </span>
+          <div className="flex gap-1 flex-wrap flex-1">
+            {/* Type filter (not for hubs) */}
+            {mode !== 'hubs' && (
+              <>
+                <button
+                  onClick={() => setTypeFilter(typeFilter === 'offer' ? undefined : 'offer')}
+                  className="px-2 py-1 text-xs font-semibold rounded-md transition-all"
+                  style={{
+                    background: typeFilter === 'offer' ? 'var(--thamara-accent-500)' : 'var(--thamara-bg-secondary)',
+                    color: typeFilter === 'offer' ? 'white' : 'var(--thamara-text-secondary)',
+                  }}
+                >
+                  Offers
+                </button>
+                <button
+                  onClick={() => setTypeFilter(typeFilter === 'request' ? undefined : 'request')}
+                  className="px-2 py-1 text-xs font-semibold rounded-md transition-all"
+                  style={{
+                    background: typeFilter === 'request' ? 'var(--thamara-warning)' : 'var(--thamara-bg-secondary)',
+                    color: typeFilter === 'request' ? 'white' : 'var(--thamara-text-secondary)',
+                  }}
+                >
+                  Requests
+                </button>
+              </>
+            )}
             
-            return (
-              <button
-                key={cat.value}
-                onClick={() => setCategoryFilter(isActive ? 'all' : cat.value)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all flex-shrink-0"
-                style={{
-                  background: isActive ? 'var(--thamara-primary-500)' : 'var(--thamara-bg-secondary)',
-                  color: isActive ? 'var(--thamara-text-on-primary)' : 'var(--thamara-text-secondary)',
-                }}
-              >
-                <Icon size={12} strokeWidth={2.5} />
-                {cat.label}
-              </button>
-            );
-          })}
-          
-          {/* Distance filter */}
-          <button
-            onClick={() => setDistanceFilter(distanceFilter === 'near' ? 'any' : 'near')}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all flex-shrink-0"
-            style={{
-              background: distanceFilter === 'near' ? 'var(--thamara-info)' : 'var(--thamara-bg-secondary)',
-              color: distanceFilter === 'near' ? 'white' : 'var(--thamara-text-secondary)',
-            }}
-          >
-            <MapPin size={12} strokeWidth={2.5} />
-            Near Only
-          </button>
-          
-          {/* Trust filter */}
-          <button
-            onClick={() => setTrustFilter(!trustFilter)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all flex-shrink-0"
-            style={{
-              background: trustFilter ? 'var(--thamara-success)' : 'var(--thamara-bg-secondary)',
-              color: trustFilter ? 'white' : 'var(--thamara-text-secondary)',
-            }}
-          >
-            <ShieldCheck size={12} strokeWidth={2.5} />
-            Verified Only
-          </button>
-          
-          {/* Urgency filter */}
-          <select
-            value={urgencyFilter}
-            onChange={(e) => setUrgencyFilter(e.target.value)}
-            className="px-3 py-1.5 text-xs font-semibold rounded-full border flex-shrink-0"
-            style={{
-              background: urgencyFilter !== 'any' ? 'var(--thamara-warning)' : 'var(--thamara-bg-secondary)',
-              borderColor: 'var(--thamara-border)',
-              color: urgencyFilter !== 'any' ? 'white' : 'var(--thamara-text-secondary)',
-            }}
-          >
-            <option value="any">Any Time</option>
-            <option value="today">Today</option>
-            <option value="week">This Week</option>
-          </select>
-        </div>
-        
-        {/* Sort */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold" style={{ color: 'var(--thamara-text-muted)' }}>
-              Sort by:
-            </span>
+            {/* Category dropdown */}
             <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="px-3 py-1 text-xs font-semibold rounded-md border"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-2 py-1 text-xs font-semibold rounded-md border"
               style={{
-                background: 'var(--thamara-bg)',
+                background: categoryFilter !== 'all' ? 'var(--thamara-primary-500)' : 'var(--thamara-bg-secondary)',
                 borderColor: 'var(--thamara-border)',
-                color: 'var(--thamara-text-primary)',
+                color: categoryFilter !== 'all' ? 'white' : 'var(--thamara-text-secondary)',
               }}
             >
-              <option value="ai_match">AI Match</option>
-              <option value="newest">Newest</option>
-              <option value="closest">Closest</option>
-              <option value="quantity">Quantity</option>
+              {MODE_CONFIGS[mode].categories.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
+              ))}
             </select>
+            
+            <button
+              onClick={() => setDistanceFilter(distanceFilter === 'near' ? 'any' : 'near')}
+              className="px-2 py-1 text-xs font-semibold rounded-md transition-all"
+              style={{
+                background: distanceFilter === 'near' ? 'var(--thamara-info)' : 'var(--thamara-bg-secondary)',
+                color: distanceFilter === 'near' ? 'white' : 'var(--thamara-text-secondary)',
+              }}
+            >
+              Near
+            </button>
+            
+            <button
+              onClick={() => setTrustFilter(!trustFilter)}
+              className="px-2 py-1 text-xs font-semibold rounded-md transition-all"
+              style={{
+                background: trustFilter ? 'var(--thamara-success)' : 'var(--thamara-bg-secondary)',
+                color: trustFilter ? 'white' : 'var(--thamara-text-secondary)',
+              }}
+            >
+              Verified
+            </button>
           </div>
           
-          <div className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>
-            {displayedListings.length} listing{displayedListings.length !== 1 ? 's' : ''}
-          </div>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortOption)}
+            className="px-2 py-1 text-xs font-semibold rounded-md border"
+            style={{
+              background: 'var(--thamara-bg-secondary)',
+              borderColor: 'var(--thamara-border)',
+              color: 'var(--thamara-text-secondary)',
+            }}
+          >
+            <option value="ai_match">AI Match</option>
+            <option value="newest">Newest</option>
+            <option value="closest">Closest</option>
+            <option value="quantity">Quantity</option>
+          </select>
         </div>
       </div>
       
-      {/* Listings */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+      {/* Listings - Compact */}
+      <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
         {displayedListings.length === 0 ? (
           <div className="text-center py-12">
-            <Package size={48} style={{ color: 'var(--thamara-text-muted)', margin: '0 auto 16px' }} />
+            <Package size={40} style={{ color: 'var(--thamara-text-muted)', margin: '0 auto 12px' }} />
             <p className="text-sm font-semibold mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
               No listings found
             </p>
             <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>
-              Try adjusting your filters or create a new listing
+              Try adjusting your filters
             </p>
           </div>
         ) : (
@@ -410,31 +374,31 @@ export default function ExchangePage() {
         )}
       </div>
       
-      {/* Floating Action Button */}
-      <div className="flex-shrink-0 p-5">
+      {/* Floating Action Button - Fixed */}
+      <div className="sticky bottom-0 flex-shrink-0 p-3 border-t" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)', boxShadow: '0 -2px 8px rgba(0,0,0,0.1)' }}>
         {mode === 'hubs' ? (
           <button
             onClick={() => setShowBundleGenerator(true)}
-            className="w-full flex items-center justify-center gap-2 px-6 py-4 text-base font-bold rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold rounded-lg shadow-md transition-all active:scale-95"
             style={{
               background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
               color: 'var(--thamara-text-on-accent)',
             }}
           >
-            <Sparkles size={20} strokeWidth={2.5} />
-            Generate Request Bundle
+            <Sparkles size={18} strokeWidth={2.5} />
+            Generate Bundle
           </button>
         ) : (
           <button
             onClick={() => setShowCreateModal(true)}
-            className="w-full flex items-center justify-center gap-2 px-6 py-4 text-base font-bold rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold rounded-lg shadow-md transition-all active:scale-95"
             style={{
               background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
               color: 'var(--thamara-text-on-accent)',
             }}
           >
-            <Plus size={20} strokeWidth={2.5} />
-            Post {typeFilter === 'offer' ? 'Offer' : typeFilter === 'request' ? 'Request' : 'Offer/Request'}
+            <Plus size={18} strokeWidth={2.5} />
+            Post Listing
           </button>
         )}
       </div>
@@ -533,149 +497,135 @@ function ListingCard({
   
   return (
     <div
-      className="p-4 rounded-xl border shadow-sm"
+      className="p-3 rounded-lg border"
       style={{
         background: 'var(--thamara-surface)',
         borderColor: 'var(--thamara-border)',
       }}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-start gap-3 flex-1">
-          <div
-            className="flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0"
-            style={{
-              background: 'var(--thamara-primary-100)',
-              color: 'var(--thamara-primary-700)',
-            }}
-          >
-            <CategoryIcon size={20} strokeWidth={2.5} />
+      {/* Compact Header */}
+      <div className="flex items-start gap-2 mb-2">
+        <div
+          className="flex items-center justify-center w-8 h-8 rounded-md flex-shrink-0"
+          style={{
+            background: 'var(--thamara-primary-100)',
+            color: 'var(--thamara-primary-700)',
+          }}
+        >
+          <CategoryIcon size={16} strokeWidth={2.5} />
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span
+              className="px-1.5 py-0.5 text-xs font-bold rounded uppercase leading-none"
+              style={{
+                background: listing.type === 'offer' ? 'var(--thamara-success)' : 'var(--thamara-warning)',
+                color: 'white',
+              }}
+            >
+              {listing.type}
+            </span>
+            {matchScore.score >= 70 && (
+              <div className="flex items-center gap-0.5">
+                <Sparkles size={11} style={{ color: 'var(--thamara-accent-600)' }} />
+                <span className="text-xs font-bold" style={{ color: 'var(--thamara-accent-600)' }}>
+                  {matchScore.score}%
+                </span>
+              </div>
+            )}
+            <div className="flex items-center gap-0.5 ml-auto">
+              <TrustIcon size={11} strokeWidth={2.5} style={{ color: trustBadge.color }} />
+            </div>
           </div>
           
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span
-                className="px-2 py-0.5 text-xs font-bold rounded uppercase"
-                style={{
-                  background: listing.type === 'offer' ? 'var(--thamara-success)' : 'var(--thamara-warning)',
-                  color: 'white',
-                }}
-              >
-                {listing.type}
-              </span>
-              {matchScore.score >= 70 && (
-                <div className="flex items-center gap-1">
-                  <Sparkles size={12} style={{ color: 'var(--thamara-accent-600)' }} />
-                  <span className="text-xs font-bold" style={{ color: 'var(--thamara-accent-600)' }}>
-                    {matchScore.score}% Match
-                  </span>
-                </div>
+          <h3 className="text-sm font-bold leading-tight mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
+            {listing.title}
+          </h3>
+          
+          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
+            <span className="font-semibold">
+              {listing.quantity} {listing.unit}
+            </span>
+            <span>•</span>
+            <span className="truncate">{listing.locationLabel.split('–')[0].trim()}</span>
+            <span
+              className="px-1.5 py-0.5 rounded text-xs font-semibold"
+              style={{
+                background: 'var(--thamara-primary-50)',
+                color: 'var(--thamara-primary-700)',
+              }}
+            >
+              {listing.distanceBand}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Compact Details - Only show if important */}
+      {(listing.notes || (isHub && listing.availableItems) || listing.dateTime) && (
+        <div className="mb-2 space-y-1">
+          {listing.dateTime && (
+            <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
+              <Clock size={12} strokeWidth={2.5} />
+              <span>{listing.dateTime}</span>
+            </div>
+          )}
+          
+          {listing.notes && !isHub && (
+            <p className="text-xs leading-snug line-clamp-2" style={{ color: 'var(--thamara-text-secondary)' }}>
+              {listing.notes}
+            </p>
+          )}
+          
+          {isHub && listing.availableItems && (
+            <div className="flex flex-wrap gap-1">
+              {listing.availableItems.slice(0, 3).map((item, i) => (
+                <span
+                  key={i}
+                  className="px-1.5 py-0.5 text-xs rounded"
+                  style={{
+                    background: 'var(--thamara-accent-100)',
+                    color: 'var(--thamara-accent-700)',
+                  }}
+                >
+                  {item}
+                </span>
+              ))}
+              {listing.availableItems.length > 3 && (
+                <span className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>
+                  +{listing.availableItems.length - 3}
+                </span>
               )}
             </div>
-            
-            <h3 className="text-base font-bold mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-              {listing.title}
-            </h3>
-            
-            <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
-              <span className="font-semibold">
-                {listing.quantity} {listing.unit}
-              </span>
-              <span>•</span>
-              <div className="flex items-center gap-1">
-                <TrustIcon size={12} strokeWidth={2.5} />
-                <span style={{ color: trustBadge.color }}>{trustBadge.label}</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-      </div>
+      )}
       
-      {/* Details */}
-      <div className="space-y-2 mb-3">
-        <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
-          <MapPin size={14} strokeWidth={2.5} />
-          <span>{listing.locationLabel}</span>
-          <span
-            className="px-2 py-0.5 rounded-full text-xs font-semibold"
-            style={{
-              background: 'var(--thamara-primary-50)',
-              color: 'var(--thamara-primary-700)',
-            }}
-          >
-            {listing.distanceBand}
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
-          <Clock size={14} strokeWidth={2.5} />
-          <span>
-            {listing.urgency === 'today' ? 'Available today' : listing.urgency === 'week' ? 'This week' : 'Flexible timing'}
-          </span>
-        </div>
-        
-        {listing.dateTime && (
-          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
-            <Calendar size={14} strokeWidth={2.5} />
-            <span>{listing.dateTime}</span>
-          </div>
-        )}
-        
-        {listing.notes && (
-          <p className="text-xs leading-relaxed pt-1" style={{ color: 'var(--thamara-text-secondary)' }}>
-            {listing.notes}
-          </p>
-        )}
-        
-        {isHub && listing.availableItems && (
-          <div className="flex flex-wrap gap-1 pt-1">
-            {listing.availableItems.map((item, i) => (
-              <span
-                key={i}
-                className="px-2 py-1 text-xs rounded-md"
-                style={{
-                  background: 'var(--thamara-accent-100)',
-                  color: 'var(--thamara-accent-700)',
-                }}
-              >
-                {item}
-              </span>
-            ))}
-          </div>
-        )}
-        
-        {isHub && listing.hours && (
-          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
-            <Clock size={14} strokeWidth={2.5} />
-            <span>{listing.hours}</span>
-          </div>
-        )}
-      </div>
-      
-      {/* Actions */}
-      <div className="flex gap-2 pt-2 border-t" style={{ borderColor: 'var(--thamara-border)' }}>
+      {/* Compact Actions */}
+      <div className="flex gap-1.5">
         <button
           onClick={() => onViewMatches(listing)}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all"
+          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-all"
           style={{
             background: 'var(--thamara-primary-500)',
             color: 'var(--thamara-text-on-primary)',
           }}
         >
-          <Sparkles size={16} strokeWidth={2.5} />
-          View Matches
+          <Sparkles size={13} strokeWidth={2.5} />
+          Matches
         </button>
         
         {listing.category === 'fertilizer' && (
           <button
             onClick={() => onShowSafety(listing.category)}
-            className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all"
+            className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-all"
             style={{
               background: 'var(--thamara-warning)',
               color: 'white',
             }}
           >
-            <Info size={16} strokeWidth={2.5} />
+            <Info size={13} strokeWidth={2.5} />
             Safety
           </button>
         )}
