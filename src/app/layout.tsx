@@ -7,6 +7,15 @@ import { PlotProvider } from "@/lib/plotStore";
 export const metadata: Metadata = {
   title: "Thamara - Farm Recovery & Coordination",
   description: "Ultra-lightweight, offline-first farm recovery app for Gaza",
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Thamara',
+  },
 };
 
 export default function RootLayout({
