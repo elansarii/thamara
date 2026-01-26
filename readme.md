@@ -8,7 +8,7 @@ Built for the LifeLines Hackathon 2026 - Problem Statement #1
 
 ## 🔴 LIVE DEMO - TEST NOW
 
-### 🌐 **[YOUR_NETLIFY_URL_HERE](https://thamara-lifelines.netlify.app)**
+### 🌐 **[Link](https://thamara-lifelines.netlify.app)**
 
 **📱 For full experience:** Open the link on your Android phone and install the PWA!
 
@@ -205,7 +205,7 @@ The app will be available at **http://localhost:3000**
 
 ### Scenario: Farmer Returns to Damaged Land
 
-**Live at: [\[YOUR_NETLIFY_URL_HERE\]](https://thamara-lifelines.netlify.app)**
+**Live at: [Link](https://thamara-lifelines.netlify.app)**
 
 1. **Open Map** (Click "Map" in bottom navigation)
    - Show plantability overlay for Gaza region
@@ -348,7 +348,7 @@ Instead of requiring constant connectivity, Thamara packages expert guidance int
 ## 🚢 Deployment
 
 ### Live Deployment
-**Currently deployed on Netlify:** [YOUR_NETLIFY_URL_HERE](https://thamara-lifelines.netlify.app)
+**Currently deployed on Netlify:** [Link](https://thamara-lifelines.netlify.app)
 
 ### Deployment Details
 - Builds to static HTML/CSS/JS
