@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="zucGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#84cc16;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#65a30d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4d7c0f;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect fill="#f7fee7" width="400" height="400"/>
+  <ellipse cx="200" cy="200" rx="140" ry="55" fill="url(#zucGrad)"/>
+  <path d="M 90 195 Q 150 185 200 185 Q 250 185 310 195" stroke="#3f6212" stroke-width="2" fill="none" opacity="0.4"/>
+  <path d="M 85 205 Q 150 215 200 215 Q 250 215 315 205" stroke="#3f6212" stroke-width="2" fill="none" opacity="0.4"/>
+  <ellipse cx="140" cy="200" rx="12" ry="45" fill="#3f6212" opacity="0.25"/>
+  <ellipse cx="200" cy="200" rx="12" ry="45" fill="#3f6212" opacity="0.25"/>
+  <ellipse cx="260" cy="200" rx="12" ry="45" fill="#3f6212" opacity="0.25"/>
+  <ellipse cx="160" cy="185" rx="50" ry="18" fill="#bef264" opacity="0.5"/>
+  <circle cx="65" cy="200" r="12" fill="#fef08a"/>
+</svg>

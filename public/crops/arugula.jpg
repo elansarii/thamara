@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect fill="#f1f8e9" width="400" height="300"/>
+  <ellipse cx="200" cy="150" rx="70" ry="45" fill="#558b2f"/>
+  <path d="M150,150 Q180,120 200,150 Q220,120 250,150" fill="none" stroke="#33691e" stroke-width="2"/>
+  <text x="200" y="270" font-family="Arial" font-size="24" fill="#33691e" text-anchor="middle">Arugula (Rocket)</text>
+</svg>

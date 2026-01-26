@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect fill="#f1f8e9" width="400" height="300"/>
+  <path d="M150,180 Q180,100 210,180" fill="none" stroke="#c62828" stroke-width="8"/>
+  <ellipse cx="150" cy="180" rx="45" ry="35" fill="#66bb6a"/>
+  <ellipse cx="210" cy="180" rx="45" ry="35" fill="#81c784"/>
+  <text x="200" y="270" font-family="Arial" font-size="24" fill="#2e7d32" text-anchor="middle">Swiss Chard</text>
+</svg>

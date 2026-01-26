@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <radialGradient id="radishGrad" cx="35%" cy="35%">
+      <stop offset="0%" style="stop-color:#ff6b9d;stop-opacity:1" />
+      <stop offset="60%" style="stop-color:#e91e63;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c2185b;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <rect fill="#fce7f3" width="400" height="400"/>
+  <!-- Radish bulb -->
+  <ellipse cx="200" cy="240" rx="65" ry="70" fill="url(#radishGrad)"/>
+  <!-- Root tip -->
+  <path d="M 200 310 Q 195 330 200 345" stroke="#f8bbd0" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Root lines -->
+  <path d="M 170 260 Q 160 270 155 275" stroke="#f8bbd0" stroke-width="2" fill="none"/>
+  <path d="M 230 260 Q 240 270 245 275" stroke="#f8bbd0" stroke-width="2" fill="none"/>
+  <!-- Highlight -->
+  <ellipse cx="175" cy="220" rx="20" ry="25" fill="#f48fb1" opacity="0.7"/>
+  <!-- Stem and leaves -->
+  <path d="M 200 170 L 200 200" stroke="#4caf50" stroke-width="8" stroke-linecap="round"/>
+  <!-- Leaves -->
+  <ellipse cx="180" cy="150" rx="35" ry="18" fill="#66bb6a" transform="rotate(-25 180 150)"/>
+  <ellipse cx="220" cy="145" rx="40" ry="20" fill="#66bb6a" transform="rotate(20 220 145)"/>
+  <ellipse cx="190" cy="130" rx="38" ry="19" fill="#81c784" transform="rotate(-10 190 130)"/>
+  <ellipse cx="210" cy="125" rx="35" ry="18" fill="#81c784" transform="rotate(15 210 125)"/>
+  <!-- Leaf veins -->
+  <path d="M 180 140 L 180 160" stroke="#4caf50" stroke-width="1.5" opacity="0.6"/>
+  <path d="M 220 135 L 220 155" stroke="#4caf50" stroke-width="1.5" opacity="0.6"/>
+</svg>

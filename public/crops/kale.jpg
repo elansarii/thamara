@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect fill="#e8f5e9" width="400" height="300"/>
+  <ellipse cx="180" cy="140" rx="55" ry="45" fill="#1b5e20"/>
+  <ellipse cx="220" cy="150" rx="60" ry="50" fill="#2e7d32"/>
+  <path d="M180,140 Q200,100 220,130" fill="none" stroke="#1b5e20" stroke-width="2"/>
+  <text x="200" y="270" font-family="Arial" font-size="24" fill="#1b5e20" text-anchor="middle">Kale</text>
+</svg>

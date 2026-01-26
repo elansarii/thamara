@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Info, X, Navigation, AlertTriangle } from "lucide-react";
+import { Info, X, Navigation, AlertTriangle, MapPin } from "lucide-react";
 import {
   AgroPackManifest,
   PlantabilityGeoJSON,
@@ -13,12 +13,16 @@ import {
 import { explainPlantability } from "@/lib/plantabilityExplain";
 import { usePlotStore } from "@/lib/plotStore";
 import { ROUTES } from "@/lib/routes";
+import { getAllSeedSources, getSeedSourcesForCrop, getSourceTypeLabel, getDaysSinceConfirmation, type SeedSource } from "@/data/seedSources";
+import { getCropById } from "@/data/crops";
 
 export default function MapPlantability() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const marker = useRef<maplibregl.Marker | null>(null);
+  const seedMarkers = useRef<maplibregl.Marker[]>([]);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setDraftPlot } = usePlotStore();
 
   const [manifest, setManifest] = useState<AgroPackManifest | null>(null);
@@ -28,7 +32,27 @@ export default function MapPlantability() {
     lon: number;
     feature: PlantabilityFeature | null;
   } | null>(null);
+  const [selectedSeedSource, setSelectedSeedSource] = useState<SeedSource | null>(null);
   const [mapError, setMapError] = useState(false);
+  const [showSeedSources, setShowSeedSources] = useState(false);
+  const [showPlantability, setShowPlantability] = useState(true);
+  const [filterCropId, setFilterCropId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check for seed layer parameter
+    const layer = searchParams?.get('layer');
+    if (layer === 'seeds') {
+      setShowSeedSources(true);
+      setShowPlantability(false);
+      
+      // Check for specific crop filter
+      const cropId = sessionStorage.getItem('thamara_seed_search_crop');
+      if (cropId) {
+        setFilterCropId(cropId);
+        sessionStorage.removeItem('thamara_seed_search_crop');
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
@@ -61,8 +85,8 @@ export default function MapPlantability() {
           },
         ],
       },
-      center: [34.47, 31.42], // Gaza Strip center
-      zoom: 11,
+      center: [34.35, 31.42], // Gaza Strip center - more to the west
+      zoom: 10,
     });
 
     map.current = mapInstance;
@@ -200,6 +224,76 @@ export default function MapPlantability() {
     };
   }, []);
 
+  // Render seed source markers
+  useEffect(() => {
+    if (!map.current || !showSeedSources) {
+      // Remove existing markers
+      seedMarkers.current.forEach(m => m.remove());
+      seedMarkers.current = [];
+      return;
+    }
+
+    // Get sources to display
+    const sources = filterCropId
+      ? getSeedSourcesForCrop(filterCropId)
+      : getAllSeedSources();
+
+    // Clear existing markers
+    seedMarkers.current.forEach(m => m.remove());
+    seedMarkers.current = [];
+
+    // Add markers for each source
+    sources.forEach(source => {
+      const el = document.createElement('div');
+      el.className = 'seed-source-marker';
+      el.style.cssText = `
+        width: 32px;
+        height: 32px;
+        background-color: #16a34a;
+        border: 3px solid white;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      `;
+
+      const markerInstance = new maplibregl.Marker({ element: el })
+        .setLngLat([source.lng, source.lat])
+        .addTo(map.current!);
+
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setSelectedSeedSource(source);
+        setSelectedZone(null);
+      });
+
+      seedMarkers.current.push(markerInstance);
+    });
+
+    // Fit bounds to show all markers
+    if (sources.length > 0) {
+      const bounds = new maplibregl.LngLatBounds();
+      sources.forEach(source => bounds.extend([source.lng, source.lat]));
+      map.current.fitBounds(bounds, { padding: 50 });
+    }
+  }, [showSeedSources, filterCropId]);
+
+  // Toggle plantability layer visibility
+  useEffect(() => {
+    if (!map.current || !map.current.getLayer('plantability-fill')) return;
+    
+    map.current.setLayoutProperty(
+      'plantability-fill',
+      'visibility',
+      showPlantability ? 'visible' : 'none'
+    );
+    map.current.setLayoutProperty(
+      'plantability-outline',
+      'visibility',
+      showPlantability ? 'visible' : 'none'
+    );
+  }, [showPlantability]);
+
   const handleLogPlot = () => {
     if (!selectedZone) return;
 
@@ -246,31 +340,98 @@ export default function MapPlantability() {
         <Info className="w-5 h-5 text-gray-700" />
       </button>
 
+      {/* Layer Toggles */}
+      <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-3 space-y-2">
+        <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showPlantability}
+            onChange={e => setShowPlantability(e.target.checked)}
+            className="rounded"
+          />
+          <span className="text-gray-700">Plantability</span>
+        </label>
+        <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showSeedSources}
+            onChange={e => {
+              setShowSeedSources(e.target.checked);
+              if (!e.target.checked) {
+                setFilterCropId(null);
+                setSelectedSeedSource(null);
+              }
+            }}
+            className="rounded"
+          />
+          <span className="text-gray-700">Seed Sources</span>
+        </label>
+        {showSeedSources && filterCropId && (
+          <div className="text-xs text-gray-600 border-t pt-2">
+            Showing: {getCropById(filterCropId)?.commonName}
+            <button
+              onClick={() => setFilterCropId(null)}
+              className="text-blue-600 ml-2 hover:text-blue-800"
+            >
+              Clear
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* Legend */}
-      <div className="absolute bottom-24 left-4 bg-white rounded-lg shadow-lg p-4">
-        <h3 className="font-semibold text-sm mb-3 text-gray-900">
-          Plantability
-        </h3>
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded" />
-            <span className="text-gray-700">Farmable</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-amber-500 rounded" />
-            <span className="text-gray-700">Restorable</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-500 rounded" />
-            <span className="text-gray-700">Damaged</span>
-          </div>
-          <div className="text-xs text-gray-500 mt-2 pt-2 border-t">
-            Opacity = confidence
-            <br />
-            Dashed = needs check
+      {showPlantability && (
+        <div className="absolute bottom-6 right-4 bg-white rounded-lg shadow-lg p-4">
+          <h3 className="font-semibold text-sm mb-3 text-gray-900">
+            Plantability
+          </h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-green-500 rounded" />
+              <span className="text-gray-700">Farmable</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-amber-500 rounded" />
+              <span className="text-gray-700">Restorable</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-red-500 rounded" />
+              <span className="text-gray-700">Damaged</span>
+            </div>
+            <div className="text-xs text-gray-500 mt-2 pt-2 border-t">
+              Opacity = confidence
+              <br />
+              Dashed = needs check
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {showSeedSources && (
+        <div className="absolute bottom-6 right-4 bg-white rounded-lg shadow-lg p-4">
+          <h3 className="font-semibold text-sm mb-3 text-gray-900 flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-green-600" />
+            Seed Sources
+          </h3>
+          <div className="text-sm text-gray-700">
+            {filterCropId ? (
+              <p>
+                {getSeedSourcesForCrop(filterCropId).length} sources for{' '}
+                {getCropById(filterCropId)?.commonName}
+              </p>
+            ) : (
+              <p>{getAllSeedSources().length} total sources</p>
+            )}
+          </div>
+          <div className="mt-2 flex items-center gap-2">
+            <div
+              className="w-4 h-4 bg-green-600 border-2 border-white rounded-full"
+              style={{ borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)' }}
+            />
+            <span className="text-xs text-gray-600">Seed source pin</span>
+          </div>
+        </div>
+      )}
 
       {/* Manifest Modal */}
       {showManifest && manifest && (
@@ -318,7 +479,7 @@ export default function MapPlantability() {
       )}
 
       {/* Selection Bottom Sheet */}
-      {selectedZone && (
+      {selectedZone && !selectedSeedSource && (
         <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto">
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-lg font-semibold text-gray-900">
@@ -409,6 +570,127 @@ export default function MapPlantability() {
               </button>
             </>
           )}
+        </div>
+      )}
+
+      {/* Seed Source Info Panel */}
+      {selectedSeedSource && (
+        <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto">
+          <div className="flex justify-between items-start mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-green-600" />
+              Seed Source
+            </h2>
+            <button
+              onClick={() => setSelectedSeedSource(null)}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Source Name and Type */}
+          <div className="mb-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-1">
+              {selectedSeedSource.name}
+            </h3>
+            <span className="inline-block text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full">
+              {getSourceTypeLabel(selectedSeedSource.type)}
+            </span>
+          </div>
+
+          {/* Reliability */}
+          <div className="mb-4">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-600">Reliability</span>
+              <span className="font-semibold text-gray-900">
+                {selectedSeedSource.reliabilityScore}/100
+              </span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full ${
+                  selectedSeedSource.reliabilityScore >= 80
+                    ? 'bg-green-500'
+                    : selectedSeedSource.reliabilityScore >= 60
+                    ? 'bg-yellow-500'
+                    : 'bg-red-500'
+                }`}
+                style={{ width: `${selectedSeedSource.reliabilityScore}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Last Confirmed */}
+          <div className="mb-4 text-sm">
+            <span className="text-gray-600">Last confirmed:</span>
+            <span className="ml-2 font-medium text-gray-900">
+              {selectedSeedSource.lastConfirmed}
+            </span>
+            <span className="ml-2 text-gray-500">
+              ({getDaysSinceConfirmation(selectedSeedSource.lastConfirmed)} days ago)
+            </span>
+          </div>
+
+          {/* Available Crops */}
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">
+              Available Crops ({selectedSeedSource.availableCrops.length})
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {selectedSeedSource.availableCrops.map(cropId => {
+                const crop = getCropById(cropId);
+                return crop ? (
+                  <span
+                    key={cropId}
+                    className={`text-xs px-2 py-1 rounded ${
+                      filterCropId === cropId
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    {crop.commonName}
+                  </span>
+                ) : null;
+              })}
+            </div>
+          </div>
+
+          {/* Notes */}
+          {selectedSeedSource.notes && (
+            <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-900">{selectedSeedSource.notes}</p>
+            </div>
+          )}
+
+          {/* Location */}
+          <div className="mb-4 text-xs text-gray-500">
+            <Navigation className="w-3 h-3 inline mr-1" />
+            {selectedSeedSource.lat.toFixed(6)}, {selectedSeedSource.lng.toFixed(6)}
+          </div>
+
+          {/* Actions */}
+          <div className="space-y-2">
+            {filterCropId && selectedSeedSource.availableCrops.includes(filterCropId) && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-900">
+                ✓ This source has {getCropById(filterCropId)?.commonName} seeds
+              </div>
+            )}
+            <button
+              onClick={() => {
+                // In a real app, this could open directions or copy coordinates
+                if (navigator.clipboard) {
+                  navigator.clipboard.writeText(
+                    `${selectedSeedSource.lat},${selectedSeedSource.lng}`
+                  );
+                  alert('Location copied to clipboard!');
+                }
+              }}
+              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+            >
+              Copy Location
+            </button>
+          </div>
         </div>
       )}
     </div>
