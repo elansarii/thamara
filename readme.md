@@ -416,6 +416,6 @@ netlify deploy --prod
 
 ---
 
-**Built with ❤️ for the farmers of Gaza**
+**Built with love for the farmers of Gaza**
 
 *Thamara (ثمرة) means "fruit" or "outcome" in Arabic - representing the harvest that comes from coordinated effort and resilient farming.*
