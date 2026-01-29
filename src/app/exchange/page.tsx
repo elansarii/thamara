@@ -176,35 +176,29 @@ export default function ExchangePage() {
   
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--thamara-bg)' }}>
-      {/* Sticky Header - Minimal */}
-      <div className="sticky top-0 z-10 flex-shrink-0 px-4 py-3 border-b shadow-sm" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
-        <div className="flex items-center justify-between gap-3 mb-2">
-          <h1 className="text-xl font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
+      {/* Sticky Header - Compact for mobile */}
+      <div className="sticky top-0 z-10 flex-shrink-0 px-4 py-2.5 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <h1 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
             Exchange Hub
           </h1>
-          <div className="flex items-center gap-2">
-            <div
-              className="flex items-center gap-1 px-2 py-1 text-xs font-semibold whitespace-nowrap"
+          <div className="flex items-center gap-1.5">
+            <span
+              className="px-2 py-1 text-[11px] font-semibold rounded-full"
               style={{
                 background: 'var(--thamara-primary-50)',
                 color: 'var(--thamara-primary-700)',
-                borderRadius: 'var(--thamara-radius-full)',
-                border: '1px solid var(--thamara-primary-200)',
               }}
             >
-              <ShieldCheck size={11} strokeWidth={2.5} />
-              <span className="hidden sm:inline">Offline</span>
-            </div>
-            <div className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>
-              {displayedListings.length}
-            </div>
+              {displayedListings.length} items
+            </span>
           </div>
         </div>
-        
-        {/* Search bar */}
+
+        {/* Search bar - Better touch target */}
         <div className="relative">
           <Search
-            size={16}
+            size={18}
             className="absolute left-3 top-1/2 transform -translate-y-1/2"
             style={{ color: 'var(--thamara-text-muted)' }}
           />
@@ -213,7 +207,7 @@ export default function ExchangePage() {
             placeholder={mode === 'inputs' ? 'Search seeds, tools...' : mode === 'labor' ? 'Search services...' : 'Search hubs...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border"
+            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border touch-target"
             style={{
               background: 'var(--thamara-bg)',
               borderColor: 'var(--thamara-border)',
@@ -223,14 +217,14 @@ export default function ExchangePage() {
         </div>
       </div>
       
-      {/* Mode tabs - Non-sticky */}
+      {/* Mode tabs - Full width segmented control */}
       <div className="flex-shrink-0 px-4 py-2 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
-        <div className="flex gap-2">
+        <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'var(--thamara-bg-secondary)' }}>
           {(Object.keys(MODE_CONFIGS) as ListingMode[]).map((m) => {
             const config = MODE_CONFIGS[m];
             const Icon = config.icon;
             const isActive = mode === m;
-            
+
             return (
               <button
                 key={m}
@@ -239,34 +233,31 @@ export default function ExchangePage() {
                   setCategoryFilter('all');
                   setTypeFilter(undefined);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all"
+                className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-md transition-all touch-target"
                 style={{
-                  background: isActive ? 'var(--thamara-primary-500)' : 'var(--thamara-bg-secondary)',
-                  color: isActive ? 'var(--thamara-text-on-primary)' : 'var(--thamara-text-secondary)',
+                  background: isActive ? 'var(--thamara-surface)' : 'transparent',
+                  color: isActive ? 'var(--thamara-primary-700)' : 'var(--thamara-text-muted)',
+                  boxShadow: isActive ? 'var(--thamara-shadow-sm)' : 'none',
                 }}
               >
-                <Icon size={14} strokeWidth={2.5} />
-                <span className="hidden sm:inline">{config.label}</span>
+                <Icon size={16} strokeWidth={2.5} />
+                <span className="truncate">{config.label}</span>
               </button>
             );
           })}
         </div>
       </div>
       
-      {/* Filters - Collapsible, Non-sticky */}
-      <div className="flex-shrink-0 px-4 py-2 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-bg)' }}>
-        <div className="flex items-center gap-2 mb-2">
-          <Filter size={14} style={{ color: 'var(--thamara-text-muted)' }} />
-          <span className="text-xs font-semibold" style={{ color: 'var(--thamara-text-muted)' }}>
-            Filters:
-          </span>
-          <div className="flex gap-1 flex-wrap flex-1">
+      {/* Filters - Horizontal scrolling on mobile */}
+      <div className="flex-shrink-0 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-bg)' }}>
+        <div className="px-4 py-2">
+          <div className="scroll-x-container">
             {/* Type filter (not for hubs) */}
             {mode !== 'hubs' && (
               <>
                 <button
                   onClick={() => setTypeFilter(typeFilter === 'offer' ? undefined : 'offer')}
-                  className="px-2 py-1 text-xs font-semibold rounded-md transition-all"
+                  className="px-3 py-1.5 text-xs font-semibold rounded-full transition-all whitespace-nowrap"
                   style={{
                     background: typeFilter === 'offer' ? 'var(--thamara-accent-500)' : 'var(--thamara-bg-secondary)',
                     color: typeFilter === 'offer' ? 'white' : 'var(--thamara-text-secondary)',
@@ -276,7 +267,7 @@ export default function ExchangePage() {
                 </button>
                 <button
                   onClick={() => setTypeFilter(typeFilter === 'request' ? undefined : 'request')}
-                  className="px-2 py-1 text-xs font-semibold rounded-md transition-all"
+                  className="px-3 py-1.5 text-xs font-semibold rounded-full transition-all whitespace-nowrap"
                   style={{
                     background: typeFilter === 'request' ? 'var(--thamara-warning)' : 'var(--thamara-bg-secondary)',
                     color: typeFilter === 'request' ? 'white' : 'var(--thamara-text-secondary)',
@@ -286,15 +277,14 @@ export default function ExchangePage() {
                 </button>
               </>
             )}
-            
+
             {/* Category dropdown */}
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-2 py-1 text-xs font-semibold rounded-md border"
+              className="px-3 py-1.5 text-xs font-semibold rounded-full border-none appearance-none cursor-pointer"
               style={{
                 background: categoryFilter !== 'all' ? 'var(--thamara-primary-500)' : 'var(--thamara-bg-secondary)',
-                borderColor: 'var(--thamara-border)',
                 color: categoryFilter !== 'all' ? 'white' : 'var(--thamara-text-secondary)',
               }}
             >
@@ -304,21 +294,21 @@ export default function ExchangePage() {
                 </option>
               ))}
             </select>
-            
+
             <button
               onClick={() => setDistanceFilter(distanceFilter === 'near' ? 'any' : 'near')}
-              className="px-2 py-1 text-xs font-semibold rounded-md transition-all"
+              className="px-3 py-1.5 text-xs font-semibold rounded-full transition-all whitespace-nowrap"
               style={{
                 background: distanceFilter === 'near' ? 'var(--thamara-info)' : 'var(--thamara-bg-secondary)',
                 color: distanceFilter === 'near' ? 'white' : 'var(--thamara-text-secondary)',
               }}
             >
-              Near
+              Nearby
             </button>
-            
+
             <button
               onClick={() => setTrustFilter(!trustFilter)}
-              className="px-2 py-1 text-xs font-semibold rounded-md transition-all"
+              className="px-3 py-1.5 text-xs font-semibold rounded-full transition-all whitespace-nowrap"
               style={{
                 background: trustFilter ? 'var(--thamara-success)' : 'var(--thamara-bg-secondary)',
                 color: trustFilter ? 'white' : 'var(--thamara-text-secondary)',
@@ -326,23 +316,23 @@ export default function ExchangePage() {
             >
               Verified
             </button>
+
+            {/* Sort dropdown */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="px-3 py-1.5 text-xs font-semibold rounded-full border-none appearance-none cursor-pointer"
+              style={{
+                background: 'var(--thamara-bg-secondary)',
+                color: 'var(--thamara-text-secondary)',
+              }}
+            >
+              <option value="ai_match">Sort: AI Match</option>
+              <option value="newest">Sort: Newest</option>
+              <option value="closest">Sort: Closest</option>
+              <option value="quantity">Sort: Quantity</option>
+            </select>
           </div>
-          
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="px-2 py-1 text-xs font-semibold rounded-md border"
-            style={{
-              background: 'var(--thamara-bg-secondary)',
-              borderColor: 'var(--thamara-border)',
-              color: 'var(--thamara-text-secondary)',
-            }}
-          >
-            <option value="ai_match">AI Match</option>
-            <option value="newest">Newest</option>
-            <option value="closest">Closest</option>
-            <option value="quantity">Quantity</option>
-          </select>
         </div>
       </div>
       
@@ -374,12 +364,19 @@ export default function ExchangePage() {
         )}
       </div>
       
-      {/* Floating Action Button - Fixed */}
-      <div className="sticky bottom-0 flex-shrink-0 p-3 border-t" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)', boxShadow: '0 -2px 8px rgba(0,0,0,0.1)' }}>
+      {/* Bottom Action Bar - Safe area aware */}
+      <div
+        className="sticky bottom-0 flex-shrink-0 p-3 border-t safe-bottom"
+        style={{
+          borderColor: 'var(--thamara-border)',
+          background: 'var(--thamara-surface)',
+          boxShadow: '0 -2px 8px rgba(0,0,0,0.08)'
+        }}
+      >
         {mode === 'hubs' ? (
           <button
             onClick={() => setShowBundleGenerator(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold rounded-lg shadow-md transition-all active:scale-95"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold rounded-xl transition-all active:scale-[0.98] touch-target"
             style={{
               background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
               color: 'var(--thamara-text-on-accent)',
@@ -391,7 +388,7 @@ export default function ExchangePage() {
         ) : (
           <button
             onClick={() => setShowCreateModal(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold rounded-lg shadow-md transition-all active:scale-95"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold rounded-xl transition-all active:scale-[0.98] touch-target"
             style={{
               background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
               color: 'var(--thamara-text-on-accent)',
@@ -673,21 +670,24 @@ function CreateListingModal({
   };
   
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
       <div
-        className="w-full max-w-lg rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto"
-        style={{ background: 'var(--thamara-surface)' }}
+        className="w-full max-w-lg rounded-t-2xl shadow-xl overflow-hidden flex flex-col safe-bottom"
+        style={{
+          background: 'var(--thamara-surface)',
+          maxHeight: 'calc(100vh - var(--safe-area-inset-top) - 20px)'
+        }}
       >
-        <div className="sticky top-0 flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
-          <h2 className="text-xl font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
+        <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+          <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
             Create Listing
           </h2>
-          <button onClick={onClose} className="p-2">
-            <X size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
+          <button onClick={onClose} className="p-2 -mr-2 touch-target">
+            <X size={22} style={{ color: 'var(--thamara-text-secondary)' }} />
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Type */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -876,21 +876,24 @@ function MatchesDrawer({
   const topMatches = matches.slice(0, 5);
   
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
       <div
-        className="w-full max-w-lg rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[90vh] flex flex-col"
-        style={{ background: 'var(--thamara-surface)' }}
+        className="w-full max-w-lg rounded-t-2xl shadow-xl flex flex-col safe-bottom"
+        style={{
+          background: 'var(--thamara-surface)',
+          maxHeight: 'calc(100vh - var(--safe-area-inset-top) - 20px)'
+        }}
       >
-        <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--thamara-border)' }}>
-          <h2 className="text-xl font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
+        <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)' }}>
+          <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
             Recommended Matches
           </h2>
-          <button onClick={onClose} className="p-2">
-            <X size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
+          <button onClick={onClose} className="p-2 -mr-2 touch-target">
+            <X size={22} style={{ color: 'var(--thamara-text-secondary)' }} />
           </button>
         </div>
-        
-        <div className="flex-1 overflow-y-auto p-5 space-y-3">
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {topMatches.length === 0 ? (
             <div className="text-center py-12">
               <Package size={48} style={{ color: 'var(--thamara-text-muted)', margin: '0 auto 16px' }} />
@@ -1023,21 +1026,24 @@ function BundleGeneratorModal({
   };
   
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
       <div
-        className="w-full max-w-lg rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto"
-        style={{ background: 'var(--thamara-surface)' }}
+        className="w-full max-w-lg rounded-t-2xl shadow-xl flex flex-col safe-bottom"
+        style={{
+          background: 'var(--thamara-surface)',
+          maxHeight: 'calc(100vh - var(--safe-area-inset-top) - 20px)'
+        }}
       >
-        <div className="sticky top-0 flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
-          <h2 className="text-xl font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
+        <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+          <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
             Generate Request Bundle
           </h2>
-          <button onClick={onClose} className="p-2">
-            <X size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
+          <button onClick={onClose} className="p-2 -mr-2 touch-target">
+            <X size={22} style={{ color: 'var(--thamara-text-secondary)' }} />
           </button>
         </div>
-        
-        <div className="p-5 space-y-4">
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {!generated ? (
             <>
               <div>
@@ -1233,12 +1239,15 @@ function SafetyGuidanceModal({
   const data = guidance[category];
   
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
       <div
-        className="w-full max-w-lg rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto"
-        style={{ background: 'var(--thamara-surface)' }}
+        className="w-full max-w-lg rounded-t-2xl shadow-xl flex flex-col safe-bottom"
+        style={{
+          background: 'var(--thamara-surface)',
+          maxHeight: 'calc(100vh - var(--safe-area-inset-top) - 20px)'
+        }}
       >
-        <div className="sticky top-0 flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+        <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
           <div className="flex items-center gap-2">
             <div
               className="flex items-center justify-center w-8 h-8 rounded-lg"
@@ -1248,16 +1257,16 @@ function SafetyGuidanceModal({
             >
               <Info size={18} strokeWidth={2.5} style={{ color: 'white' }} />
             </div>
-            <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
+            <h2 className="text-base font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
               {data.title}
             </h2>
           </div>
-          <button onClick={onClose} className="p-2">
-            <X size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
+          <button onClick={onClose} className="p-2 -mr-2 touch-target">
+            <X size={22} style={{ color: 'var(--thamara-text-secondary)' }} />
           </button>
         </div>
-        
-        <div className="p-5 space-y-4">
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div>
             <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
               Best Practices

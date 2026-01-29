@@ -32,29 +32,29 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* Action Tiles Grid - Modern card design */}
-      <section className="grid grid-cols-2 gap-4">
+      {/* Action Tiles Grid - Mobile optimized */}
+      <section className="grid grid-cols-2 gap-3">
         <ActionCard
           title="Check Plantability"
-          icon={<MapPin size={28} strokeWidth={2} />}
+          icon={<MapPin size={26} strokeWidth={2} />}
           href={ROUTES.MAP}
           gradient="from-blue-500 to-blue-600"
         />
         <ActionCard
           title="Get Crop Plan"
-          icon={<Sprout size={28} strokeWidth={2} />}
+          icon={<Sprout size={26} strokeWidth={2} />}
           href={ROUTES.CROP_PLAN}
           gradient="from-green-500 to-green-600"
         />
         <ActionCard
           title="Find Water"
-          icon={<Droplet size={28} strokeWidth={2} />}
+          icon={<Droplet size={26} strokeWidth={2} />}
           href={ROUTES.WATER}
           gradient="from-cyan-500 to-cyan-600"
         />
         <ActionCard
           title="Exchange & Work"
-          icon={<Users size={28} strokeWidth={2} />}
+          icon={<Users size={26} strokeWidth={2} />}
           href={ROUTES.EXCHANGE}
           gradient="from-orange-500 to-orange-600"
         />
@@ -166,17 +166,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Primary CTA - Gradient button */}
+      {/* Primary CTA - Gradient button with proper touch target */}
       <section>
         <Link
           href={ROUTES.LOG_PLOT}
-          className="block w-full py-4 rounded-2xl text-center text-lg font-bold text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-          style={{ 
+          className="flex w-full py-3.5 rounded-xl text-center text-base font-bold text-white transition-all duration-200 active:scale-[0.98] items-center justify-center gap-2 touch-target"
+          style={{
             background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
             boxShadow: '0 4px 12px -2px rgba(124, 179, 66, 0.3)'
           }}
         >
-          <MapPinned size={22} strokeWidth={2.5} />
+          <MapPinned size={20} strokeWidth={2.5} />
           Log New Plot
         </Link>
       </section>
@@ -203,43 +203,44 @@ export default function HomePage() {
   );
 }
 
-// Action Card Component - Perfectly aligned with centered layout
-function ActionCard({ 
-  title, 
-  icon, 
-  href, 
-  gradient 
-}: { 
-  title: string; 
-  icon: React.ReactNode; 
+// Action Card Component - Mobile optimized with better touch targets
+function ActionCard({
+  title,
+  icon,
+  href,
+  gradient
+}: {
+  title: string;
+  icon: React.ReactNode;
   href: string;
   gradient: string;
 }) {
   return (
     <Link
       href={href}
-      className="rounded-2xl p-6 border flex flex-col items-center justify-center gap-3.5 aspect-square transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-95 group"
-      style={{ 
-        background: 'var(--thamara-surface)', 
+      className="rounded-xl p-4 border flex flex-col items-center justify-center gap-3 transition-all duration-200 active:scale-[0.97] group touch-target"
+      style={{
+        background: 'var(--thamara-surface)',
         borderColor: 'var(--thamara-border)',
-        boxShadow: 'var(--thamara-shadow-sm)'
+        boxShadow: 'var(--thamara-shadow-sm)',
+        minHeight: '120px'
       }}
     >
-      {/* Icon container with gradient - centered */}
-      <div 
-        className={`w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br ${gradient} transition-transform duration-200 group-hover:scale-105 group-hover:rotate-3`}
+      {/* Icon container with gradient */}
+      <div
+        className={`w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br ${gradient} transition-transform duration-200 group-active:scale-95`}
         style={{
-          boxShadow: '0 6px 12px -2px rgba(0, 0, 0, 0.2)'
+          boxShadow: '0 4px 10px -2px rgba(0, 0, 0, 0.2)'
         }}
       >
         <span style={{ color: 'white' }}>
           {icon}
         </span>
       </div>
-      
-      {/* Title - centered and properly sized */}
-      <span 
-        className="text-sm font-bold leading-tight text-center"
+
+      {/* Title - centered */}
+      <span
+        className="text-[13px] font-bold leading-tight text-center"
         style={{ color: 'var(--thamara-text-primary)' }}
       >
         {title}

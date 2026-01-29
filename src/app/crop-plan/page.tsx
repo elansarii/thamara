@@ -120,51 +120,49 @@ export default function CropPlanPage() {
         </div>
       )}
       
-      {/* Header */}
-      <div 
-        className="px-5 py-4 border-b"
-        style={{ 
+      {/* Header - Compact for mobile */}
+      <div
+        className="px-4 py-3 border-b"
+        style={{
           background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)',
-          boxShadow: 'var(--thamara-shadow-sm)'
         }}
       >
-        <h1 className="text-xl font-semibold" style={{ color: 'var(--thamara-text-primary)' }}>
+        <h1 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
           Crop & Practice Plan
         </h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--thamara-text-secondary)' }}>
-          AI-powered crop recommendations based on your constraints
+        <p className="text-sm" style={{ color: 'var(--thamara-text-secondary)' }}>
+          AI-powered recommendations for your land
         </p>
         {usingLoggedPlot && (
-          <div 
-            className="mt-2 text-xs px-3 py-2 rounded-lg flex items-center"
-            style={{ 
+          <div
+            className="mt-2 text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1.5"
+            style={{
               background: 'var(--thamara-accent-100)',
               color: 'var(--thamara-accent-700)',
             }}
           >
-            <CheckCircle2 size={14} className="inline mr-2 flex-shrink-0" />
-            Using conditions from your logged plot{lastPlot?.name ? ` "${lastPlot.name}"` : ''}
+            <CheckCircle2 size={14} className="flex-shrink-0" />
+            <span className="truncate">Using logged plot{lastPlot?.name ? `: ${lastPlot.name}` : ''}</span>
           </div>
         )}
         {offlineMode && (
-          <div 
-            className="mt-2 text-xs px-3 py-2 rounded-lg"
-            style={{ 
+          <div
+            className="mt-2 text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1.5"
+            style={{
               background: 'var(--thamara-warning)',
               color: 'white',
-              opacity: 0.9
             }}
           >
-            <AlertTriangle size={14} className="inline mr-1" />
-            Offline mode - using cached data
+            <AlertTriangle size={14} />
+            Offline mode - cached data
           </div>
         )}
       </div>
       
-      {/* Input Panel */}
-      <div 
-        className="p-5 border-b space-y-4"
+      {/* Input Panel - Mobile optimized */}
+      <div
+        className="p-4 border-b space-y-3"
         style={{
           background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)'
@@ -173,18 +171,18 @@ export default function CropPlanPage() {
         <h2 className="font-semibold text-sm" style={{ color: 'var(--thamara-text-primary)' }}>
           Your Conditions
         </h2>
-        
+
         {/* Plot Area */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
-            <Target size={16} className="inline mr-2" />
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
+            <Target size={16} />
             Plot Area (m²)
           </label>
           <input
             type="number"
             value={plotAreaM2}
             onChange={e => setPlotAreaM2(Math.max(1, Number(e.target.value)))}
-            className="w-full px-4 py-3 border rounded-lg text-sm"
+            className="w-full px-3 py-2.5 border rounded-lg text-base touch-target"
             style={{
               borderColor: 'var(--thamara-border)',
               background: 'var(--thamara-surface)',
@@ -193,17 +191,17 @@ export default function CropPlanPage() {
             min="1"
           />
         </div>
-        
+
         {/* Water Access */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
-            <Droplets size={16} className="inline mr-2" />
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
+            <Droplets size={16} />
             Water Access
           </label>
           <select
             value={waterAccess}
             onChange={e => setWaterAccess(e.target.value as WaterAccess)}
-            className="w-full px-4 py-3 border rounded-lg text-sm"
+            className="w-full px-3 py-2.5 border rounded-lg text-base touch-target"
             style={{
               borderColor: 'var(--thamara-border)',
               background: 'var(--thamara-surface)',
@@ -211,85 +209,86 @@ export default function CropPlanPage() {
             }}
           >
             <option value="none">None (rainwater only)</option>
-            <option value="limited">Limited (occasional irrigation)</option>
-            <option value="reliable">Reliable (regular irrigation)</option>
+            <option value="limited">Limited (occasional)</option>
+            <option value="reliable">Reliable (regular)</option>
           </select>
         </div>
-        
+
         {/* Salinity Risk */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
-            <AlertTriangle size={16} className="inline mr-2" />
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
+            <AlertTriangle size={16} />
             Salinity Risk
           </label>
           <select
             value={salinityRisk}
             onChange={e => setSalinityRisk(e.target.value as SalinityRisk)}
-            className="w-full px-4 py-3 border rounded-lg text-sm"
+            className="w-full px-3 py-2.5 border rounded-lg text-base touch-target"
             style={{
               borderColor: 'var(--thamara-border)',
               background: 'var(--thamara-surface)',
               color: 'var(--thamara-text-primary)'
             }}
           >
-            <option value="none">None (fresh soil/water)</option>
-            <option value="some">Some (moderate salinity)</option>
-            <option value="strong">Strong (high salinity)</option>
+            <option value="none">None (fresh)</option>
+            <option value="some">Some (moderate)</option>
+            <option value="strong">Strong (high)</option>
           </select>
         </div>
-        
-        {/* Harvest Window */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
-            <Calendar size={16} className="inline mr-2" />
-            Target Harvest (days)
-          </label>
-          <select
-            value={targetHarvestWindowDays}
-            onChange={e => setTargetHarvestWindowDays(Number(e.target.value))}
-            className="w-full px-4 py-3 border rounded-lg text-sm"
-            style={{
-              borderColor: 'var(--thamara-border)',
-              background: 'var(--thamara-surface)',
-              color: 'var(--thamara-text-primary)'
-            }}
-          >
-            <option value="30">30 days (very fast)</option>
-            <option value="45">45 days (fast)</option>
-            <option value="60">60 days (medium)</option>
-            <option value="90">90 days (patient)</option>
-          </select>
+
+        {/* Harvest Window & Priority - Side by side on larger screens */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-1.5 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
+              <Calendar size={14} />
+              Harvest
+            </label>
+            <select
+              value={targetHarvestWindowDays}
+              onChange={e => setTargetHarvestWindowDays(Number(e.target.value))}
+              className="w-full px-3 py-2.5 border rounded-lg text-sm touch-target"
+              style={{
+                borderColor: 'var(--thamara-border)',
+                background: 'var(--thamara-surface)',
+                color: 'var(--thamara-text-primary)'
+              }}
+            >
+              <option value="30">30 days</option>
+              <option value="45">45 days</option>
+              <option value="60">60 days</option>
+              <option value="90">90 days</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-1.5 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
+              <Sparkles size={14} />
+              Priority
+            </label>
+            <select
+              value={userPriority}
+              onChange={e => setUserPriority(e.target.value as UserPriority)}
+              className="w-full px-3 py-2.5 border rounded-lg text-sm touch-target"
+              style={{
+                borderColor: 'var(--thamara-border)',
+                background: 'var(--thamara-surface)',
+                color: 'var(--thamara-text-primary)'
+              }}
+            >
+              <option value="max_calories">Max Calories</option>
+              <option value="min_water">Min Water</option>
+              <option value="balanced">Balanced</option>
+            </select>
+          </div>
         </div>
-        
-        {/* Priority */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
-            <Sparkles size={16} className="inline mr-2" />
-            Priority
-          </label>
-          <select
-            value={userPriority}
-            onChange={e => setUserPriority(e.target.value as UserPriority)}
-            className="w-full px-4 py-3 border rounded-lg text-sm"
-            style={{
-              borderColor: 'var(--thamara-border)',
-              background: 'var(--thamara-surface)',
-              color: 'var(--thamara-text-primary)'
-            }}
-          >
-            <option value="max_calories">Maximum Calories</option>
-            <option value="min_water">Minimum Water</option>
-            <option value="balanced">Balanced</option>
-          </select>
-        </div>
-        
+
         {/* Calculate Button */}
         <button
           onClick={handleCalculate}
           disabled={isCalculating}
-          className="w-full font-semibold py-4 px-4 rounded-lg text-sm transition-all"
-          style={{ 
-            background: isCalculating 
+          className="w-full font-semibold py-3.5 px-4 rounded-xl text-sm transition-all active:scale-[0.98] touch-target"
+          style={{
+            background: isCalculating
               ? 'var(--thamara-text-disabled)'
               : 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
             color: 'var(--thamara-text-on-accent)',
