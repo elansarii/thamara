@@ -201,8 +201,7 @@ function CropResultsContent() {
           borderColor: 'var(--thamara-border)'
         }}
       >
-        <p>Crop images and summaries: Wikipedia/Wikimedia (cached when available)</p>
-        <p className="mt-1">Dataset values are approximate for MVP demonstration</p>
+  
       </div>
     </div>
   );

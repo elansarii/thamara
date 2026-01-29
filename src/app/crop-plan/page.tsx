@@ -315,8 +315,6 @@ export default function CropPlanPage() {
         className="px-5 py-4 text-xs mt-auto"
         style={{ color: 'var(--thamara-text-muted)' }}
       >
-        <p>Crop images and summaries: Wikipedia/Wikimedia (cached when available)</p>
-        <p className="mt-1">Dataset values are approximate for MVP demonstration</p>
       </div>
     </div>
   );

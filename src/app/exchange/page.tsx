@@ -119,7 +119,20 @@ export default function ExchangePage() {
     setListings(loadListings());
     setBundles(loadBundles());
   }, []);
-  
+
+  // Lock body scroll when any modal is open
+  useEffect(() => {
+    const isAnyModalOpen = showCreateModal || showMatchesDrawer || showBundleGenerator || showSafetyGuidance;
+    if (isAnyModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showCreateModal, showMatchesDrawer, showBundleGenerator, showSafetyGuidance]);
+
   // User context for matching
   const userContext: UserContext = useMemo(() => {
     const sessionData = typeof window !== 'undefined' 
@@ -670,13 +683,20 @@ function CreateListingModal({
   };
   
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center"
+      style={{ background: 'rgba(0, 0, 0, 0.5)' }}
+      onClick={onClose}
+      onTouchMove={(e) => e.preventDefault()}
+    >
       <div
         className="w-full max-w-lg rounded-t-2xl shadow-xl overflow-hidden flex flex-col safe-bottom"
         style={{
           background: 'var(--thamara-surface)',
           maxHeight: 'calc(100vh - var(--safe-area-inset-top) - 20px)'
         }}
+        onClick={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -686,8 +706,8 @@ function CreateListingModal({
             <X size={22} style={{ color: 'var(--thamara-text-secondary)' }} />
           </button>
         </div>
-        
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
+
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
           {/* Type */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -876,13 +896,20 @@ function MatchesDrawer({
   const topMatches = matches.slice(0, 5);
   
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center"
+      style={{ background: 'rgba(0, 0, 0, 0.5)' }}
+      onClick={onClose}
+      onTouchMove={(e) => e.preventDefault()}
+    >
       <div
         className="w-full max-w-lg rounded-t-2xl shadow-xl flex flex-col safe-bottom"
         style={{
           background: 'var(--thamara-surface)',
           maxHeight: 'calc(100vh - var(--safe-area-inset-top) - 20px)'
         }}
+        onClick={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -893,7 +920,7 @@ function MatchesDrawer({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
           {topMatches.length === 0 ? (
             <div className="text-center py-12">
               <Package size={48} style={{ color: 'var(--thamara-text-muted)', margin: '0 auto 16px' }} />
@@ -1026,13 +1053,20 @@ function BundleGeneratorModal({
   };
   
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center"
+      style={{ background: 'rgba(0, 0, 0, 0.5)' }}
+      onClick={onClose}
+      onTouchMove={(e) => e.preventDefault()}
+    >
       <div
         className="w-full max-w-lg rounded-t-2xl shadow-xl flex flex-col safe-bottom"
         style={{
           background: 'var(--thamara-surface)',
           maxHeight: 'calc(100vh - var(--safe-area-inset-top) - 20px)'
         }}
+        onClick={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -1043,7 +1077,7 @@ function BundleGeneratorModal({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
           {!generated ? (
             <>
               <div>
@@ -1239,13 +1273,20 @@ function SafetyGuidanceModal({
   const data = guidance[category];
   
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center"
+      style={{ background: 'rgba(0, 0, 0, 0.5)' }}
+      onClick={onClose}
+      onTouchMove={(e) => e.preventDefault()}
+    >
       <div
         className="w-full max-w-lg rounded-t-2xl shadow-xl flex flex-col safe-bottom"
         style={{
           background: 'var(--thamara-surface)',
           maxHeight: 'calc(100vh - var(--safe-area-inset-top) - 20px)'
         }}
+        onClick={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
           <div className="flex items-center gap-2">
@@ -1266,7 +1307,7 @@ function SafetyGuidanceModal({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
           <div>
             <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
               Best Practices
