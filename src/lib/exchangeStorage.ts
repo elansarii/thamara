@@ -1,42 +1,119 @@
 /**
- * Exchange Hub Local Storage Utilities
- * Offline-first persistence for listings and bundles
+ * Exchange Hub SQLite Storage Utilities
+ * Persistent storage for listings and bundles using SQLite
  */
 
-import type { Listing, RequestBundle } from './exchangeTypes';
+import type { Listing, RequestBundle, RequestBundleItem } from './exchangeTypes';
+import { query, execute, generateId } from './database';
 
-const LISTINGS_KEY = 'thamara_exchange_listings';
-const BUNDLES_KEY = 'thamara_exchange_bundles';
+// In-memory cache for synchronous access (populated on first load)
+let listingsCache: Listing[] | null = null;
+let bundlesCache: RequestBundle[] | null = null;
+let isInitialized = false;
 
 /**
- * Load all listings from localStorage
+ * Initialize the storage (call this early in app lifecycle)
  */
-export function loadListings(): Listing[] {
-  if (typeof window === 'undefined') return [];
-  
+export async function initExchangeStorage(): Promise<void> {
+  if (isInitialized) return;
+
   try {
-    const stored = localStorage.getItem(LISTINGS_KEY);
-    if (!stored) return getDefaultListings();
-    
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : getDefaultListings();
+    // Check if we have any listings
+    const count = await query<{ count: number }>('SELECT COUNT(*) as count FROM listings');
+
+    if (count[0]?.count === 0) {
+      // Seed with default listings
+      await seedDefaultListings();
+    }
+
+    // Load into cache
+    await loadListingsAsync();
+    await loadBundlesAsync();
+
+    isInitialized = true;
   } catch (error) {
-    console.error('Failed to load listings:', error);
-    return getDefaultListings();
+    console.error('Failed to initialize exchange storage:', error);
   }
 }
 
 /**
- * Save listings to localStorage
+ * Load all listings from SQLite (async)
+ */
+export async function loadListingsAsync(): Promise<Listing[]> {
+  try {
+    const rows = await query<{
+      id: string;
+      type: string;
+      mode: string;
+      category: string;
+      title: string;
+      quantity: number;
+      unit: string;
+      locationLabel: string;
+      distanceBand: string;
+      urgency: string;
+      trust: string;
+      notes: string | null;
+      createdAt: number;
+      status: string;
+      dateTime: string | null;
+      capacity: string | null;
+      skillTags: string | null;
+      availableItems: string | null;
+      hours: string | null;
+      hubName: string | null;
+    }>('SELECT * FROM listings ORDER BY createdAt DESC');
+
+    const listings: Listing[] = rows.map(row => ({
+      id: row.id,
+      type: row.type as 'offer' | 'request',
+      mode: row.mode as 'inputs' | 'labor' | 'hubs',
+      category: row.category as Listing['category'],
+      title: row.title,
+      quantity: row.quantity,
+      unit: row.unit,
+      locationLabel: row.locationLabel,
+      distanceBand: row.distanceBand as 'near' | 'medium' | 'far',
+      urgency: row.urgency as 'today' | 'week' | 'any',
+      trust: row.trust as 'peer' | 'ngo' | 'verified_hub',
+      notes: row.notes || undefined,
+      createdAt: row.createdAt,
+      status: row.status as 'active' | 'reserved' | 'fulfilled',
+      dateTime: row.dateTime || undefined,
+      capacity: row.capacity || undefined,
+      skillTags: row.skillTags ? JSON.parse(row.skillTags) : undefined,
+      availableItems: row.availableItems ? JSON.parse(row.availableItems) : undefined,
+      hours: row.hours || undefined,
+      hubName: row.hubName || undefined,
+    }));
+
+    listingsCache = listings;
+    return listings;
+  } catch (error) {
+    console.error('Failed to load listings:', error);
+    return listingsCache || getDefaultListings();
+  }
+}
+
+/**
+ * Load all listings (sync - returns cached data)
+ */
+export function loadListings(): Listing[] {
+  if (listingsCache !== null) {
+    return listingsCache;
+  }
+
+  // If cache is empty, trigger async load and return defaults
+  loadListingsAsync().catch(console.error);
+  return getDefaultListings();
+}
+
+/**
+ * Save listings (for backward compatibility - now a no-op since we save per operation)
  */
 export function saveListings(listings: Listing[]): void {
-  if (typeof window === 'undefined') return;
-  
-  try {
-    localStorage.setItem(LISTINGS_KEY, JSON.stringify(listings));
-  } catch (error) {
-    console.error('Failed to save listings:', error);
-  }
+  listingsCache = listings;
+  // Note: Individual saves happen in addListing/updateListing/deleteListing
 }
 
 /**
@@ -45,15 +122,45 @@ export function saveListings(listings: Listing[]): void {
 export function addListing(listing: Omit<Listing, 'id' | 'createdAt' | 'status'>): Listing {
   const newListing: Listing = {
     ...listing,
-    id: `listing-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: `listing-${generateId()}`,
     createdAt: Date.now(),
     status: 'active',
   };
-  
-  const listings = loadListings();
-  listings.unshift(newListing);
-  saveListings(listings);
-  
+
+  // Update cache immediately for UI responsiveness
+  if (listingsCache) {
+    listingsCache = [newListing, ...listingsCache];
+  }
+
+  // Persist to SQLite asynchronously
+  execute(
+    `INSERT INTO listings
+     (id, type, mode, category, title, quantity, unit, locationLabel, distanceBand, urgency, trust, notes, createdAt, status, dateTime, capacity, skillTags, availableItems, hours, hubName)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      newListing.id,
+      newListing.type,
+      newListing.mode,
+      newListing.category,
+      newListing.title,
+      newListing.quantity,
+      newListing.unit,
+      newListing.locationLabel,
+      newListing.distanceBand,
+      newListing.urgency,
+      newListing.trust,
+      newListing.notes || null,
+      newListing.createdAt,
+      newListing.status,
+      newListing.dateTime || null,
+      newListing.capacity || null,
+      newListing.skillTags ? JSON.stringify(newListing.skillTags) : null,
+      newListing.availableItems ? JSON.stringify(newListing.availableItems) : null,
+      newListing.hours || null,
+      newListing.hubName || null,
+    ]
+  ).catch(console.error);
+
   return newListing;
 }
 
@@ -61,12 +168,40 @@ export function addListing(listing: Omit<Listing, 'id' | 'createdAt' | 'status'>
  * Update a listing
  */
 export function updateListing(id: string, updates: Partial<Listing>): void {
-  const listings = loadListings();
-  const index = listings.findIndex(l => l.id === id);
-  
-  if (index !== -1) {
-    listings[index] = { ...listings[index], ...updates };
-    saveListings(listings);
+  // Update cache
+  if (listingsCache) {
+    const index = listingsCache.findIndex(l => l.id === id);
+    if (index !== -1) {
+      listingsCache[index] = { ...listingsCache[index], ...updates };
+    }
+  }
+
+  // Build dynamic update query
+  const fields: string[] = [];
+  const values: unknown[] = [];
+
+  if (updates.type !== undefined) { fields.push('type = ?'); values.push(updates.type); }
+  if (updates.mode !== undefined) { fields.push('mode = ?'); values.push(updates.mode); }
+  if (updates.category !== undefined) { fields.push('category = ?'); values.push(updates.category); }
+  if (updates.title !== undefined) { fields.push('title = ?'); values.push(updates.title); }
+  if (updates.quantity !== undefined) { fields.push('quantity = ?'); values.push(updates.quantity); }
+  if (updates.unit !== undefined) { fields.push('unit = ?'); values.push(updates.unit); }
+  if (updates.locationLabel !== undefined) { fields.push('locationLabel = ?'); values.push(updates.locationLabel); }
+  if (updates.distanceBand !== undefined) { fields.push('distanceBand = ?'); values.push(updates.distanceBand); }
+  if (updates.urgency !== undefined) { fields.push('urgency = ?'); values.push(updates.urgency); }
+  if (updates.trust !== undefined) { fields.push('trust = ?'); values.push(updates.trust); }
+  if (updates.notes !== undefined) { fields.push('notes = ?'); values.push(updates.notes); }
+  if (updates.status !== undefined) { fields.push('status = ?'); values.push(updates.status); }
+  if (updates.dateTime !== undefined) { fields.push('dateTime = ?'); values.push(updates.dateTime); }
+  if (updates.capacity !== undefined) { fields.push('capacity = ?'); values.push(updates.capacity); }
+  if (updates.skillTags !== undefined) { fields.push('skillTags = ?'); values.push(JSON.stringify(updates.skillTags)); }
+  if (updates.availableItems !== undefined) { fields.push('availableItems = ?'); values.push(JSON.stringify(updates.availableItems)); }
+  if (updates.hours !== undefined) { fields.push('hours = ?'); values.push(updates.hours); }
+  if (updates.hubName !== undefined) { fields.push('hubName = ?'); values.push(updates.hubName); }
+
+  if (fields.length > 0) {
+    values.push(id);
+    execute(`UPDATE listings SET ${fields.join(', ')} WHERE id = ?`, values).catch(console.error);
   }
 }
 
@@ -74,27 +209,54 @@ export function updateListing(id: string, updates: Partial<Listing>): void {
  * Delete a listing
  */
 export function deleteListing(id: string): void {
-  const listings = loadListings();
-  const filtered = listings.filter(l => l.id !== id);
-  saveListings(filtered);
+  // Update cache
+  if (listingsCache) {
+    listingsCache = listingsCache.filter(l => l.id !== id);
+  }
+
+  execute('DELETE FROM listings WHERE id = ?', [id]).catch(console.error);
 }
 
 /**
- * Load request bundles
+ * Load request bundles (async)
  */
-export function loadBundles(): RequestBundle[] {
-  if (typeof window === 'undefined') return [];
-  
+export async function loadBundlesAsync(): Promise<RequestBundle[]> {
   try {
-    const stored = localStorage.getItem(BUNDLES_KEY);
-    if (!stored) return [];
-    
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : [];
+    const rows = await query<{
+      id: string;
+      cropName: string;
+      plotSize: string;
+      items: string;
+      createdAt: number;
+    }>('SELECT * FROM request_bundles ORDER BY createdAt DESC');
+
+    const bundles: RequestBundle[] = rows.map(row => ({
+      id: row.id,
+      cropName: row.cropName,
+      plotSize: row.plotSize as 'small' | 'medium' | 'large',
+      items: JSON.parse(row.items) as RequestBundleItem[],
+      createdAt: row.createdAt,
+    }));
+
+    bundlesCache = bundles;
+    return bundles;
   } catch (error) {
     console.error('Failed to load bundles:', error);
-    return [];
+    return bundlesCache || [];
   }
+}
+
+/**
+ * Load request bundles (sync - returns cached data)
+ */
+export function loadBundles(): RequestBundle[] {
+  if (bundlesCache !== null) {
+    return bundlesCache;
+  }
+
+  // Trigger async load
+  loadBundlesAsync().catch(console.error);
+  return [];
 }
 
 /**
@@ -103,20 +265,63 @@ export function loadBundles(): RequestBundle[] {
 export function saveBundle(bundle: Omit<RequestBundle, 'id' | 'createdAt'>): RequestBundle {
   const newBundle: RequestBundle = {
     ...bundle,
-    id: `bundle-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: `bundle-${generateId()}`,
     createdAt: Date.now(),
   };
-  
-  const bundles = loadBundles();
-  bundles.unshift(newBundle);
-  
-  try {
-    localStorage.setItem(BUNDLES_KEY, JSON.stringify(bundles));
-  } catch (error) {
-    console.error('Failed to save bundle:', error);
+
+  // Update cache
+  if (bundlesCache) {
+    bundlesCache = [newBundle, ...bundlesCache];
+  } else {
+    bundlesCache = [newBundle];
   }
-  
+
+  // Persist to SQLite
+  execute(
+    'INSERT INTO request_bundles (id, cropName, plotSize, items, createdAt) VALUES (?, ?, ?, ?, ?)',
+    [newBundle.id, newBundle.cropName, newBundle.plotSize, JSON.stringify(newBundle.items), newBundle.createdAt]
+  ).catch(console.error);
+
   return newBundle;
+}
+
+/**
+ * Seed default demo listings
+ */
+async function seedDefaultListings(): Promise<void> {
+  const defaults = getDefaultListings();
+
+  for (const listing of defaults) {
+    await execute(
+      `INSERT OR IGNORE INTO listings
+       (id, type, mode, category, title, quantity, unit, locationLabel, distanceBand, urgency, trust, notes, createdAt, status, dateTime, capacity, skillTags, availableItems, hours, hubName)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        listing.id,
+        listing.type,
+        listing.mode,
+        listing.category,
+        listing.title,
+        listing.quantity,
+        listing.unit,
+        listing.locationLabel,
+        listing.distanceBand,
+        listing.urgency,
+        listing.trust,
+        listing.notes || null,
+        listing.createdAt,
+        listing.status,
+        listing.dateTime || null,
+        listing.capacity || null,
+        listing.skillTags ? JSON.stringify(listing.skillTags) : null,
+        listing.availableItems ? JSON.stringify(listing.availableItems) : null,
+        listing.hours || null,
+        listing.hubName || null,
+      ]
+    );
+  }
+
+  console.log(`Seeded ${defaults.length} default listings`);
 }
 
 /**
@@ -176,7 +381,6 @@ function getDefaultListings(): Listing[] {
       createdAt: Date.now() - 86400000 * 5,
       status: 'active',
     },
-    
     // INPUTS - Tools
     {
       id: 'tool-001',
@@ -210,7 +414,6 @@ function getDefaultListings(): Listing[] {
       createdAt: Date.now() - 86400000,
       status: 'active',
     },
-    
     // INPUTS - Fertilizer/Compost
     {
       id: 'fert-001',
@@ -245,7 +448,6 @@ function getDefaultListings(): Listing[] {
       createdAt: Date.now() - 86400000 * 3,
       status: 'active',
     },
-    
     // INPUTS - Irrigation
     {
       id: 'irr-001',
@@ -279,8 +481,7 @@ function getDefaultListings(): Listing[] {
       createdAt: Date.now() - 14400000,
       status: 'active',
     },
-    
-    // LABOR & TRANSPORT - Day Labor
+    // LABOR & TRANSPORT
     {
       id: 'labor-001',
       type: 'offer',
@@ -316,8 +517,6 @@ function getDefaultListings(): Listing[] {
       status: 'active',
       dateTime: 'Today, morning',
     },
-    
-    // LABOR & TRANSPORT - Harvest Help
     {
       id: 'harvest-001',
       type: 'request',
@@ -336,8 +535,6 @@ function getDefaultListings(): Listing[] {
       dateTime: 'Next week, 6-9 AM',
       skillTags: ['Harvest'],
     },
-    
-    // LABOR & TRANSPORT - Transport
     {
       id: 'trans-001',
       type: 'offer',
@@ -373,8 +570,6 @@ function getDefaultListings(): Listing[] {
       status: 'active',
       dateTime: 'Today afternoon',
     },
-    
-    // LABOR & TRANSPORT - Containers
     {
       id: 'cont-001',
       type: 'offer',
@@ -391,7 +586,6 @@ function getDefaultListings(): Listing[] {
       createdAt: Date.now() - 86400000 * 10,
       status: 'active',
     },
-    
     // VERIFIED HUBS
     {
       id: 'hub-001',
