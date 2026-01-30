@@ -131,10 +131,10 @@ export default function CropPlanPage() {
         }}
       >
         <h1 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
-          {t.nav.guide}
+          {t.guide.title}
         </h1>
         <p className="text-sm" style={{ color: 'var(--thamara-text-secondary)' }}>
-          {t.app.subtitle}
+          {t.guide.subtitle}
         </p>
         {usingLoggedPlot && (
           <div
