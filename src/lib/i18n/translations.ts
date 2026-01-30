@@ -69,6 +69,7 @@ interface TranslationSchema {
         title: string;
         subtitle: string;
         searchPlaceholder: string;
+        items: string;
         aiPriority: string;
         soonest: string;
         largest: string;
@@ -257,6 +258,7 @@ export const translations: Record<Language, TranslationSchema> = {
             title: 'Drops',
             subtitle: 'Plan harvest pickup without refrigeration',
             searchPlaceholder: 'Search crops or locations...',
+            items: 'items',
             aiPriority: 'AI Priority',
             soonest: 'Soonest Window',
             largest: 'Largest Quantity',
@@ -452,6 +454,7 @@ export const translations: Record<Language, TranslationSchema> = {
             title: 'التوصيل',
             subtitle: 'تخطيط استلام المحصول بدون تبريد',
             searchPlaceholder: 'ابحث عن المحاصيل أو المواقع...',
+            items: 'عناصر',
             aiPriority: 'أولوية الذكاء الاصطناعي',
             soonest: 'الأقرب وقتاً',
             largest: 'الأكبر كمية',
