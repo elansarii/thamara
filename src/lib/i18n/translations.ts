@@ -409,6 +409,8 @@ export const translations: Record<Language, TranslationSchema> = {
             filter: 'تصفية',
             sort: 'ترتيب',
             noResults: 'لا توجد نتائج',
+            loadingMap: 'جار تحميل الخريطة...',
+            loadingWater: 'جار تحميل نقاط المياه...',
             offlineData: 'وضع غير متصل - بيانات مخزنة',
             usingLoggedPlot: 'استخدام قطعة الأرض المسجلة',
         },
