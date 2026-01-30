@@ -1,53 +1,52 @@
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { WifiOff, Battery, Globe, Volume2 } from 'lucide-react';
+import { Menu, X, WifiOff, Wifi, Volume2, Settings, Bell, Globe, HelpCircle, Info } from 'lucide-react';
 
 export default function TopBar() {
-  return (
-    <header
-      className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 border-b backdrop-blur-sm"
-      style={{
-        height: 'calc(56px + var(--safe-area-inset-top))',
-        paddingTop: 'var(--safe-area-inset-top)',
-        background: 'var(--thamara-surface)',
-        borderColor: 'var(--thamara-border)',
-        boxShadow: 'var(--thamara-shadow-sm)',
-        zIndex: 100
-      }}
-    >
-      {/* Logo - Compact */}
-      <Link href="/" className="flex items-center gap-2 cursor-pointer touch-target">
-        <Image
-          src="/thamara_logo.svg"
-          alt="Thamara"
-          width={90}
-          height={36}
-          className="object-contain"
-          priority
-        />
-      </Link>
+  const [menuOpen, setMenuOpen] = useState(false);
 
-      {/* Right actions - Streamlined */}
-      <div className="flex items-center gap-1.5">
-        {/* Text-to-Speech Button - Primary action */}
+  return (
+    <>
+      <header
+        className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 border-b backdrop-blur-sm"
+        style={{
+          height: 'calc(56px + var(--safe-area-inset-top))',
+          paddingTop: 'var(--safe-area-inset-top)',
+          background: 'var(--thamara-surface)',
+          borderColor: 'var(--thamara-border)',
+          boxShadow: 'var(--thamara-shadow-sm)',
+          zIndex: 100
+        }}
+      >
+        {/* Hamburger Menu Button */}
         <button
+          onClick={() => setMenuOpen(true)}
           className="flex items-center justify-center w-10 h-10 transition-all duration-200 active:scale-95"
           style={{
-            background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
+            background: 'var(--thamara-bg-secondary)',
             borderRadius: 'var(--thamara-radius-md)',
-            boxShadow: '0 2px 6px -1px rgba(124, 179, 66, 0.3)'
           }}
-          aria-label="Read page aloud"
-          title="Read page aloud"
+          aria-label="Open menu"
         >
-          <Volume2
-            size={20}
-            strokeWidth={2.5}
-            style={{ color: 'var(--thamara-text-on-accent)' }}
-          />
+          <Menu size={22} strokeWidth={2} style={{ color: 'var(--thamara-text-primary)' }} />
         </button>
 
-        {/* Offline indicator - Icon only for maximum space efficiency */}
+        {/* Center - Logo */}
+        <Link href="/" className="flex items-center justify-center cursor-pointer touch-target absolute left-1/2 transform -translate-x-1/2">
+          <Image
+            src="/thamara_logo.svg"
+            alt="Thamara"
+            width={100}
+            height={40}
+            className="object-contain"
+            priority
+          />
+        </Link>
+
+        {/* Right - Connectivity Status */}
         <div
           className="flex items-center justify-center w-10 h-10"
           style={{
@@ -59,20 +58,187 @@ export default function TopBar() {
         >
           <WifiOff size={18} strokeWidth={2.5} />
         </div>
+      </header>
 
-        {/* Language toggle - Compact */}
-        <button
-          className="flex items-center justify-center w-10 h-10 text-xs font-bold transition-all active:scale-95"
+      {/* Menu Overlay */}
+      {menuOpen && (
+        <div
+          className="absolute inset-0 bg-black/50 z-[150]"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      {/* Slide-out Menu */}
+      <div
+        className="absolute top-0 left-0 h-full w-72 transform transition-transform duration-300 ease-out z-[200]"
+        style={{
+          transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
+          background: 'var(--thamara-surface)',
+          boxShadow: menuOpen ? '4px 0 20px rgba(0,0,0,0.15)' : 'none',
+        }}
+      >
+        {/* Menu Header */}
+        <div
+          className="flex items-center justify-between px-4 border-b"
           style={{
-            background: 'var(--thamara-bg-secondary)',
-            color: 'var(--thamara-text-secondary)',
-            borderRadius: 'var(--thamara-radius-md)'
+            height: 'calc(56px + var(--safe-area-inset-top))',
+            paddingTop: 'var(--safe-area-inset-top)',
+            borderColor: 'var(--thamara-border)',
           }}
-          aria-label="Change Language"
         >
-          EN
-        </button>
+          <span className="font-semibold text-lg" style={{ color: 'var(--thamara-text-primary)' }}>
+            Menu
+          </span>
+          <button
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center justify-center w-10 h-10 transition-all duration-200 active:scale-95"
+            style={{
+              background: 'var(--thamara-bg-secondary)',
+              borderRadius: 'var(--thamara-radius-md)',
+            }}
+            aria-label="Close menu"
+          >
+            <X size={22} strokeWidth={2} style={{ color: 'var(--thamara-text-primary)' }} />
+          </button>
+        </div>
+
+        {/* Menu Items */}
+        <div className="p-3 space-y-1">
+          {/* Text-to-Speech */}
+          <button
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 active:scale-[0.98]"
+            style={{ background: 'var(--thamara-accent-50)' }}
+            onClick={() => setMenuOpen(false)}
+          >
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-lg"
+              style={{
+                background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
+              }}
+            >
+              <Volume2 size={20} style={{ color: 'var(--thamara-text-on-accent)' }} />
+            </div>
+            <div className="text-left">
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Read Aloud</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>Listen to page content</p>
+            </div>
+          </button>
+
+          {/* Language */}
+          <button
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 active:scale-[0.98] hover:bg-gray-50"
+            onClick={() => setMenuOpen(false)}
+          >
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-lg"
+              style={{ background: 'var(--thamara-bg-secondary)' }}
+            >
+              <Globe size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
+            </div>
+            <div className="text-left flex-1">
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Language</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>English</p>
+            </div>
+            <span
+              className="text-xs font-bold px-2 py-1 rounded"
+              style={{ background: 'var(--thamara-bg-secondary)', color: 'var(--thamara-text-secondary)' }}
+            >
+              EN
+            </span>
+          </button>
+
+          {/* Notifications */}
+          <button
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 active:scale-[0.98] hover:bg-gray-50"
+            onClick={() => setMenuOpen(false)}
+          >
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-lg"
+              style={{ background: 'var(--thamara-bg-secondary)' }}
+            >
+              <Bell size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
+            </div>
+            <div className="text-left">
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Notifications</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>Alerts & updates</p>
+            </div>
+          </button>
+
+          <div className="border-t my-2" style={{ borderColor: 'var(--thamara-border)' }} />
+
+          {/* Settings */}
+          <button
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 active:scale-[0.98] hover:bg-gray-50"
+            onClick={() => setMenuOpen(false)}
+          >
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-lg"
+              style={{ background: 'var(--thamara-bg-secondary)' }}
+            >
+              <Settings size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
+            </div>
+            <div className="text-left">
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Settings</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>App preferences</p>
+            </div>
+          </button>
+
+          {/* Help */}
+          <button
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 active:scale-[0.98] hover:bg-gray-50"
+            onClick={() => setMenuOpen(false)}
+          >
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-lg"
+              style={{ background: 'var(--thamara-bg-secondary)' }}
+            >
+              <HelpCircle size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
+            </div>
+            <div className="text-left">
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Help & Support</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>FAQs & tutorials</p>
+            </div>
+          </button>
+
+          {/* About */}
+          <button
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 active:scale-[0.98] hover:bg-gray-50"
+            onClick={() => setMenuOpen(false)}
+          >
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-lg"
+              style={{ background: 'var(--thamara-bg-secondary)' }}
+            >
+              <Info size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
+            </div>
+            <div className="text-left">
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>About Thamara</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>Version & info</p>
+            </div>
+          </button>
+        </div>
+
+        {/* Footer */}
+        <div
+          className="absolute bottom-0 left-0 right-0 p-4 border-t"
+          style={{
+            borderColor: 'var(--thamara-border)',
+            paddingBottom: 'calc(16px + var(--safe-area-inset-bottom))'
+          }}
+        >
+          <div className="flex items-center gap-2 justify-center">
+            <div
+              className="flex items-center gap-2 px-3 py-2 rounded-lg"
+              style={{ background: 'var(--thamara-primary-50)' }}
+            >
+              <WifiOff size={16} style={{ color: 'var(--thamara-primary-700)' }} />
+              <span className="text-sm font-medium" style={{ color: 'var(--thamara-primary-700)' }}>
+                Offline Mode
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
-    </header>
+    </>
   );
 }
