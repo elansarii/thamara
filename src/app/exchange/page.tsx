@@ -90,7 +90,7 @@ export default function ExchangePage() {
         { value: 'all', label: t.exchange.allHubs, icon: Building2 },
         { value: 'ngo_hub', label: t.exchange.ngoHubs, icon: ShieldCheck },
         { value: 'coop_hub', label: t.exchange.coopHubs, icon: Users },
-        { value: 'supplier_hub', label: t.exchange.supplierHubs, icon: Package },
+        { value: 'supplier_hub', label: t.exchange.suppliers, icon: Package },
       ],
     },
   }), [t]);
