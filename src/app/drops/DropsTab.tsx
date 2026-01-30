@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   Search,
-  Filter,
   Plus,
   MapPin,
   Clock,
@@ -11,10 +10,14 @@ import {
   AlertTriangle,
   Sparkles,
   X,
-  Calendar,
   TrendingUp,
-  Droplets,
   CheckCircle2,
+  Timer,
+  Leaf,
+  ChevronRight,
+  Filter,
+  Zap,
+  Users,
 } from 'lucide-react';
 import type { HarvestDrop, DropStatus, PickupPreference, DropSortOption, DropFilters, QuantityBand } from '@/lib/dropsTypes';
 import {
@@ -35,6 +38,89 @@ import { CROPS } from '@/data/crops';
 import MatchPickupDrawer from './MatchPickupDrawer';
 import { useLanguage } from '@/lib/i18n';
 
+// Example drops data - preloaded for production
+const EXAMPLE_DROPS: Omit<HarvestDrop, 'id' | 'createdAt'>[] = [
+  {
+    cropType: 'lettuce',
+    cropCommonName: 'Butter Lettuce',
+    windowStart: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+    windowEnd: new Date(Date.now() + 10 * 60 * 60 * 1000).toISOString(),
+    quantityMin: 12,
+    quantityMax: 18,
+    unit: 'kg',
+    locationLabel: 'North District, Grid 5',
+    pickupPreference: 'same_day',
+    spoilageRisk: 'high',
+    status: 'active',
+    notes: 'Organic butter lettuce, ready for harvest. Best quality in morning pickup.',
+  },
+  {
+    cropType: 'tomato',
+    cropCommonName: 'Cherry Tomatoes',
+    windowStart: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    windowEnd: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+    quantityMin: 20,
+    quantityMax: 30,
+    unit: 'kg',
+    locationLabel: 'Central Block 3',
+    pickupPreference: '24h',
+    spoilageRisk: 'medium',
+    status: 'scheduled',
+    notes: 'Peak ripeness cherry tomatoes. Can provide crates if needed.',
+  },
+  {
+    cropType: 'cucumber',
+    cropCommonName: 'Persian Cucumber',
+    windowStart: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+    windowEnd: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+    quantityMin: 15,
+    quantityMax: 20,
+    unit: 'kg',
+    locationLabel: 'East Zone 7',
+    pickupPreference: 'same_day',
+    spoilageRisk: 'high',
+    status: 'active',
+    notes: 'Fresh Persian cucumbers, urgent same-day pickup preferred.',
+  },
+  {
+    cropType: 'radish',
+    cropCommonName: 'Red Radish',
+    windowStart: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+    windowEnd: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+    quantityMin: 30,
+    quantityMax: 45,
+    unit: 'bunches',
+    locationLabel: 'Southern Farm 12',
+    pickupPreference: 'any',
+    spoilageRisk: 'low',
+    status: 'scheduled',
+    notes: 'Hardy root vegetables, flexible timing available.',
+  },
+  {
+    cropType: 'spinach',
+    cropCommonName: 'Baby Spinach',
+    windowStart: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+    windowEnd: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+    quantityMin: 8,
+    quantityMax: 12,
+    unit: 'kg',
+    locationLabel: 'West Field 4',
+    pickupPreference: 'same_day',
+    spoilageRisk: 'high',
+    status: 'active',
+    notes: 'Window closing soon - urgent pickup needed!',
+  },
+];
+
+function initializeExampleDrops(): HarvestDrop[] {
+  const now = new Date();
+  return EXAMPLE_DROPS.map((drop, index) => ({
+    ...drop,
+    id: generateDropId(),
+    createdAt: new Date(now.getTime() - (index + 1) * 60 * 60 * 1000).toISOString(),
+  }));
+}
+
 export default function DropsTab() {
   const [drops, setDrops] = useState<HarvestDrop[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,14 +131,19 @@ export default function DropsTab() {
     quantityBand: [],
     search: '',
   });
-
+  const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedDropForMatch, setSelectedDropForMatch] = useState<HarvestDrop | null>(null);
   const { t, isRTL } = useLanguage();
 
-  // Load drops on mount
+  // Load drops on mount - auto-seed if empty
   useEffect(() => {
-    setDrops(loadDrops());
+    let loadedDrops = loadDrops();
+    if (loadedDrops.length === 0) {
+      loadedDrops = initializeExampleDrops();
+      saveDrops(loadedDrops);
+    }
+    setDrops(loadedDrops);
   }, []);
 
   // Apply filters and sorting
@@ -63,6 +154,19 @@ export default function DropsTab() {
       sortBy
     );
   }, [drops, filters, searchQuery, sortBy]);
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    const activeDrops = drops.filter(d => d.status === 'active');
+    const urgentDrops = activeDrops.filter(d => d.spoilageRisk === 'high');
+    const totalQuantity = drops.reduce((sum, d) => sum + d.quantityMax, 0);
+    return {
+      total: drops.length,
+      active: activeDrops.length,
+      urgent: urgentDrops.length,
+      totalKg: totalQuantity,
+    };
+  }, [drops]);
 
   // Toggle filter
   const toggleFilter = <K extends keyof DropFilters>(
@@ -81,25 +185,52 @@ export default function DropsTab() {
     });
   };
 
+  const activeFiltersCount =
+    (filters.status?.length || 0) +
+    (filters.pickupPreference?.length || 0) +
+    (filters.quantityBand?.length || 0);
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Header */}
+      {/* Header with Stats */}
       <div
-        className="px-5 py-4 border-b"
+        className="px-5 py-4"
         style={{
-          background: 'var(--thamara-surface)',
-          borderColor: 'var(--thamara-border)'
+          background: 'linear-gradient(135deg, var(--thamara-primary-600) 0%, var(--thamara-primary-700) 100%)',
         }}
       >
-        <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-          {t.drops.title}
-        </h1>
-        <p className="text-sm" style={{ color: 'var(--thamara-text-secondary)' }}>
-          {t.drops.subtitle}
-        </p>
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h1 className="text-xl font-bold text-white mb-1">
+              Harvest Drops
+            </h1>
+            <p className="text-sm text-white/80">
+              Coordinate pickups without refrigeration
+            </p>
+          </div>
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold"
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              borderRadius: 'var(--thamara-radius-full)',
+              color: 'white',
+            }}
+          >
+            <Zap size={14} />
+            <span>No-Fridge Mode</span>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-4 gap-2">
+          <StatCard icon={Package} label="Total" value={stats.total} />
+          <StatCard icon={Timer} label="Active" value={stats.active} color="var(--thamara-accent-400)" />
+          <StatCard icon={AlertTriangle} label="Urgent" value={stats.urgent} color="var(--thamara-warning)" />
+          <StatCard icon={TrendingUp} label="kg Ready" value={stats.totalKg} />
+        </div>
       </div>
 
-      {/* Controls */}
+      {/* Search and Filters */}
       <div
         className="px-5 py-3 border-b space-y-3"
         style={{
@@ -107,7 +238,7 @@ export default function DropsTab() {
           borderColor: 'var(--thamara-border)'
         }}
       >
-        {/* Search and Sort */}
+        {/* Search Bar */}
         <div className="flex gap-2">
           <div className="flex-1 relative">
             <Search
@@ -117,18 +248,42 @@ export default function DropsTab() {
             />
             <input
               type="text"
-              placeholder={t.drops.searchPlaceholder}
+              placeholder="Search crops, locations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full py-2 text-sm border outline-none ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
+              className={`w-full py-2.5 text-sm border outline-none focus:border-[var(--thamara-primary-400)] ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
               style={{
                 background: 'var(--thamara-bg)',
                 borderColor: 'var(--thamara-border)',
-                borderRadius: 'var(--thamara-radius-md)',
+                borderRadius: 'var(--thamara-radius-lg)',
                 color: 'var(--thamara-text-primary)',
               }}
             />
           </div>
+
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="relative px-3 py-2 border transition-all"
+            style={{
+              background: showFilters ? 'var(--thamara-primary-50)' : 'var(--thamara-bg)',
+              borderColor: showFilters ? 'var(--thamara-primary-300)' : 'var(--thamara-border)',
+              borderRadius: 'var(--thamara-radius-lg)',
+              color: showFilters ? 'var(--thamara-primary-600)' : 'var(--thamara-text-secondary)',
+            }}
+          >
+            <Filter size={18} />
+            {activeFiltersCount > 0 && (
+              <span
+                className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center text-[10px] font-bold text-white"
+                style={{
+                  background: 'var(--thamara-accent-500)',
+                  borderRadius: '50%',
+                }}
+              >
+                {activeFiltersCount}
+              </span>
+            )}
+          </button>
 
           <select
             value={sortBy}
@@ -137,150 +292,110 @@ export default function DropsTab() {
             style={{
               background: 'var(--thamara-bg)',
               borderColor: 'var(--thamara-border)',
-              borderRadius: 'var(--thamara-radius-md)',
+              borderRadius: 'var(--thamara-radius-lg)',
               color: 'var(--thamara-text-primary)',
             }}
           >
-            <option value="ai_priority">{t.drops.aiPriority}</option>
-            <option value="soonest">Soonest Window</option>
-            <option value="largest">Largest Quantity</option>
+            <option value="ai_priority">AI Priority</option>
+            <option value="soonest">Soonest</option>
+            <option value="largest">Largest</option>
           </select>
         </div>
 
-        {/* Filter Chips */}
-        <div className="flex flex-wrap gap-2">
-          {/* Status filters */}
-          {(['active', 'scheduled', 'completed'] as DropStatus[]).map(status => {
-            const statusLabels = {
-              active: t.drops.active,
-              scheduled: t.drops.scheduled,
-              completed: t.drops.completed,
-            };
-            return (
-              <button
-                key={status}
-                onClick={() => toggleFilter('status', status)}
-                className="px-3 py-1.5 text-xs font-semibold transition-all capitalize"
-                style={{
-                  background: filters.status?.includes(status)
-                    ? 'var(--thamara-primary-100)'
-                    : 'var(--thamara-bg)',
-                  color: filters.status?.includes(status)
-                    ? 'var(--thamara-primary-700)'
-                    : 'var(--thamara-text-secondary)',
-                  border: `1px solid ${filters.status?.includes(status)
-                    ? 'var(--thamara-primary-300)'
-                    : 'var(--thamara-border)'}`,
-                  borderRadius: 'var(--thamara-radius-full)',
-                }}
-              >
-                {statusLabels[status]}
-              </button>
-            );
-          })}
+        {/* Expandable Filter Chips */}
+        {showFilters && (
+          <div className="space-y-2 pt-2 border-t" style={{ borderColor: 'var(--thamara-border)' }}>
+            {/* Status filters */}
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs font-medium py-1" style={{ color: 'var(--thamara-text-muted)' }}>Status:</span>
+              {(['active', 'scheduled', 'completed'] as DropStatus[]).map(status => (
+                <FilterChip
+                  key={status}
+                  label={status === 'active' ? 'Active' : status === 'scheduled' ? 'Scheduled' : 'Completed'}
+                  isActive={filters.status?.includes(status)}
+                  onClick={() => toggleFilter('status', status)}
+                  color="primary"
+                />
+              ))}
+            </div>
 
-          {/* Pickup filters */}
-          {(['same_day', '24h', 'any'] as PickupPreference[]).map(pickup => {
-            const pickupLabels = {
-              same_day: t.drops.sameDay,
-              '24h': t.drops.timeFilter24h,
-              any: t.drops.timeFilterAny,
-            };
-            return (
-              <button
-                key={pickup}
-                onClick={() => toggleFilter('pickupPreference', pickup)}
-                className="px-3 py-1.5 text-xs font-semibold transition-all capitalize"
-                style={{
-                  background: filters.pickupPreference?.includes(pickup)
-                    ? 'var(--thamara-accent-100)'
-                    : 'var(--thamara-bg)',
-                  color: filters.pickupPreference?.includes(pickup)
-                    ? 'var(--thamara-accent-700)'
-                    : 'var(--thamara-text-secondary)',
-                  border: `1px solid ${filters.pickupPreference?.includes(pickup)
-                    ? 'var(--thamara-accent-300)'
-                    : 'var(--thamara-border)'}`,
-                  borderRadius: 'var(--thamara-radius-full)',
-                }}
-              >
-                {pickupLabels[pickup]}
-              </button>
-            );
-          })}
+            {/* Timing filters */}
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs font-medium py-1" style={{ color: 'var(--thamara-text-muted)' }}>Timing:</span>
+              {(['same_day', '24h', 'any'] as PickupPreference[]).map(pickup => (
+                <FilterChip
+                  key={pickup}
+                  label={pickup === 'same_day' ? 'Same-Day' : pickup === '24h' ? '24h' : 'Flexible'}
+                  isActive={filters.pickupPreference?.includes(pickup)}
+                  onClick={() => toggleFilter('pickupPreference', pickup)}
+                  color="accent"
+                />
+              ))}
+            </div>
 
-          {/* Quantity band filters */}
-          {(['small', 'medium', 'large'] as QuantityBand[]).map(band => {
-            const bandLabels = {
-              small: t.drops.sizeSmall,
-              medium: t.drops.sizeMedium,
-              large: t.drops.sizeLarge,
-            };
-            return (
-              <button
-                key={band}
-                onClick={() => toggleFilter('quantityBand', band)}
-                className="px-3 py-1.5 text-xs font-semibold transition-all capitalize"
-                style={{
-                  background: filters.quantityBand?.includes(band)
-                    ? 'var(--thamara-secondary-100)'
-                    : 'var(--thamara-bg)',
-                  color: filters.quantityBand?.includes(band)
-                    ? 'var(--thamara-secondary-700)'
-                    : 'var(--thamara-text-secondary)',
-                  border: `1px solid ${filters.quantityBand?.includes(band)
-                    ? 'var(--thamara-secondary-300)'
-                    : 'var(--thamara-border)'}`,
-                  borderRadius: 'var(--thamara-radius-full)',
-                }}
-              >
-                {bandLabels[band]}
-              </button>
-            );
-          })}
-        </div>
+            {/* Size filters */}
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs font-medium py-1" style={{ color: 'var(--thamara-text-muted)' }}>Size:</span>
+              {(['small', 'medium', 'large'] as QuantityBand[]).map(band => (
+                <FilterChip
+                  key={band}
+                  label={band.charAt(0).toUpperCase() + band.slice(1)}
+                  isActive={filters.quantityBand?.includes(band)}
+                  onClick={() => toggleFilter('quantityBand', band)}
+                  color="secondary"
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Drops List */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 pb-24">
         {filteredDrops.length === 0 ? (
-          <div className="text-center py-12">
-            <Package size={48} className="mx-auto mb-4" style={{ color: 'var(--thamara-text-muted)' }} />
-            <p className="text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-secondary)' }}>
-              {t.drops.noDrops}
-            </p>
-            <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>
-              {t.drops.noDropsDesc}
-            </p>
-          </div>
+          <EmptyState onCreateDrop={() => setShowCreateModal(true)} />
         ) : (
-          filteredDrops.map(drop => (
-            <DropCard
-              key={drop.id}
-              drop={drop}
-              sortBy={sortBy}
-              onMatchPickup={() => setSelectedDropForMatch(drop)}
-              onUpdateStatus={(status) => {
-                updateDrop(drop.id, { status });
-                setDrops(loadDrops());
-              }}
-            />
-          ))
+          <>
+            {/* Results count */}
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
+                {filteredDrops.length} drop{filteredDrops.length !== 1 ? 's' : ''} available
+              </span>
+              {sortBy === 'ai_priority' && (
+                <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--thamara-accent-600)' }}>
+                  <Sparkles size={12} />
+                  AI-sorted by urgency
+                </span>
+              )}
+            </div>
+
+            {filteredDrops.map(drop => (
+              <DropCard
+                key={drop.id}
+                drop={drop}
+                onMatchPickup={() => setSelectedDropForMatch(drop)}
+                onUpdateStatus={(status) => {
+                  updateDrop(drop.id, { status });
+                  setDrops(loadDrops());
+                }}
+              />
+            ))}
+          </>
         )}
       </div>
 
       {/* Sticky Create Button */}
       <div
-        className="px-5 py-4 border-t"
+        className="absolute bottom-0 left-0 right-0 px-5 py-4 border-t"
         style={{
           background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)',
-          boxShadow: 'var(--thamara-shadow-lg)'
+          boxShadow: '0 -4px 20px rgba(0,0,0,0.1)'
         }}
       >
         <button
           onClick={() => setShowCreateModal(true)}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3.5 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
           style={{
             background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
             color: 'var(--thamara-text-on-accent)',
@@ -289,7 +404,7 @@ export default function DropsTab() {
           }}
         >
           <Plus size={20} strokeWidth={2.5} />
-          <span>{t.drops.createDrop}</span>
+          <span>Create New Drop</span>
         </button>
       </div>
 
@@ -315,29 +430,135 @@ export default function DropsTab() {
   );
 }
 
+// Stat Card Component
+function StatCard({ icon: Icon, label, value, color }: {
+  icon: any;
+  label: string;
+  value: number;
+  color?: string;
+}) {
+  return (
+    <div
+      className="p-2.5 text-center"
+      style={{
+        background: 'rgba(255,255,255,0.15)',
+        borderRadius: 'var(--thamara-radius-md)',
+      }}
+    >
+      <Icon size={16} className="mx-auto mb-1" style={{ color: color || 'white' }} />
+      <div className="text-lg font-bold text-white">{value}</div>
+      <div className="text-[10px] text-white/70 uppercase tracking-wide">{label}</div>
+    </div>
+  );
+}
+
+// Filter Chip Component
+function FilterChip({
+  label,
+  isActive,
+  onClick,
+  color = 'primary'
+}: {
+  label: string;
+  isActive?: boolean;
+  onClick: () => void;
+  color?: 'primary' | 'accent' | 'secondary';
+}) {
+  const colorMap = {
+    primary: {
+      active: { bg: 'var(--thamara-primary-100)', border: 'var(--thamara-primary-300)', text: 'var(--thamara-primary-700)' },
+      inactive: { bg: 'var(--thamara-bg)', border: 'var(--thamara-border)', text: 'var(--thamara-text-secondary)' },
+    },
+    accent: {
+      active: { bg: 'var(--thamara-accent-100)', border: 'var(--thamara-accent-300)', text: 'var(--thamara-accent-700)' },
+      inactive: { bg: 'var(--thamara-bg)', border: 'var(--thamara-border)', text: 'var(--thamara-text-secondary)' },
+    },
+    secondary: {
+      active: { bg: 'var(--thamara-secondary-100)', border: 'var(--thamara-secondary-300)', text: 'var(--thamara-secondary-700)' },
+      inactive: { bg: 'var(--thamara-bg)', border: 'var(--thamara-border)', text: 'var(--thamara-text-secondary)' },
+    },
+  };
+
+  const colors = colorMap[color][isActive ? 'active' : 'inactive'];
+
+  return (
+    <button
+      onClick={onClick}
+      className="px-3 py-1.5 text-xs font-semibold transition-all"
+      style={{
+        background: colors.bg,
+        color: colors.text,
+        border: `1px solid ${colors.border}`,
+        borderRadius: 'var(--thamara-radius-full)',
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+// Empty State Component
+function EmptyState({ onCreateDrop }: { onCreateDrop: () => void }) {
+  return (
+    <div className="text-center py-12 px-6">
+      <div
+        className="w-20 h-20 mx-auto mb-5 flex items-center justify-center"
+        style={{
+          background: 'var(--thamara-primary-50)',
+          borderRadius: 'var(--thamara-radius-xl)',
+        }}
+      >
+        <Package size={40} style={{ color: 'var(--thamara-primary-400)' }} />
+      </div>
+      <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+        No Drops Found
+      </h3>
+      <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: 'var(--thamara-text-secondary)' }}>
+        Create your first harvest drop to coordinate pickup with buyers, NGOs, and distribution hubs.
+      </p>
+      <button
+        onClick={onCreateDrop}
+        className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-all"
+        style={{
+          background: 'var(--thamara-accent-500)',
+          color: 'white',
+          borderRadius: 'var(--thamara-radius-lg)',
+        }}
+      >
+        <Plus size={18} />
+        Create Your First Drop
+      </button>
+    </div>
+  );
+}
+
 // Drop Card Component
 function DropCard({
   drop,
-  sortBy,
   onMatchPickup,
   onUpdateStatus,
 }: {
   drop: HarvestDrop;
-  sortBy: DropSortOption;
   onMatchPickup: () => void;
   onUpdateStatus: (status: DropStatus) => void;
 }) {
   const priorityScore = calculateDropPriority(drop);
   const timeLabel = formatTimeUntilWindow(drop.windowStart);
-  const quantityBand = getQuantityBand(drop.quantityMin, drop.quantityMax);
+  const isUrgent = drop.spoilageRisk === 'high';
+  const isActive = drop.status === 'active';
+
+  // Determine urgency styling
+  const urgencyColors = isUrgent
+    ? { border: 'var(--thamara-warning)', bg: 'rgba(245, 158, 11, 0.05)' }
+    : { border: 'var(--thamara-border)', bg: 'var(--thamara-surface)' };
 
   return (
     <div
-      className="p-4 border transition-all hover:shadow-md"
+      className="p-4 border-2 transition-all hover:shadow-lg"
       style={{
-        background: 'var(--thamara-surface)',
-        borderColor: 'var(--thamara-border)',
-        borderRadius: 'var(--thamara-radius-lg)',
+        background: urgencyColors.bg,
+        borderColor: urgencyColors.border,
+        borderRadius: 'var(--thamara-radius-xl)',
       }}
     >
       {/* Header */}
@@ -346,136 +567,170 @@ function DropCard({
           <div
             className="w-12 h-12 flex items-center justify-center"
             style={{
-              background: 'var(--thamara-primary-50)',
-              borderRadius: 'var(--thamara-radius-md)',
+              background: isUrgent ? 'var(--thamara-warning)' : 'var(--thamara-primary-100)',
+              borderRadius: 'var(--thamara-radius-lg)',
             }}
           >
-            <Package size={24} style={{ color: 'var(--thamara-primary-600)' }} />
+            <Leaf size={24} style={{ color: isUrgent ? 'white' : 'var(--thamara-primary-600)' }} />
           </div>
           <div>
-            <h3 className="font-semibold text-base" style={{ color: 'var(--thamara-text-primary)' }}>
+            <h3 className="font-bold text-base" style={{ color: 'var(--thamara-text-primary)' }}>
               {drop.cropCommonName}
             </h3>
-            <p className="text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
-              {timeLabel}
-            </p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span
+                className={`inline-flex items-center gap-1 text-xs font-medium ${isActive ? 'animate-pulse' : ''}`}
+                style={{ color: isUrgent ? 'var(--thamara-warning)' : 'var(--thamara-text-secondary)' }}
+              >
+                <Clock size={12} />
+                {timeLabel}
+              </span>
+            </div>
           </div>
         </div>
 
-        {sortBy === 'ai_priority' && (
-          <div
-            className="flex items-center gap-1 px-2 py-1 text-xs font-bold"
-            style={{
-              background: priorityScore >= 70
-                ? 'var(--thamara-warning)'
-                : priorityScore >= 50
-                  ? 'var(--thamara-accent-500)'
-                  : 'var(--thamara-primary-300)',
-              color: 'white',
-              borderRadius: 'var(--thamara-radius-md)',
-            }}
-          >
-            <Sparkles size={12} />
-            <span>{priorityScore}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Details */}
-      <div className="space-y-2 mb-3">
-        <div className="flex items-center gap-2 text-sm">
-          <Clock size={14} style={{ color: 'var(--thamara-text-muted)' }} />
-          <span style={{ color: 'var(--thamara-text-secondary)' }}>
-            {new Date(drop.windowStart).toLocaleDateString()} - {new Date(drop.windowEnd).toLocaleDateString()}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
-          <Package size={14} style={{ color: 'var(--thamara-text-muted)' }} />
-          <span style={{ color: 'var(--thamara-text-secondary)' }}>
-            {drop.quantityMin}-{drop.quantityMax} {drop.unit}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
-          <MapPin size={14} style={{ color: 'var(--thamara-text-muted)' }} />
-          <span style={{ color: 'var(--thamara-text-secondary)' }}>
-            {drop.locationLabel}
-          </span>
-        </div>
-      </div>
-
-      {/* Badges */}
-      <div className="flex flex-wrap gap-2 mb-3">
-        <span
-          className="px-2 py-1 text-xs font-semibold"
+        {/* Priority Badge */}
+        <div
+          className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold"
           style={{
-            background: 'var(--thamara-info)',
-            color: 'white',
-            borderRadius: 'var(--thamara-radius-md)',
-          }}
-        >
-          No-Fridge Mode
-        </span>
-
-        <span
-          className="flex items-center gap-1 px-2 py-1 text-xs font-semibold"
-          style={{
-            background: drop.spoilageRisk === 'high'
+            background: priorityScore >= 70
               ? 'var(--thamara-error)'
-              : drop.spoilageRisk === 'medium'
+              : priorityScore >= 50
                 ? 'var(--thamara-warning)'
-                : 'var(--thamara-success)',
+                : 'var(--thamara-accent-500)',
             color: 'white',
             borderRadius: 'var(--thamara-radius-md)',
           }}
         >
-          <AlertTriangle size={12} />
-          <span>AI Risk: {drop.spoilageRisk}</span>
-        </span>
-
-        <span
-          className="px-2 py-1 text-xs font-semibold capitalize"
-          style={{
-            background: 'var(--thamara-accent-100)',
-            color: 'var(--thamara-accent-700)',
-            borderRadius: 'var(--thamara-radius-md)',
-          }}
-        >
-          {drop.pickupPreference === 'same_day' ? 'Same-Day' : drop.pickupPreference === '24h' ? '24h Pickup' : 'Flexible'}
-        </span>
+          <Sparkles size={12} />
+          <span>{priorityScore}</span>
+        </div>
       </div>
+
+      {/* Details Grid */}
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <DetailItem icon={Package} label="Quantity" value={`${drop.quantityMin}-${drop.quantityMax} ${drop.unit}`} />
+        <DetailItem icon={MapPin} label="Location" value={drop.locationLabel} />
+      </div>
+
+      {/* Tags */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <StatusBadge status={drop.status} />
+        <RiskBadge risk={drop.spoilageRisk} />
+        <TimingBadge preference={drop.pickupPreference} />
+      </div>
+
+      {/* Notes Preview */}
+      {drop.notes && (
+        <p className="text-xs mb-4 p-2" style={{
+          color: 'var(--thamara-text-secondary)',
+          background: 'var(--thamara-bg)',
+          borderRadius: 'var(--thamara-radius-md)',
+        }}>
+          {drop.notes}
+        </p>
+      )}
 
       {/* Actions */}
       <div className="flex gap-2">
         <button
           onClick={onMatchPickup}
-          className="flex-1 px-3 py-2 text-sm font-semibold transition-all hover:opacity-80"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-90"
           style={{
             background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
             color: 'white',
             borderRadius: 'var(--thamara-radius-md)',
           }}
         >
-          Match Pickup
+          <Users size={16} />
+          Find Pickup Match
+          <ChevronRight size={16} />
         </button>
 
         {drop.status !== 'completed' && (
           <button
             onClick={() => onUpdateStatus('completed')}
-            className="px-3 py-2 text-sm font-semibold border transition-all hover:bg-opacity-80"
+            className="px-4 py-2.5 text-sm font-semibold border transition-all hover:bg-opacity-80"
             style={{
               background: 'var(--thamara-bg)',
-              color: 'var(--thamara-text-secondary)',
-              borderColor: 'var(--thamara-border)',
+              color: 'var(--thamara-success)',
+              borderColor: 'var(--thamara-success)',
               borderRadius: 'var(--thamara-radius-md)',
             }}
           >
-            Complete
+            <CheckCircle2 size={18} />
           </button>
         )}
       </div>
     </div>
+  );
+}
+
+// Detail Item Component
+function DetailItem({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <Icon size={14} style={{ color: 'var(--thamara-text-muted)' }} />
+      <span className="truncate" style={{ color: 'var(--thamara-text-secondary)' }}>{value}</span>
+    </div>
+  );
+}
+
+// Status Badge Component
+function StatusBadge({ status }: { status: DropStatus }) {
+  const config = {
+    active: { bg: 'var(--thamara-success)', label: 'Active' },
+    scheduled: { bg: 'var(--thamara-info)', label: 'Scheduled' },
+    completed: { bg: 'var(--thamara-text-muted)', label: 'Completed' },
+  };
+  const { bg, label } = config[status];
+
+  return (
+    <span
+      className="px-2 py-1 text-[10px] font-bold uppercase tracking-wide"
+      style={{ background: bg, color: 'white', borderRadius: 'var(--thamara-radius-md)' }}
+    >
+      {label}
+    </span>
+  );
+}
+
+// Risk Badge Component
+function RiskBadge({ risk }: { risk: 'low' | 'medium' | 'high' }) {
+  const config = {
+    low: { bg: 'var(--thamara-success)', label: 'Low Risk' },
+    medium: { bg: 'var(--thamara-warning)', label: 'Med Risk' },
+    high: { bg: 'var(--thamara-error)', label: 'High Risk' },
+  };
+  const { bg, label } = config[risk];
+
+  return (
+    <span
+      className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold uppercase tracking-wide"
+      style={{ background: bg, color: 'white', borderRadius: 'var(--thamara-radius-md)' }}
+    >
+      <AlertTriangle size={10} />
+      {label}
+    </span>
+  );
+}
+
+// Timing Badge Component
+function TimingBadge({ preference }: { preference: PickupPreference }) {
+  const config = {
+    same_day: { bg: 'var(--thamara-accent-100)', color: 'var(--thamara-accent-700)', label: 'Same-Day' },
+    '24h': { bg: 'var(--thamara-primary-100)', color: 'var(--thamara-primary-700)', label: '24h Pickup' },
+    any: { bg: 'var(--thamara-bg-secondary)', color: 'var(--thamara-text-secondary)', label: 'Flexible' },
+  };
+  const { bg, color, label } = config[preference];
+
+  return (
+    <span
+      className="px-2 py-1 text-[10px] font-bold uppercase tracking-wide"
+      style={{ background: bg, color, borderRadius: 'var(--thamara-radius-md)' }}
+    >
+      {label}
+    </span>
   );
 }
 
@@ -487,6 +742,7 @@ function CreateDropModal({
   onClose: () => void;
   onSave: (drop: HarvestDrop) => void;
 }) {
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [formData, setFormData] = useState({
     cropType: '',
     windowStart: '',
@@ -531,237 +787,352 @@ function CreateDropModal({
     onSave(drop);
   };
 
+  const isStep1Valid = formData.cropType && formData.locationLabel;
+  const isStep2Valid = formData.windowStart && formData.windowEnd && formData.quantityMin && formData.quantityMax;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-      style={{ background: 'rgba(0, 0, 0, 0.5)' }}
+      style={{ background: 'rgba(0, 0, 0, 0.6)' }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
         style={{
           background: 'var(--thamara-surface)',
-          borderRadius: 'var(--thamara-radius-xl)',
+          borderRadius: 'var(--thamara-radius-xl) var(--thamara-radius-xl) 0 0',
           boxShadow: 'var(--thamara-shadow-xl)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
-            Create Harvest Drop
-          </h2>
+        <div
+          className="sticky top-0 flex items-center justify-between p-5 border-b"
+          style={{ background: 'var(--thamara-surface)', borderColor: 'var(--thamara-border)' }}
+        >
+          <div>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
+              Create Drop
+            </h2>
+            <p className="text-sm mt-0.5" style={{ color: 'var(--thamara-text-secondary)' }}>
+              Step {step} of 3
+            </p>
+          </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-opacity-80 transition-all"
-            style={{ color: 'var(--thamara-text-secondary)' }}
+            className="p-2 hover:bg-opacity-80 transition-all"
+            style={{
+              color: 'var(--thamara-text-secondary)',
+              background: 'var(--thamara-bg)',
+              borderRadius: 'var(--thamara-radius-md)',
+            }}
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-              Crop
-            </label>
-            <select
-              required
-              value={formData.cropType}
-              onChange={(e) => setFormData({ ...formData, cropType: e.target.value })}
-              className="w-full px-3 py-2 border outline-none"
+        {/* Progress Bar */}
+        <div className="flex gap-1 px-5 pt-4">
+          {[1, 2, 3].map((s) => (
+            <div
+              key={s}
+              className="flex-1 h-1.5 transition-all"
               style={{
-                background: 'var(--thamara-bg)',
-                borderColor: 'var(--thamara-border)',
-                borderRadius: 'var(--thamara-radius-md)',
-                color: 'var(--thamara-text-primary)',
+                background: s <= step ? 'var(--thamara-accent-500)' : 'var(--thamara-border)',
+                borderRadius: 'var(--thamara-radius-full)',
               }}
-            >
-              <option value="">Select crop...</option>
-              {CROPS.map(crop => (
-                <option key={crop.id} value={crop.id}>
-                  {crop.commonName}
-                </option>
-              ))}
-            </select>
-          </div>
+            />
+          ))}
+        </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-                Window Start
-              </label>
-              <input
-                type="datetime-local"
-                required
-                value={formData.windowStart}
-                onChange={(e) => setFormData({ ...formData, windowStart: e.target.value })}
-                className="w-full px-3 py-2 border outline-none"
-                style={{
-                  background: 'var(--thamara-bg)',
-                  borderColor: 'var(--thamara-border)',
-                  borderRadius: 'var(--thamara-radius-md)',
-                  color: 'var(--thamara-text-primary)',
-                }}
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="p-5 space-y-5">
+          {step === 1 && (
+            <>
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+                  What are you harvesting?
+                </label>
+                <select
+                  required
+                  value={formData.cropType}
+                  onChange={(e) => setFormData({ ...formData, cropType: e.target.value })}
+                  className="w-full px-4 py-3 border outline-none focus:border-[var(--thamara-primary-400)]"
+                  style={{
+                    background: 'var(--thamara-bg)',
+                    borderColor: 'var(--thamara-border)',
+                    borderRadius: 'var(--thamara-radius-lg)',
+                    color: 'var(--thamara-text-primary)',
+                  }}
+                >
+                  <option value="">Select crop...</option>
+                  {CROPS.map(crop => (
+                    <option key={crop.id} value={crop.id}>
+                      {crop.commonName}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-                Window End
-              </label>
-              <input
-                type="datetime-local"
-                required
-                value={formData.windowEnd}
-                onChange={(e) => setFormData({ ...formData, windowEnd: e.target.value })}
-                className="w-full px-3 py-2 border outline-none"
-                style={{
-                  background: 'var(--thamara-bg)',
-                  borderColor: 'var(--thamara-border)',
-                  borderRadius: 'var(--thamara-radius-md)',
-                  color: 'var(--thamara-text-primary)',
-                }}
-              />
-            </div>
-          </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+                  Pickup Location
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g., North District Grid 5"
+                  value={formData.locationLabel}
+                  onChange={(e) => setFormData({ ...formData, locationLabel: e.target.value })}
+                  className="w-full px-4 py-3 border outline-none focus:border-[var(--thamara-primary-400)]"
+                  style={{
+                    background: 'var(--thamara-bg)',
+                    borderColor: 'var(--thamara-border)',
+                    borderRadius: 'var(--thamara-radius-lg)',
+                    color: 'var(--thamara-text-primary)',
+                  }}
+                />
+              </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-                Min Quantity
-              </label>
-              <input
-                type="number"
-                required
-                min="0"
-                step="0.1"
-                value={formData.quantityMin}
-                onChange={(e) => setFormData({ ...formData, quantityMin: e.target.value })}
-                className="w-full px-3 py-2 border outline-none"
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                disabled={!isStep1Valid}
+                className="w-full py-3.5 text-base font-semibold transition-all disabled:opacity-50"
                 style={{
-                  background: 'var(--thamara-bg)',
-                  borderColor: 'var(--thamara-border)',
-                  borderRadius: 'var(--thamara-radius-md)',
-                  color: 'var(--thamara-text-primary)',
-                }}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-                Max Quantity
-              </label>
-              <input
-                type="number"
-                required
-                min="0"
-                step="0.1"
-                value={formData.quantityMax}
-                onChange={(e) => setFormData({ ...formData, quantityMax: e.target.value })}
-                className="w-full px-3 py-2 border outline-none"
-                style={{
-                  background: 'var(--thamara-bg)',
-                  borderColor: 'var(--thamara-border)',
-                  borderRadius: 'var(--thamara-radius-md)',
-                  color: 'var(--thamara-text-primary)',
-                }}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-                Unit
-              </label>
-              <select
-                value={formData.unit}
-                onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                className="w-full px-3 py-2 border outline-none"
-                style={{
-                  background: 'var(--thamara-bg)',
-                  borderColor: 'var(--thamara-border)',
-                  borderRadius: 'var(--thamara-radius-md)',
-                  color: 'var(--thamara-text-primary)',
+                  background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
+                  color: 'white',
+                  borderRadius: 'var(--thamara-radius-lg)',
                 }}
               >
-                <option value="kg">kg</option>
-                <option value="bunches">bunches</option>
-                <option value="crates">crates</option>
-              </select>
-            </div>
-          </div>
+                Continue
+              </button>
+            </>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-              Location Label
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g., North District Grid 5"
-              value={formData.locationLabel}
-              onChange={(e) => setFormData({ ...formData, locationLabel: e.target.value })}
-              className="w-full px-3 py-2 border outline-none"
-              style={{
-                background: 'var(--thamara-bg)',
-                borderColor: 'var(--thamara-border)',
-                borderRadius: 'var(--thamara-radius-md)',
-                color: 'var(--thamara-text-primary)',
-              }}
-            />
-          </div>
+          {step === 2 && (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+                    Window Start
+                  </label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={formData.windowStart}
+                    onChange={(e) => setFormData({ ...formData, windowStart: e.target.value })}
+                    className="w-full px-3 py-3 border outline-none text-sm"
+                    style={{
+                      background: 'var(--thamara-bg)',
+                      borderColor: 'var(--thamara-border)',
+                      borderRadius: 'var(--thamara-radius-lg)',
+                      color: 'var(--thamara-text-primary)',
+                    }}
+                  />
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-              Pickup Preference
-            </label>
-            <select
-              value={formData.pickupPreference}
-              onChange={(e) => setFormData({ ...formData, pickupPreference: e.target.value as PickupPreference })}
-              className="w-full px-3 py-2 border outline-none"
-              style={{
-                background: 'var(--thamara-bg)',
-                borderColor: 'var(--thamara-border)',
-                borderRadius: 'var(--thamara-radius-md)',
-                color: 'var(--thamara-text-primary)',
-              }}
-            >
-              <option value="same_day">Same-day pickup</option>
-              <option value="24h">Within 24 hours</option>
-              <option value="any">Flexible timing</option>
-            </select>
-          </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+                    Window End
+                  </label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={formData.windowEnd}
+                    onChange={(e) => setFormData({ ...formData, windowEnd: e.target.value })}
+                    className="w-full px-3 py-3 border outline-none text-sm"
+                    style={{
+                      background: 'var(--thamara-bg)',
+                      borderColor: 'var(--thamara-border)',
+                      borderRadius: 'var(--thamara-radius-lg)',
+                      color: 'var(--thamara-text-primary)',
+                    }}
+                  />
+                </div>
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-              Notes (optional)
-            </label>
-            <textarea
-              rows={3}
-              placeholder="Additional details..."
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-3 py-2 border outline-none resize-none"
-              style={{
-                background: 'var(--thamara-bg)',
-                borderColor: 'var(--thamara-border)',
-                borderRadius: 'var(--thamara-radius-md)',
-                color: 'var(--thamara-text-primary)',
-              }}
-            />
-          </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+                    Min Qty
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    step="0.1"
+                    value={formData.quantityMin}
+                    onChange={(e) => setFormData({ ...formData, quantityMin: e.target.value })}
+                    className="w-full px-3 py-3 border outline-none"
+                    style={{
+                      background: 'var(--thamara-bg)',
+                      borderColor: 'var(--thamara-border)',
+                      borderRadius: 'var(--thamara-radius-lg)',
+                      color: 'var(--thamara-text-primary)',
+                    }}
+                  />
+                </div>
 
-          <button
-            type="submit"
-            className="w-full py-3 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
-            style={{
-              background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
-              color: 'white',
-              borderRadius: 'var(--thamara-radius-lg)',
-            }}
-          >
-            Create Drop
-          </button>
+                <div>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+                    Max Qty
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    step="0.1"
+                    value={formData.quantityMax}
+                    onChange={(e) => setFormData({ ...formData, quantityMax: e.target.value })}
+                    className="w-full px-3 py-3 border outline-none"
+                    style={{
+                      background: 'var(--thamara-bg)',
+                      borderColor: 'var(--thamara-border)',
+                      borderRadius: 'var(--thamara-radius-lg)',
+                      color: 'var(--thamara-text-primary)',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+                    Unit
+                  </label>
+                  <select
+                    value={formData.unit}
+                    onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                    className="w-full px-3 py-3 border outline-none"
+                    style={{
+                      background: 'var(--thamara-bg)',
+                      borderColor: 'var(--thamara-border)',
+                      borderRadius: 'var(--thamara-radius-lg)',
+                      color: 'var(--thamara-text-primary)',
+                    }}
+                  >
+                    <option value="kg">kg</option>
+                    <option value="bunches">bunches</option>
+                    <option value="crates">crates</option>
+                    <option value="pieces">pieces</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="flex-1 py-3 text-base font-semibold border transition-all"
+                  style={{
+                    background: 'var(--thamara-bg)',
+                    borderColor: 'var(--thamara-border)',
+                    borderRadius: 'var(--thamara-radius-lg)',
+                    color: 'var(--thamara-text-secondary)',
+                  }}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStep(3)}
+                  disabled={!isStep2Valid}
+                  className="flex-1 py-3 text-base font-semibold transition-all disabled:opacity-50"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
+                    color: 'white',
+                    borderRadius: 'var(--thamara-radius-lg)',
+                  }}
+                >
+                  Continue
+                </button>
+              </div>
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+                  Pickup Preference
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { value: 'same_day', label: 'Same-Day', desc: 'Urgent' },
+                    { value: '24h', label: '24 Hours', desc: 'Standard' },
+                    { value: 'any', label: 'Flexible', desc: 'No rush' },
+                  ].map(option => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, pickupPreference: option.value as PickupPreference })}
+                      className="p-3 border-2 text-center transition-all"
+                      style={{
+                        background: formData.pickupPreference === option.value
+                          ? 'var(--thamara-accent-50)'
+                          : 'var(--thamara-bg)',
+                        borderColor: formData.pickupPreference === option.value
+                          ? 'var(--thamara-accent-500)'
+                          : 'var(--thamara-border)',
+                        borderRadius: 'var(--thamara-radius-lg)',
+                      }}
+                    >
+                      <div className="font-semibold text-sm" style={{ color: 'var(--thamara-text-primary)' }}>
+                        {option.label}
+                      </div>
+                      <div className="text-xs mt-0.5" style={{ color: 'var(--thamara-text-muted)' }}>
+                        {option.desc}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
+                  Notes (optional)
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Any special instructions or details..."
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full px-4 py-3 border outline-none resize-none focus:border-[var(--thamara-primary-400)]"
+                  style={{
+                    background: 'var(--thamara-bg)',
+                    borderColor: 'var(--thamara-border)',
+                    borderRadius: 'var(--thamara-radius-lg)',
+                    color: 'var(--thamara-text-primary)',
+                  }}
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="flex-1 py-3 text-base font-semibold border transition-all"
+                  style={{
+                    background: 'var(--thamara-bg)',
+                    borderColor: 'var(--thamara-border)',
+                    borderRadius: 'var(--thamara-radius-lg)',
+                    color: 'var(--thamara-text-secondary)',
+                  }}
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
+                    color: 'white',
+                    borderRadius: 'var(--thamara-radius-lg)',
+                  }}
+                >
+                  Create Drop
+                </button>
+              </div>
+            </>
+          )}
         </form>
       </div>
     </div>
