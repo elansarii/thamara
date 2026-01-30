@@ -8,31 +8,52 @@ import {
 import { ROUTES } from '@/lib/routes';
 import { usePlotStore } from '@/lib/plotStore';
 import { assess } from '@/lib/assessment';
+import { useLanguage } from '@/lib/i18n';
+
+// Day abbreviations for localization
+const DAY_ABBR_EN = ['To', 'Fr', 'Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const DAY_ABBR_AR = ['اليوم', 'الجمعة', 'السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
 // Mock weather data for the next 10 days
 const WEATHER_FORECAST = [
-  { day: 'Today', date: 'Jan 30', rain: false, rainChance: 10, temp: 18 },
-  { day: 'Fri', date: 'Jan 31', rain: false, rainChance: 15, temp: 19 },
-  { day: 'Sat', date: 'Feb 1', rain: true, rainChance: 80, temp: 16 },
-  { day: 'Sun', date: 'Feb 2', rain: true, rainChance: 90, temp: 14 },
-  { day: 'Mon', date: 'Feb 3', rain: true, rainChance: 70, temp: 15 },
-  { day: 'Tue', date: 'Feb 4', rain: false, rainChance: 30, temp: 17 },
-  { day: 'Wed', date: 'Feb 5', rain: false, rainChance: 20, temp: 19 },
-  { day: 'Thu', date: 'Feb 6', rain: false, rainChance: 15, temp: 20 },
-  { day: 'Fri', date: 'Feb 7', rain: true, rainChance: 65, temp: 16 },
-  { day: 'Sat', date: 'Feb 8', rain: false, rainChance: 25, temp: 18 },
+  { dayKey: 0, rain: false, rainChance: 10, temp: 18 },
+  { dayKey: 1, rain: false, rainChance: 15, temp: 19 },
+  { dayKey: 2, rain: true, rainChance: 80, temp: 16 },
+  { dayKey: 3, rain: true, rainChance: 90, temp: 14 },
+  { dayKey: 4, rain: true, rainChance: 70, temp: 15 },
+  { dayKey: 5, rain: false, rainChance: 30, temp: 17 },
+  { dayKey: 6, rain: false, rainChance: 20, temp: 19 },
+  { dayKey: 7, rain: false, rainChance: 15, temp: 20 },
+  { dayKey: 8, rain: true, rainChance: 65, temp: 16 },
+  { dayKey: 9, rain: false, rainChance: 25, temp: 18 },
 ];
 
-// Seasonal crop recommendations
+// Seasonal crop recommendations with translation keys
 const SEASONAL_CROPS = [
-  { name: 'Lettuce', daysToHarvest: 30, icon: '🥬', reason: 'Cool weather crop' },
-  { name: 'Spinach', daysToHarvest: 40, icon: '🥗', reason: 'Thrives in winter' },
-  { name: 'Radish', daysToHarvest: 25, icon: '🔴', reason: 'Fast harvest' },
-  { name: 'Peas', daysToHarvest: 60, icon: '🫛', reason: 'Nitrogen fixer' },
+  { nameKey: 'lettuce', daysToHarvest: 30, icon: '🥬', reasonKey: 'coolWeather' },
+  { nameKey: 'spinach', daysToHarvest: 40, icon: '🥗', reasonKey: 'winterCrop' },
+  { nameKey: 'radish', daysToHarvest: 25, icon: '🔴', reasonKey: 'fastHarvest' },
+  { nameKey: 'peas', daysToHarvest: 60, icon: '🫛', reasonKey: 'nitrogenFixer' },
 ];
+
+// Crop names for localization
+const CROP_NAMES: Record<string, { en: string; ar: string }> = {
+  lettuce: { en: 'Lettuce', ar: 'خس' },
+  spinach: { en: 'Spinach', ar: 'سبانخ' },
+  radish: { en: 'Radish', ar: 'فجل' },
+  peas: { en: 'Peas', ar: 'بازلاء' },
+};
+
+const CROP_REASONS: Record<string, { en: string; ar: string }> = {
+  coolWeather: { en: 'Cool weather crop', ar: 'محصول الطقس البارد' },
+  winterCrop: { en: 'Thrives in winter', ar: 'ينمو في الشتاء' },
+  fastHarvest: { en: 'Fast harvest', ar: 'حصاد سريع' },
+  nitrogenFixer: { en: 'Nitrogen fixer', ar: 'مثبت للنيتروجين' },
+};
 
 export default function HomePage() {
   const { lastPlot, plots, waterPoints } = usePlotStore();
+  const { t, language, isRTL } = useLanguage();
 
   // Calculate impact metrics
   const totalPlots = plots.length;
@@ -51,6 +72,21 @@ export default function HomePage() {
     damaged: 10,
   };
 
+  // Get day abbreviations based on language
+  const dayAbbr = language === 'ar' ? DAY_ABBR_AR : DAY_ABBR_EN;
+
+  // Get rain highlight text
+  const getRainHighlight = () => {
+    if (daysUntilRain === 0) return t.home.todayLabel;
+    if (daysUntilRain === 1) return t.home.tomorrow;
+    return t.home.inDays.replace('{days}', String(daysUntilRain));
+  };
+
+  // Get first crop name
+  const firstCrop = SEASONAL_CROPS[0];
+  const cropName = CROP_NAMES[firstCrop.nameKey]?.[language] || firstCrop.nameKey;
+  const cropReason = CROP_REASONS[firstCrop.reasonKey]?.[language] || firstCrop.reasonKey;
+
   return (
     <div className="pb-6 space-y-6">
       {/* Insights Widget - Horizontal Scrollable */}
@@ -60,13 +96,13 @@ export default function HomePage() {
             className="text-sm font-bold uppercase tracking-wide"
             style={{ color: 'var(--thamara-text-muted)' }}
           >
-            Farm Insights
+            {t.home.farmInsights}
           </h2>
           <span
             className="text-xs"
             style={{ color: 'var(--thamara-text-muted)' }}
           >
-            Updated today
+            {t.home.updatedToday}
           </span>
         </div>
 
@@ -76,10 +112,10 @@ export default function HomePage() {
             <InsightCard
               icon={<CloudRain size={20} />}
               iconBg="var(--thamara-info)"
-              title="Rain Coming"
-              highlight={daysUntilRain === 0 ? 'Today!' : daysUntilRain === 1 ? 'Tomorrow' : `In ${daysUntilRain} days`}
-              subtitle={`${rainDays.length} rainy days in next 10 days`}
-              action="Perfect time to prepare soil"
+              title={t.home.rainComing}
+              highlight={getRainHighlight()}
+              subtitle={t.home.rainyDaysInNext.replace('{count}', String(rainDays.length))}
+              action={t.home.perfectTimePrepare}
               urgent={daysUntilRain <= 2}
             />
 
@@ -87,10 +123,10 @@ export default function HomePage() {
             <InsightCard
               icon={<Leaf size={20} />}
               iconBg="var(--thamara-accent-500)"
-              title="Plant Now"
-              highlight={SEASONAL_CROPS[0].name}
-              subtitle={`${SEASONAL_CROPS[0].daysToHarvest} days to harvest`}
-              action={SEASONAL_CROPS[0].reason}
+              title={t.home.plantNow}
+              highlight={cropName}
+              subtitle={t.home.daysToHarvest.replace('{days}', String(firstCrop.daysToHarvest))}
+              action={cropReason}
               crops={SEASONAL_CROPS.slice(0, 3)}
             />
 
@@ -98,9 +134,9 @@ export default function HomePage() {
             <InsightCard
               icon={<BarChart3 size={20} />}
               iconBg="var(--thamara-primary-500)"
-              title="Land Status"
-              highlight={`${farmlandStats.farmable}% Farmable`}
-              subtitle="Regional average"
+              title={t.home.landStatus}
+              highlight={t.home.farmablePercent.replace('{percent}', String(farmlandStats.farmable))}
+              subtitle={t.home.regionalAverage}
               stats={farmlandStats}
             />
 
@@ -108,20 +144,20 @@ export default function HomePage() {
             <InsightCard
               icon={<ThermometerSun size={20} />}
               iconBg="var(--thamara-warning)"
-              title="Temperature"
+              title={t.home.temperature}
               highlight={`${WEATHER_FORECAST[0].temp}°C`}
-              subtitle="Ideal for planting"
-              action="Good growing conditions"
+              subtitle={t.home.idealForPlanting}
+              action={t.home.goodGrowingConditions}
             />
 
             {/* Planting Window Card */}
             <InsightCard
               icon={<Calendar size={20} />}
               iconBg="var(--thamara-secondary-500)"
-              title="Planting Window"
-              highlight="3 Days"
-              subtitle="Before next rain"
-              action="Plant seeds now for rain benefit"
+              title={t.home.plantingWindow}
+              highlight={t.home.daysLabel.replace('{days}', '3')}
+              subtitle={t.home.beforeNextRain}
+              action={t.home.plantSeedsNow}
               urgent={daysUntilRain <= 3}
             />
 
@@ -129,10 +165,10 @@ export default function HomePage() {
             <InsightCard
               icon={<Wind size={20} />}
               iconBg="var(--thamara-text-muted)"
-              title="Wind"
-              highlight="Light"
+              title={t.home.wind}
+              highlight={t.home.light}
               subtitle="5-10 km/h"
-              action="Safe for spraying"
+              action={t.home.safeForSpraying}
             />
           </div>
         </div>
@@ -148,10 +184,10 @@ export default function HomePage() {
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold" style={{ color: 'var(--thamara-text-secondary)' }}>
-                10-Day Rain Outlook
+                {t.home.tenDayRainOutlook}
               </span>
               <span className="text-xs" style={{ color: 'var(--thamara-info)' }}>
-                {rainDays.length} rain days
+                {t.home.rainDays.replace('{count}', String(rainDays.length))}
               </span>
             </div>
             <div className="flex gap-1">
@@ -172,7 +208,7 @@ export default function HomePage() {
                     )}
                   </div>
                   <span className="text-[9px]" style={{ color: 'var(--thamara-text-muted)' }}>
-                    {day.day.slice(0, 2)}
+                    {dayAbbr[i]}
                   </span>
                 </div>
               ))}
@@ -187,38 +223,38 @@ export default function HomePage() {
           className="text-2xl font-bold leading-tight mb-1 tracking-tight"
           style={{ color: 'var(--thamara-text-primary)' }}
         >
-          مرحبا Welcome
+          {t.home.welcome}
         </h1>
         <p
           className="text-sm leading-relaxed"
           style={{ color: 'var(--thamara-text-secondary)' }}
         >
-          Check your land and get planting guidance
+          {t.home.checkLandGuidance}
         </p>
       </section>
 
       {/* Action Tiles Grid - Mobile optimized */}
       <section className="grid grid-cols-2 gap-3 px-5">
         <ActionCard
-          title="Check Plantability"
+          title={t.home.checkPlantability}
           icon={<MapPin size={26} strokeWidth={2} />}
           href={ROUTES.MAP}
           gradient="from-blue-500 to-blue-600"
         />
         <ActionCard
-          title="Get Crop Plan"
+          title={t.home.getCropPlan}
           icon={<Sprout size={26} strokeWidth={2} />}
           href={ROUTES.CROP_PLAN}
           gradient="from-green-500 to-green-600"
         />
         <ActionCard
-          title="Find Water"
+          title={t.home.findWater}
           icon={<Droplet size={26} strokeWidth={2} />}
           href={ROUTES.WATER}
           gradient="from-cyan-500 to-cyan-600"
         />
         <ActionCard
-          title="Exchange & Work"
+          title={t.home.exchangeWork}
           icon={<Users size={26} strokeWidth={2} />}
           href={ROUTES.EXCHANGE}
           gradient="from-orange-500 to-orange-600"
@@ -239,7 +275,7 @@ export default function HomePage() {
             className="text-xl font-bold"
             style={{ color: 'var(--thamara-text-primary)' }}
           >
-            Last Logged Plot
+            {t.home.lastLoggedPlot}
           </h2>
           <ClipboardCheck 
             size={20} 
@@ -261,7 +297,7 @@ export default function HomePage() {
                   className="text-sm"
                   style={{ color: 'var(--thamara-text-secondary)' }}
                 >
-                  {(lastPlot.areaM2 / 10000).toFixed(2)} ha
+                  {(lastPlot.areaM2 / 10000).toFixed(2)} {t.home.hectares}
                 </div>
               )}
             </div>
@@ -276,7 +312,7 @@ export default function HomePage() {
                 color: 'white'
               }}
             >
-              View Assessment
+              {t.home.viewOnMap}
             </Link>
           </div>
         ) : (
@@ -285,7 +321,7 @@ export default function HomePage() {
               className="text-sm mb-3"
               style={{ color: 'var(--thamara-text-muted)' }}
             >
-              No plots logged yet
+              {t.home.noPlotLogged}
             </p>
             <Link
               href={ROUTES.LOG_PLOT}

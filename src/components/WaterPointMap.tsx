@@ -12,6 +12,7 @@ import {
   getDaysSinceConfirmation,
   type WaterPoint,
 } from "@/lib/waterPointsDb";
+import { useLanguage } from "@/lib/i18n";
 
 type ViewMode = 'map' | 'list';
 
@@ -28,6 +29,7 @@ export default function WaterPointMap() {
   const map = useRef<maplibregl.Map | null>(null);
   const waterMarkers = useRef<maplibregl.Marker[]>([]);
   const userMarker = useRef<maplibregl.Marker | null>(null);
+  const { t, isRTL } = useLanguage();
 
   const [waterPoints, setWaterPoints] = useState<WaterPoint[]>([]);
   const [selectedWaterPoint, setSelectedWaterPoint] = useState<WaterPoint | null>(null);
@@ -304,31 +306,31 @@ export default function WaterPointMap() {
           {/* Locate Me Button */}
           <button
             onClick={handleLocateMe}
-            className="absolute top-20 right-4 bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50 transition z-10"
+            className={`absolute top-20 ${isRTL ? 'left-4' : 'right-4'} bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50 transition z-10`}
             title="Find my location"
           >
             <Locate className="w-5 h-5 text-blue-600" />
           </button>
 
           {/* Legend */}
-          <div className="absolute bottom-24 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
-            <h3 className="font-semibold text-sm mb-3 text-gray-900">Reliability</h3>
+          <div className={`absolute bottom-24 ${isRTL ? 'left-4' : 'right-4'} bg-white rounded-lg shadow-lg p-4 z-10`}>
+            <h3 className="font-semibold text-sm mb-3 text-gray-900">{t.water.reliability}</h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-green-500 rounded-full" />
-                <span className="text-gray-700">&gt;70% - High</span>
+                <span className="text-gray-700">&gt;70% - {t.water.high}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-amber-500 rounded-full" />
-                <span className="text-gray-700">40-70% - Medium</span>
+                <span className="text-gray-700">40-70% - {t.water.medium}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-red-500 rounded-full" />
-                <span className="text-gray-700">&lt;40% - Low</span>
+                <span className="text-gray-700">&lt;40% - {t.water.low}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-gray-500 rounded-full" />
-                <span className="text-gray-700">Unknown</span>
+                <span className="text-gray-700">{t.water.unknown}</span>
               </div>
             </div>
           </div>
@@ -429,11 +431,11 @@ export default function WaterPointMap() {
 
       {/* Water Point Info Panel */}
       {selectedWaterPoint && (
-        <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto">
+        <div className={`absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto ${isRTL ? 'text-right' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Droplets className="w-5 h-5 text-blue-600" />
-              Water Point
+              {t.map.waterPoint}
             </h2>
             <button
               onClick={() => setSelectedWaterPoint(null)}
@@ -476,7 +478,7 @@ export default function WaterPointMap() {
           {/* Reliability */}
           <div className="mb-4">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-600">Reliability</span>
+              <span className="text-gray-600">{t.water.reliability}</span>
               <span className="font-semibold text-gray-900">
                 {selectedWaterPoint.reliabilityScore}/100
               </span>
@@ -497,19 +499,18 @@ export default function WaterPointMap() {
 
           {/* Last Confirmed */}
           <div className="mb-4 text-sm">
-            <span className="text-gray-600">Last confirmed:</span>
-            <span className="ml-2 font-medium text-gray-900">
+            <span className="text-gray-600">{t.map.lastConfirmed}:</span>
+            <span className={`${isRTL ? 'mr-2' : 'ml-2'} font-medium text-gray-900`}>
               {selectedWaterPoint.lastConfirmed.toLocaleDateString()}
             </span>
-            <span className="ml-2 text-gray-500">
-              ({getDaysSinceConfirmation(selectedWaterPoint.lastConfirmed)} days
-              ago)
+            <span className={`${isRTL ? 'mr-2' : 'ml-2'} text-gray-500`}>
+              ({getDaysSinceConfirmation(selectedWaterPoint.lastConfirmed)} {t.map.daysAgo})
             </span>
           </div>
 
           {/* Location */}
           <div className="mb-4 text-xs text-gray-500">
-            <Navigation className="w-3 h-3 inline mr-1" />
+            <Navigation className={`w-3 h-3 inline ${isRTL ? 'ml-1' : 'mr-1'}`} />
             {selectedWaterPoint.coordinates[1].toFixed(6)},{" "}
             {selectedWaterPoint.coordinates[0].toFixed(6)}
           </div>
@@ -522,7 +523,7 @@ export default function WaterPointMap() {
                   navigator.clipboard.writeText(
                     `${selectedWaterPoint.coordinates[1]},${selectedWaterPoint.coordinates[0]}`
                   );
-                  alert("Location copied to clipboard!");
+                  alert(t.map.locationCopied);
                 }
               }}
               className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"

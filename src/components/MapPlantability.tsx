@@ -22,6 +22,7 @@ import {
   getStatusLabel,
   type WaterPoint,
 } from "@/lib/waterPointsDb";
+import { useLanguage } from "@/lib/i18n";
 
 // Helper function to get color based on reliability score
 function getReliabilityColor(score: number): string {
@@ -40,6 +41,7 @@ export default function MapPlantability() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setDraftPlot } = usePlotStore();
+  const { t, isRTL } = useLanguage();
 
   const [manifest, setManifest] = useState<AgroPackManifest | null>(null);
   const [showManifest, setShowManifest] = useState(false);
@@ -515,37 +517,37 @@ export default function MapPlantability() {
 
       {/* Legend */}
       {showPlantability && (
-        <div className="absolute bottom-24 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
+        <div className={`absolute bottom-24 ${isRTL ? 'left-4' : 'right-4'} bg-white rounded-lg shadow-lg p-4 z-10`}>
           <h3 className="font-semibold text-sm mb-3 text-gray-900">
-            Plantability
+            {t.map.plantability}
           </h3>
           <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-green-500 rounded" />
-              <span className="text-gray-700">Farmable</span>
+              <span className="text-gray-700">{t.map.farmable}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-amber-500 rounded" />
-              <span className="text-gray-700">Restorable</span>
+              <span className="text-gray-700">{t.map.restorable}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-red-500 rounded" />
-              <span className="text-gray-700">Damaged</span>
+              <span className="text-gray-700">{t.map.damaged}</span>
             </div>
             <div className="text-xs text-gray-500 mt-2 pt-2 border-t">
-              Opacity = confidence
+              {t.map.opacityConfidence}
               <br />
-              Dashed = needs check
+              {t.map.dashedNeedsCheck}
             </div>
           </div>
         </div>
       )}
 
       {showSeedSources && !showWaterPoints && (
-        <div className="absolute bottom-24 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
+        <div className={`absolute bottom-24 ${isRTL ? 'left-4' : 'right-4'} bg-white rounded-lg shadow-lg p-4 z-10`}>
           <h3 className="font-semibold text-sm mb-3 text-gray-900 flex items-center gap-2">
             <MapPin className="w-4 h-4 text-green-600" />
-            Seed Sources
+            {t.map.seedSources}
           </h3>
           <div className="text-sm text-gray-700">
             {filterCropId ? (
@@ -568,10 +570,10 @@ export default function MapPlantability() {
       )}
 
       {showWaterPoints && (
-        <div className="absolute bottom-24 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
+        <div className={`absolute bottom-24 ${isRTL ? 'left-4' : 'right-4'} bg-white rounded-lg shadow-lg p-4 z-10`}>
           <h3 className="font-semibold text-sm mb-3 text-gray-900 flex items-center gap-2">
             <Droplets className="w-4 h-4 text-blue-600" />
-            Water Points
+            {t.map.waterPoints}
           </h3>
           <div className="text-sm text-gray-700 mb-3">
             <p>{waterPoints.length} sources found</p>
@@ -579,19 +581,19 @@ export default function MapPlantability() {
           <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-green-500 rounded-full" />
-              <span className="text-gray-700">&gt;70% - High</span>
+              <span className="text-gray-700">&gt;70% - {t.map.high}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-amber-500 rounded-full" />
-              <span className="text-gray-700">40-70% - Medium</span>
+              <span className="text-gray-700">40-70% - {t.map.medium}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-red-500 rounded-full" />
-              <span className="text-gray-700">&lt;40% - Low</span>
+              <span className="text-gray-700">&lt;40% - {t.map.low}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-gray-500 rounded-full" />
-              <span className="text-gray-700">Unknown</span>
+              <span className="text-gray-700">{t.map.unknown}</span>
             </div>
           </div>
         </div>
@@ -600,10 +602,10 @@ export default function MapPlantability() {
       {/* Manifest Modal */}
       {showManifest && manifest && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
+          <div className={`bg-white rounded-xl max-w-md w-full p-6 space-y-4 ${isRTL ? 'text-right' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="flex items-start justify-between">
               <h2 className="text-xl font-semibold text-gray-900">
-                Layer Information
+                {t.map.layerInformation}
               </h2>
               <button
                 onClick={() => setShowManifest(false)}
@@ -614,27 +616,27 @@ export default function MapPlantability() {
             </div>
             <div className="space-y-3 text-sm">
               <div>
-                <span className="font-medium text-gray-700">Pack ID:</span>
+                <span className="font-medium text-gray-700">{t.map.packId}:</span>
                 <p className="text-gray-600">{manifest.pack_id}</p>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Source:</span>
+                <span className="font-medium text-gray-700">{t.map.source}:</span>
                 <p className="text-gray-600">{manifest.source_name}</p>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Description:</span>
+                <span className="font-medium text-gray-700">{t.map.description}:</span>
                 <p className="text-gray-600">{manifest.source_desc}</p>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Updated:</span>
+                <span className="font-medium text-gray-700">{t.map.updated}:</span>
                 <p className="text-gray-600">{manifest.updated_at}</p>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Version:</span>
+                <span className="font-medium text-gray-700">{t.map.version}:</span>
                 <p className="text-gray-600">{manifest.version}</p>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Notes:</span>
+                <span className="font-medium text-gray-700">{t.map.notes}:</span>
                 <p className="text-gray-600">{manifest.notes}</p>
               </div>
             </div>
@@ -644,10 +646,10 @@ export default function MapPlantability() {
 
       {/* Selection Bottom Sheet */}
       {selectedZone && !selectedSeedSource && (
-        <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto">
+        <div className={`absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto ${isRTL ? 'text-right' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-lg font-semibold text-gray-900">
-              {selectedZone.feature ? "Zone Analysis" : "Location Selected"}
+              {selectedZone.feature ? t.map.zoneAnalysis : t.map.locationSelected}
             </h2>
             <button
               onClick={() => setSelectedZone(null)}
@@ -668,13 +670,13 @@ export default function MapPlantability() {
                     {explained?.statusLabel}
                   </span>
                   <span className="text-lg text-gray-600">
-                    {selectedZone.feature.properties.confidence}% confidence
+                    {selectedZone.feature.properties.confidence}% {t.map.confidence}
                   </span>
                 </div>
                 {explained?.needsCheck && (
                   <div className="flex items-center gap-2 text-amber-700 bg-amber-50 px-3 py-2 rounded-lg text-sm">
                     <AlertTriangle className="w-4 h-4" />
-                    Needs on-site check
+                    {t.map.needsOnSiteCheck}
                   </div>
                 )}
               </div>
@@ -682,7 +684,7 @@ export default function MapPlantability() {
               {/* Explainability */}
               <div className="mb-4">
                 <h3 className="font-semibold text-gray-900 mb-2 text-sm">
-                  Why?
+                  {t.map.why}
                 </h3>
                 <p className="text-gray-700 text-sm leading-relaxed">
                   {explained?.whyText}
@@ -692,8 +694,8 @@ export default function MapPlantability() {
               {/* Provenance */}
               <div className="mb-6 pb-4 border-b">
                 <p className="text-xs text-gray-500">
-                  <strong>Source:</strong>{" "}
-                  {selectedZone.feature.properties.baseline_source} • Updated:{" "}
+                  <strong>{t.map.source}:</strong>{" "}
+                  {selectedZone.feature.properties.baseline_source} • {t.map.updated}:{" "}
                   {selectedZone.feature.properties.baseline_date}
                 </p>
                 {selectedZone.feature.properties.notes && (
@@ -705,7 +707,7 @@ export default function MapPlantability() {
 
               {/* Location */}
               <div className="mb-4 text-xs text-gray-500">
-                <Navigation className="w-3 h-3 inline mr-1" />
+                <Navigation className={`w-3 h-3 inline ${isRTL ? 'ml-1' : 'mr-1'}`} />
                 {selectedZone.lat.toFixed(6)}, {selectedZone.lon.toFixed(6)}
               </div>
 
@@ -714,23 +716,23 @@ export default function MapPlantability() {
                 onClick={handleLogPlot}
                 className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
               >
-                Log plot here
+                {t.map.logPlotHere}
               </button>
             </>
           ) : (
             <>
               <p className="text-gray-600 mb-4 text-sm">
-                No overlay data here (demo pack coverage is limited).
+                {t.map.noOverlayData}
               </p>
               <div className="mb-4 text-xs text-gray-500">
-                <Navigation className="w-3 h-3 inline mr-1" />
+                <Navigation className={`w-3 h-3 inline ${isRTL ? 'ml-1' : 'mr-1'}`} />
                 {selectedZone.lat.toFixed(6)}, {selectedZone.lon.toFixed(6)}
               </div>
               <button
                 onClick={handleLogPlot}
                 className="w-full bg-gray-600 text-white py-3 rounded-xl font-semibold hover:bg-gray-700 transition"
               >
-                Log plot anyway
+                {t.map.logPlotAnyway}
               </button>
             </>
           )}
@@ -739,11 +741,11 @@ export default function MapPlantability() {
 
       {/* Seed Source Info Panel */}
       {selectedSeedSource && (
-        <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto">
+        <div className={`absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto ${isRTL ? 'text-right' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-green-600" />
-              Seed Source
+              {t.map.seedSource}
             </h2>
             <button
               onClick={() => setSelectedSeedSource(null)}
@@ -766,7 +768,7 @@ export default function MapPlantability() {
           {/* Reliability */}
           <div className="mb-4">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-600">Reliability</span>
+              <span className="text-gray-600">{t.map.reliability}</span>
               <span className="font-semibold text-gray-900">
                 {selectedSeedSource.reliabilityScore}/100
               </span>
@@ -787,19 +789,19 @@ export default function MapPlantability() {
 
           {/* Last Confirmed */}
           <div className="mb-4 text-sm">
-            <span className="text-gray-600">Last confirmed:</span>
-            <span className="ml-2 font-medium text-gray-900">
+            <span className="text-gray-600">{t.map.lastConfirmed}:</span>
+            <span className={`${isRTL ? 'mr-2' : 'ml-2'} font-medium text-gray-900`}>
               {selectedSeedSource.lastConfirmed}
             </span>
-            <span className="ml-2 text-gray-500">
-              ({getDaysSinceConfirmation(selectedSeedSource.lastConfirmed)} days ago)
+            <span className={`${isRTL ? 'mr-2' : 'ml-2'} text-gray-500`}>
+              ({getDaysSinceConfirmation(selectedSeedSource.lastConfirmed)} {t.map.daysAgo})
             </span>
           </div>
 
           {/* Available Crops */}
           <div className="mb-4">
             <h4 className="text-sm font-semibold text-gray-900 mb-2">
-              Available Crops ({selectedSeedSource.availableCrops.length})
+              {t.map.availableCrops} ({selectedSeedSource.availableCrops.length})
             </h4>
             <div className="flex flex-wrap gap-2">
               {selectedSeedSource.availableCrops.map(cropId => {
@@ -829,7 +831,7 @@ export default function MapPlantability() {
 
           {/* Location */}
           <div className="mb-4 text-xs text-gray-500">
-            <Navigation className="w-3 h-3 inline mr-1" />
+            <Navigation className={`w-3 h-3 inline ${isRTL ? 'ml-1' : 'mr-1'}`} />
             {selectedSeedSource.lat.toFixed(6)}, {selectedSeedSource.lng.toFixed(6)}
           </div>
 
@@ -837,7 +839,7 @@ export default function MapPlantability() {
           <div className="space-y-2">
             {filterCropId && selectedSeedSource.availableCrops.includes(filterCropId) && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-900">
-                ✓ This source has {getCropById(filterCropId)?.commonName} seeds
+                ✓ {t.map.hasSeeds} {getCropById(filterCropId)?.commonName}
               </div>
             )}
             <button
@@ -847,12 +849,12 @@ export default function MapPlantability() {
                   navigator.clipboard.writeText(
                     `${selectedSeedSource.lat},${selectedSeedSource.lng}`
                   );
-                  alert('Location copied to clipboard!');
+                  alert(t.map.locationCopied);
                 }
               }}
               className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
             >
-              Copy Location
+              {t.map.copyLocation}
             </button>
           </div>
         </div>
@@ -860,11 +862,11 @@ export default function MapPlantability() {
 
       {/* Water Point Info Panel */}
       {selectedWaterPoint && (
-        <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto">
+        <div className={`absolute inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-6 pb-8 z-40 max-h-[70vh] overflow-y-auto ${isRTL ? 'text-right' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Droplets className="w-5 h-5 text-blue-600" />
-              Water Point
+              {t.map.waterPoint}
             </h2>
             <button
               onClick={() => setSelectedWaterPoint(null)}
@@ -887,7 +889,7 @@ export default function MapPlantability() {
           {/* Status */}
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-gray-600">Status:</span>
+              <span className="text-sm text-gray-600">{t.map.status}:</span>
               <span
                 className={`text-sm font-semibold px-2 py-1 rounded ${
                   selectedWaterPoint.status === "available"
@@ -907,7 +909,7 @@ export default function MapPlantability() {
           {/* Reliability */}
           <div className="mb-4">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-600">Reliability</span>
+              <span className="text-gray-600">{t.map.reliability}</span>
               <span className="font-semibold text-gray-900">
                 {selectedWaterPoint.reliabilityScore}/100
               </span>
@@ -928,15 +930,15 @@ export default function MapPlantability() {
 
           {/* Last Confirmed */}
           <div className="mb-4 text-sm">
-            <span className="text-gray-600">Last confirmed:</span>
-            <span className="ml-2 font-medium text-gray-900">
+            <span className="text-gray-600">{t.map.lastConfirmed}:</span>
+            <span className={`${isRTL ? 'mr-2' : 'ml-2'} font-medium text-gray-900`}>
               {selectedWaterPoint.lastConfirmed.toLocaleDateString()}
             </span>
           </div>
 
           {/* Location */}
           <div className="mb-4 text-xs text-gray-500">
-            <Navigation className="w-3 h-3 inline mr-1" />
+            <Navigation className={`w-3 h-3 inline ${isRTL ? 'ml-1' : 'mr-1'}`} />
             {selectedWaterPoint.coordinates[1].toFixed(6)},{" "}
             {selectedWaterPoint.coordinates[0].toFixed(6)}
           </div>
@@ -949,12 +951,12 @@ export default function MapPlantability() {
                   navigator.clipboard.writeText(
                     `${selectedWaterPoint.coordinates[1]},${selectedWaterPoint.coordinates[0]}`
                   );
-                  alert("Location copied to clipboard!");
+                  alert(t.map.locationCopied);
                 }
               }}
               className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
             >
-              Copy Location
+              {t.map.copyLocation}
             </button>
           </div>
         </div>

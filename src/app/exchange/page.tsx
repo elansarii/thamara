@@ -330,7 +330,7 @@ export default function ExchangePage() {
                 color: trustFilter ? 'white' : 'var(--thamara-text-secondary)',
               }}
             >
-              Verified
+              {t.exchange.verified}
             </button>
 
             {/* Sort dropdown */}
@@ -343,10 +343,10 @@ export default function ExchangePage() {
                 color: 'var(--thamara-text-secondary)',
               }}
             >
-              <option value="ai_match">Sort: AI Match</option>
-              <option value="newest">Sort: Newest</option>
-              <option value="closest">Sort: Closest</option>
-              <option value="quantity">Sort: Quantity</option>
+              <option value="ai_match">{t.exchange.sortAiMatch}</option>
+              <option value="newest">{t.exchange.sortNewest}</option>
+              <option value="closest">{t.exchange.sortClosest}</option>
+              <option value="quantity">{t.exchange.sortQuantity}</option>
             </select>
           </div>
         </div>
@@ -358,10 +358,10 @@ export default function ExchangePage() {
           <div className="text-center py-12">
             <Package size={40} style={{ color: 'var(--thamara-text-muted)', margin: '0 auto 12px' }} />
             <p className="text-sm font-semibold mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-              No listings found
+              {t.exchange.noListings}
             </p>
             <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>
-              Try adjusting your filters
+              {t.exchange.tryAdjustFilters}
             </p>
           </div>
         ) : (
@@ -370,6 +370,7 @@ export default function ExchangePage() {
               key={listing.id}
               listing={listing}
               userContext={userContext}
+              t={t}
               onViewMatches={handleViewMatches}
               onShowSafety={(category) => {
                 setSafetyCategory(category as InputCategory);
@@ -399,7 +400,7 @@ export default function ExchangePage() {
             }}
           >
             <Sparkles size={18} strokeWidth={2.5} />
-            Generate Bundle
+            {t.exchange.generateBundle}
           </button>
         ) : (
           <button
@@ -411,7 +412,7 @@ export default function ExchangePage() {
             }}
           >
             <Plus size={18} strokeWidth={2.5} />
-            Post Listing
+            {t.exchange.postListing}
           </button>
         )}
       </div>
@@ -421,6 +422,7 @@ export default function ExchangePage() {
         <CreateListingModal
           mode={mode}
           modeConfigs={MODE_CONFIGS}
+          t={t}
           defaultType={typeFilter}
           onClose={() => setShowCreateModal(false)}
           onCreate={handleCreateListing}
@@ -433,6 +435,7 @@ export default function ExchangePage() {
           listing={selectedListing}
           allListings={listings}
           userContext={userContext}
+          t={t}
           onClose={() => {
             setShowMatchesDrawer(false);
             setSelectedListing(null);
@@ -444,6 +447,7 @@ export default function ExchangePage() {
       {showBundleGenerator && (
         <BundleGeneratorModal
           userContext={userContext}
+          t={t}
           onClose={() => setShowBundleGenerator(false)}
           onSave={(bundle) => {
             saveBundle(bundle);
@@ -457,6 +461,7 @@ export default function ExchangePage() {
       {showSafetyGuidance && (
         <SafetyGuidanceModal
           category={safetyCategory}
+          t={t}
           onClose={() => setShowSafetyGuidance(false)}
         />
       )}
@@ -468,11 +473,13 @@ export default function ExchangePage() {
 function ListingCard({
   listing,
   userContext,
+  t,
   onViewMatches,
   onShowSafety,
 }: {
   listing: Listing;
   userContext: UserContext;
+  t: typeof import('@/lib/i18n').translations.en;
   onViewMatches: (listing: Listing) => void;
   onShowSafety: (category: string) => void;
 }) {
@@ -498,11 +505,11 @@ function ListingCard({
   const getTrustBadge = () => {
     switch (listing.trust) {
       case 'verified_hub':
-        return { label: 'Verified Hub', color: 'var(--thamara-success)', icon: ShieldCheck };
+        return { label: t.exchange.verifiedHub, color: 'var(--thamara-success)', icon: ShieldCheck };
       case 'ngo':
-        return { label: 'NGO', color: 'var(--thamara-info)', icon: ShieldCheck };
+        return { label: t.exchange.ngo, color: 'var(--thamara-info)', icon: ShieldCheck };
       default:
-        return { label: 'Peer', color: 'var(--thamara-text-muted)', icon: Users };
+        return { label: t.exchange.peer, color: 'var(--thamara-text-muted)', icon: Users };
     }
   };
 
@@ -627,7 +634,7 @@ function ListingCard({
           }}
         >
           <Sparkles size={13} strokeWidth={2.5} />
-          Matches
+          {t.exchange.matches}
         </button>
 
         {listing.category === 'fertilizer' && (
@@ -640,7 +647,7 @@ function ListingCard({
             }}
           >
             <Info size={13} strokeWidth={2.5} />
-            Safety
+            {t.exchange.safety}
           </button>
         )}
       </div>
@@ -652,6 +659,7 @@ function ListingCard({
 function CreateListingModal({
   mode,
   modeConfigs,
+  t,
   defaultType,
   onClose,
   onCreate,
@@ -662,6 +670,7 @@ function CreateListingModal({
     labor: { label: string; icon: typeof Users; categories: { value: string; label: string; icon: typeof Users }[] };
     hubs: { label: string; icon: typeof Building2; categories: { value: string; label: string; icon: typeof Building2 }[] };
   };
+  t: typeof import('@/lib/i18n').translations.en;
   defaultType?: ListingType;
   onClose: () => void;
   onCreate: (data: Omit<Listing, 'id' | 'createdAt' | 'status'>) => void;
@@ -710,7 +719,7 @@ function CreateListingModal({
       >
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
-            Create Listing
+            {t.exchange.createListing}
           </h2>
           <button onClick={onClose} className="p-2 -mr-2 touch-target">
             <X size={22} style={{ color: 'var(--thamara-text-secondary)' }} />
@@ -721,7 +730,7 @@ function CreateListingModal({
           {/* Type */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-              Type
+              {t.exchange.type}
             </label>
             <div className="flex gap-2">
               <button
@@ -733,7 +742,7 @@ function CreateListingModal({
                   color: type === 'offer' ? 'white' : 'var(--thamara-text-secondary)',
                 }}
               >
-                Offer
+                {t.exchange.offer}
               </button>
               <button
                 type="button"
@@ -744,7 +753,7 @@ function CreateListingModal({
                   color: type === 'request' ? 'white' : 'var(--thamara-text-secondary)',
                 }}
               >
-                Request
+                {t.exchange.request}
               </button>
             </div>
           </div>
@@ -752,7 +761,7 @@ function CreateListingModal({
           {/* Category */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-              Category
+              {t.exchange.category}
             </label>
             <select
               value={category}
@@ -775,7 +784,7 @@ function CreateListingModal({
           {/* Title */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-              Title
+              {t.exchange.titleLabel}
             </label>
             <input
               type="text"
@@ -796,7 +805,7 @@ function CreateListingModal({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-                Quantity
+                {t.exchange.quantityLabel}
               </label>
               <input
                 type="number"
@@ -814,7 +823,7 @@ function CreateListingModal({
             </div>
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-                Unit
+                {t.exchange.unit}
               </label>
               <input
                 type="text"
@@ -835,7 +844,7 @@ function CreateListingModal({
           {/* Urgency */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-              Urgency
+              {t.exchange.urgency}
             </label>
             <select
               value={urgency}
@@ -847,21 +856,21 @@ function CreateListingModal({
                 color: 'var(--thamara-text-primary)',
               }}
             >
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="any">Flexible</option>
+              <option value="today">{t.exchange.today}</option>
+              <option value="week">{t.exchange.thisWeek}</option>
+              <option value="any">{t.exchange.flexible}</option>
             </select>
           </div>
 
           {/* Notes */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-              Notes (optional)
+              {t.exchange.notesOptional}
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Additional details..."
+              placeholder={t.exchange.additionalDetails}
               rows={3}
               className="w-full px-4 py-2 text-sm rounded-lg border"
               style={{
@@ -882,7 +891,7 @@ function CreateListingModal({
             }}
           >
             <Check size={20} strokeWidth={2.5} />
-            Create Listing
+            {t.exchange.createListingSubmit}
           </button>
         </form>
       </div>
@@ -895,11 +904,13 @@ function MatchesDrawer({
   listing,
   allListings,
   userContext,
+  t,
   onClose,
 }: {
   listing: Listing;
   allListings: Listing[];
   userContext: UserContext;
+  t: typeof import('@/lib/i18n').translations.en;
   onClose: () => void;
 }) {
   const matches = getRankedMatches(allListings, userContext, listing.id);
@@ -923,7 +934,7 @@ function MatchesDrawer({
       >
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
-            Recommended Matches
+            {t.exchange.recommendedMatches}
           </h2>
           <button onClick={onClose} className="p-2 -mr-2 touch-target">
             <X size={22} style={{ color: 'var(--thamara-text-secondary)' }} />
@@ -935,7 +946,7 @@ function MatchesDrawer({
             <div className="text-center py-12">
               <Package size={48} style={{ color: 'var(--thamara-text-muted)', margin: '0 auto 16px' }} />
               <p className="text-sm font-semibold" style={{ color: 'var(--thamara-text-primary)' }}>
-                No matches found
+                {t.exchange.noMatchesFound}
               </p>
             </div>
           ) : (
@@ -997,10 +1008,12 @@ function MatchesDrawer({
 // Bundle Generator Modal Component
 function BundleGeneratorModal({
   userContext,
+  t,
   onClose,
   onSave,
 }: {
   userContext: UserContext;
+  t: typeof import('@/lib/i18n').translations.en;
   onClose: () => void;
   onSave: (bundle: Omit<RequestBundle, 'id' | 'createdAt'>) => void;
 }) {
@@ -1080,7 +1093,7 @@ function BundleGeneratorModal({
       >
         <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
-            Generate Request Bundle
+            {t.exchange.generateBundleTitle}
           </h2>
           <button onClick={onClose} className="p-2 -mr-2 touch-target">
             <X size={22} style={{ color: 'var(--thamara-text-secondary)' }} />
@@ -1092,7 +1105,7 @@ function BundleGeneratorModal({
             <>
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-                  Crop
+                  {t.exchange.crop}
                 </label>
                 <input
                   type="text"
@@ -1109,7 +1122,7 @@ function BundleGeneratorModal({
 
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-                  Plot Size
+                  {t.exchange.plotSize}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {(['small', 'medium', 'large'] as const).map((size) => (
@@ -1117,13 +1130,13 @@ function BundleGeneratorModal({
                       key={size}
                       type="button"
                       onClick={() => setPlotSize(size)}
-                      className="px-4 py-2 text-sm font-semibold rounded-lg transition-all capitalize"
+                      className="px-4 py-2 text-sm font-semibold rounded-lg transition-all"
                       style={{
                         background: plotSize === size ? 'var(--thamara-primary-500)' : 'var(--thamara-bg-secondary)',
                         color: plotSize === size ? 'var(--thamara-text-on-primary)' : 'var(--thamara-text-secondary)',
                       }}
                     >
-                      {size}
+                      {t.exchange[size]}
                     </button>
                   ))}
                 </div>
@@ -1138,17 +1151,17 @@ function BundleGeneratorModal({
                 }}
               >
                 <Sparkles size={20} strokeWidth={2.5} />
-                Generate Bundle
+                {t.exchange.generateBundle}
               </button>
             </>
           ) : (
             <>
               <div className="p-4 rounded-xl" style={{ background: 'var(--thamara-primary-50)' }}>
                 <h3 className="text-base font-bold mb-1" style={{ color: 'var(--thamara-primary-700)' }}>
-                  {cropName} - {plotSize.charAt(0).toUpperCase() + plotSize.slice(1)} Plot
+                  {cropName} - {t.exchange[plotSize]}
                 </h3>
                 <p className="text-xs" style={{ color: 'var(--thamara-primary-600)' }}>
-                  Generated request bundle
+                  {t.exchange.generatedBundle}
                 </p>
               </div>
 
@@ -1173,7 +1186,7 @@ function BundleGeneratorModal({
                           color: 'white',
                         }}
                       >
-                        {item.priority}
+                        {item.priority === 'essential' ? t.exchange.essential : t.exchange.recommended}
                       </span>
                     </div>
                     <p className="text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
@@ -1193,7 +1206,7 @@ function BundleGeneratorModal({
                   }}
                 >
                   <Copy size={16} strokeWidth={2.5} />
-                  Copy
+                  {t.exchange.copy}
                 </button>
                 <button
                   onClick={handleSave}
@@ -1204,7 +1217,7 @@ function BundleGeneratorModal({
                   }}
                 >
                   <Check size={16} strokeWidth={2.5} />
-                  Save Locally
+                  {t.exchange.saveLocally}
                 </button>
               </div>
             </>
@@ -1218,14 +1231,23 @@ function BundleGeneratorModal({
 // Safety Guidance Modal Component
 function SafetyGuidanceModal({
   category,
+  t,
   onClose,
 }: {
   category: InputCategory;
+  t: typeof import('@/lib/i18n').translations.en;
   onClose: () => void;
 }) {
+  const safetyTitles = {
+    fertilizer: t.exchange.fertilizerSafetyTitle,
+    seeds: t.exchange.seedHandlingTitle,
+    tools: t.exchange.toolSafetyTitle,
+    irrigation: t.exchange.waterSafetyTitle,
+  };
+
   const guidance = {
     fertilizer: {
-      title: 'Fertilizer Safety Basics',
+      title: safetyTitles.fertilizer,
       content: [
         'Always wear gloves when handling fertilizers and soil amendments',
         'Store in cool, dry place away from food and water sources',
@@ -1240,7 +1262,7 @@ function SafetyGuidanceModal({
       ],
     },
     seeds: {
-      title: 'Seed Handling Tips',
+      title: safetyTitles.seeds,
       content: [
         'Store seeds in cool, dry, dark location',
         'Use airtight containers to prevent moisture damage',
@@ -1253,7 +1275,7 @@ function SafetyGuidanceModal({
       ],
     },
     tools: {
-      title: 'Tool Safety & Maintenance',
+      title: safetyTitles.tools,
       content: [
         'Clean tools after each use to prevent disease spread',
         'Sharpen blades regularly for safer, more effective cutting',
@@ -1266,7 +1288,7 @@ function SafetyGuidanceModal({
       ],
     },
     irrigation: {
-      title: 'Water Storage & Irrigation Safety',
+      title: safetyTitles.irrigation,
       content: [
         'Clean water containers regularly to prevent algae and contamination',
         'Cover containers to reduce evaporation and keep out debris',
@@ -1320,7 +1342,7 @@ function SafetyGuidanceModal({
         <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
           <div>
             <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-              Best Practices
+              {t.exchange.bestPractices}
             </h3>
             <ul className="space-y-2">
               {data.content.map((item, i) => (
@@ -1341,7 +1363,7 @@ function SafetyGuidanceModal({
           >
             <h3 className="text-sm font-bold mb-2 flex items-center gap-2">
               <AlertTriangle size={16} strokeWidth={2.5} />
-              Important Warnings
+              {t.exchange.importantWarnings}
             </h3>
             <ul className="space-y-1.5">
               {data.warnings.map((warning, i) => (

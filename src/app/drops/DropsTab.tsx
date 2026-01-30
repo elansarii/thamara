@@ -207,7 +207,7 @@ export default function DropsTab() {
     (filters.quantityBand?.length || 0);
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className={`flex-1 flex flex-col overflow-hidden ${isRTL ? 'text-right' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header with Stats - Collapsible on scroll */}
       <div
         className="grid transition-[grid-template-rows] duration-200 ease-out"
@@ -225,10 +225,10 @@ export default function DropsTab() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h1 className="text-xl font-bold text-white mb-1">
-                Harvest Drops
+                {t.drops.title}
               </h1>
               <p className="text-sm text-white/80">
-                Coordinate pickups without refrigeration
+                {t.drops.subtitle}
               </p>
             </div>
             <div
@@ -247,7 +247,7 @@ export default function DropsTab() {
           {/* Stats Cards */}
           <div className="grid grid-cols-4 gap-2">
             <StatCard icon={Package} label="Total" value={stats.total} />
-            <StatCard icon={Timer} label="Active" value={stats.active} color="var(--thamara-accent-400)" />
+            <StatCard icon={Timer} label={t.drops.active} value={stats.active} color="var(--thamara-accent-400)" />
             <StatCard icon={AlertTriangle} label="Urgent" value={stats.urgent} color="var(--thamara-warning)" />
             <StatCard icon={TrendingUp} label="kg Ready" value={stats.totalKg} />
           </div>
@@ -273,7 +273,7 @@ export default function DropsTab() {
             />
             <input
               type="text"
-              placeholder="Search crops, locations..."
+              placeholder={t.drops.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={`w-full py-2.5 text-sm border outline-none focus:border-[var(--thamara-primary-400)] ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
@@ -321,9 +321,9 @@ export default function DropsTab() {
               color: 'var(--thamara-text-primary)',
             }}
           >
-            <option value="ai_priority">AI Priority</option>
-            <option value="soonest">Soonest</option>
-            <option value="largest">Largest</option>
+            <option value="ai_priority">{t.drops.aiPriority}</option>
+            <option value="soonest">{t.drops.soonest}</option>
+            <option value="largest">{t.drops.largest}</option>
           </select>
         </div>
 
@@ -336,7 +336,7 @@ export default function DropsTab() {
               {(['active', 'scheduled', 'completed'] as DropStatus[]).map(status => (
                 <FilterChip
                   key={status}
-                  label={status === 'active' ? 'Active' : status === 'scheduled' ? 'Scheduled' : 'Completed'}
+                  label={status === 'active' ? t.drops.active : status === 'scheduled' ? t.drops.scheduled : t.drops.completed}
                   isActive={filters.status?.includes(status)}
                   onClick={() => toggleFilter('status', status)}
                   color="primary"
@@ -350,7 +350,7 @@ export default function DropsTab() {
               {(['same_day', '24h', 'any'] as PickupPreference[]).map(pickup => (
                 <FilterChip
                   key={pickup}
-                  label={pickup === 'same_day' ? 'Same-Day' : pickup === '24h' ? '24h' : 'Flexible'}
+                  label={pickup === 'same_day' ? t.drops.sameDay : pickup === '24h' ? t.drops.timeFilter24h : t.drops.timeFilterAny}
                   isActive={filters.pickupPreference?.includes(pickup)}
                   onClick={() => toggleFilter('pickupPreference', pickup)}
                   color="accent"
@@ -364,7 +364,7 @@ export default function DropsTab() {
               {(['small', 'medium', 'large'] as QuantityBand[]).map(band => (
                 <FilterChip
                   key={band}
-                  label={band.charAt(0).toUpperCase() + band.slice(1)}
+                  label={band === 'small' ? t.drops.sizeSmall : band === 'medium' ? t.drops.sizeMedium : t.drops.sizeLarge}
                   isActive={filters.quantityBand?.includes(band)}
                   onClick={() => toggleFilter('quantityBand', band)}
                   color="secondary"
@@ -378,13 +378,13 @@ export default function DropsTab() {
       {/* Drops List */}
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
         {filteredDrops.length === 0 ? (
-          <EmptyState onCreateDrop={() => setShowCreateModal(true)} />
+          <EmptyState onCreateDrop={() => setShowCreateModal(true)} t={t} />
         ) : (
           <>
             {/* Results count */}
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
-                {filteredDrops.length} drop{filteredDrops.length !== 1 ? 's' : ''} available
+                {filteredDrops.length} {t.drops.items}
               </span>
               {sortBy === 'ai_priority' && (
                 <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--thamara-accent-600)' }}>
@@ -398,6 +398,8 @@ export default function DropsTab() {
               <DropCard
                 key={drop.id}
                 drop={drop}
+                t={t}
+                isRTL={isRTL}
                 onMatchPickup={() => setSelectedDropForMatch(drop)}
                 onUpdateStatus={(status) => {
                   updateDrop(drop.id, { status });
@@ -429,7 +431,7 @@ export default function DropsTab() {
           }}
         >
           <Plus size={20} strokeWidth={2.5} />
-          <span>Create New Drop</span>
+          <span>{t.drops.createNewDrop}</span>
         </button>
       </div>
 
@@ -523,7 +525,7 @@ function FilterChip({
 }
 
 // Empty State Component
-function EmptyState({ onCreateDrop }: { onCreateDrop: () => void }) {
+function EmptyState({ onCreateDrop, t }: { onCreateDrop: () => void; t: ReturnType<typeof useLanguage>['t'] }) {
   return (
     <div className="text-center py-12 px-6">
       <div
@@ -536,10 +538,10 @@ function EmptyState({ onCreateDrop }: { onCreateDrop: () => void }) {
         <Package size={40} style={{ color: 'var(--thamara-primary-400)' }} />
       </div>
       <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
-        No Drops Found
+        {t.drops.noDrops}
       </h3>
       <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: 'var(--thamara-text-secondary)' }}>
-        Create your first harvest drop to coordinate pickup with buyers, NGOs, and distribution hubs.
+        {t.drops.noDropsDesc}
       </p>
       <button
         onClick={onCreateDrop}
@@ -551,7 +553,7 @@ function EmptyState({ onCreateDrop }: { onCreateDrop: () => void }) {
         }}
       >
         <Plus size={18} />
-        Create Your First Drop
+        {t.drops.createDrop}
       </button>
     </div>
   );
@@ -560,10 +562,14 @@ function EmptyState({ onCreateDrop }: { onCreateDrop: () => void }) {
 // Drop Card Component
 function DropCard({
   drop,
+  t,
+  isRTL,
   onMatchPickup,
   onUpdateStatus,
 }: {
   drop: HarvestDrop;
+  t: ReturnType<typeof useLanguage>['t'];
+  isRTL: boolean;
   onMatchPickup: () => void;
   onUpdateStatus: (status: DropStatus) => void;
 }) {
@@ -634,15 +640,15 @@ function DropCard({
 
       {/* Details Grid */}
       <div className="grid grid-cols-2 gap-2 mb-3">
-        <DetailItem icon={Package} label="Quantity" value={`${drop.quantityMin}-${drop.quantityMax} ${drop.unit}`} />
-        <DetailItem icon={MapPin} label="Location" value={drop.locationLabel} />
+        <DetailItem icon={Package} label={t.drops.quantity} value={`${drop.quantityMin}-${drop.quantityMax} ${drop.unit}`} />
+        <DetailItem icon={MapPin} label={t.drops.location} value={drop.locationLabel} />
       </div>
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2 mb-4">
-        <StatusBadge status={drop.status} />
-        <RiskBadge risk={drop.spoilageRisk} />
-        <TimingBadge preference={drop.pickupPreference} />
+        <StatusBadge status={drop.status} t={t} />
+        <RiskBadge risk={drop.spoilageRisk} t={t} />
+        <TimingBadge preference={drop.pickupPreference} t={t} />
       </div>
 
       {/* Notes Preview */}
@@ -657,10 +663,10 @@ function DropCard({
       )}
 
       {/* Actions */}
-      <div className="flex gap-2">
+      <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
         <button
           onClick={onMatchPickup}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-90"
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-90 ${isRTL ? 'flex-row-reverse' : ''}`}
           style={{
             background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
             color: 'white',
@@ -668,8 +674,8 @@ function DropCard({
           }}
         >
           <Users size={16} />
-          Find Pickup Match
-          <ChevronRight size={16} />
+          {t.drops.findPickupMatch}
+          <ChevronRight size={16} className={isRTL ? 'rotate-180' : ''} />
         </button>
 
         {drop.status !== 'completed' && (
@@ -702,11 +708,11 @@ function DetailItem({ icon: Icon, label, value }: { icon: any; label: string; va
 }
 
 // Status Badge Component
-function StatusBadge({ status }: { status: DropStatus }) {
+function StatusBadge({ status, t }: { status: DropStatus; t: ReturnType<typeof useLanguage>['t'] }) {
   const config = {
-    active: { bg: 'var(--thamara-success)', label: 'Active' },
-    scheduled: { bg: 'var(--thamara-info)', label: 'Scheduled' },
-    completed: { bg: 'var(--thamara-text-muted)', label: 'Completed' },
+    active: { bg: 'var(--thamara-success)', label: t.drops.active },
+    scheduled: { bg: 'var(--thamara-info)', label: t.drops.scheduled },
+    completed: { bg: 'var(--thamara-text-muted)', label: t.drops.completed },
   };
   const { bg, label } = config[status];
 
@@ -721,11 +727,11 @@ function StatusBadge({ status }: { status: DropStatus }) {
 }
 
 // Risk Badge Component
-function RiskBadge({ risk }: { risk: 'low' | 'medium' | 'high' }) {
+function RiskBadge({ risk, t }: { risk: 'low' | 'medium' | 'high'; t: ReturnType<typeof useLanguage>['t'] }) {
   const config = {
-    low: { bg: 'var(--thamara-success)', label: 'Low Risk' },
-    medium: { bg: 'var(--thamara-warning)', label: 'Med Risk' },
-    high: { bg: 'var(--thamara-error)', label: 'High Risk' },
+    low: { bg: 'var(--thamara-success)', label: t.drops.lowRisk },
+    medium: { bg: 'var(--thamara-warning)', label: t.drops.medRisk },
+    high: { bg: 'var(--thamara-error)', label: t.drops.highRisk },
   };
   const { bg, label } = config[risk];
 
@@ -741,11 +747,11 @@ function RiskBadge({ risk }: { risk: 'low' | 'medium' | 'high' }) {
 }
 
 // Timing Badge Component
-function TimingBadge({ preference }: { preference: PickupPreference }) {
+function TimingBadge({ preference, t }: { preference: PickupPreference; t: ReturnType<typeof useLanguage>['t'] }) {
   const config = {
-    same_day: { bg: 'var(--thamara-accent-100)', color: 'var(--thamara-accent-700)', label: 'Same-Day' },
-    '24h': { bg: 'var(--thamara-primary-100)', color: 'var(--thamara-primary-700)', label: '24h Pickup' },
-    any: { bg: 'var(--thamara-bg-secondary)', color: 'var(--thamara-text-secondary)', label: 'Flexible' },
+    same_day: { bg: 'var(--thamara-accent-100)', color: 'var(--thamara-accent-700)', label: t.drops.sameDay },
+    '24h': { bg: 'var(--thamara-primary-100)', color: 'var(--thamara-primary-700)', label: t.drops.timeFilter24h },
+    any: { bg: 'var(--thamara-bg-secondary)', color: 'var(--thamara-text-secondary)', label: t.drops.timeFilterAny },
   };
   const { bg, color, label } = config[preference];
 
