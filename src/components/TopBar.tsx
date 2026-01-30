@@ -5,7 +5,7 @@ import { WifiOff, Battery, Globe, Volume2 } from 'lucide-react';
 export default function TopBar() {
   return (
     <header
-      className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 border-b backdrop-blur-sm"
+      className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 border-b backdrop-blur-sm"
       style={{
         height: 'calc(56px + var(--safe-area-inset-top))',
         paddingTop: 'var(--safe-area-inset-top)',
