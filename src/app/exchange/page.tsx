@@ -193,7 +193,7 @@ export default function ExchangePage() {
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--thamara-bg)' }}>
       {/* Sticky Header - Compact for mobile */}
-      <div className="sticky top-0 z-10 flex-shrink-0 px-4 py-2.5 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+      <div className="sticky top-0 z-10 shrink-0 px-4 py-2.5 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
         <div className="flex items-center justify-between gap-2 mb-2">
           <h1 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
             {t.nav.exchange}
@@ -234,7 +234,7 @@ export default function ExchangePage() {
       </div>
 
       {/* Mode tabs - Full width segmented control */}
-      <div className="flex-shrink-0 px-4 py-2 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+      <div className="shrink-0 px-4 py-2 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
         <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'var(--thamara-bg-secondary)' }}>
           {(Object.keys(MODE_CONFIGS) as ListingMode[]).map((m) => {
             const config = MODE_CONFIGS[m];
@@ -265,7 +265,7 @@ export default function ExchangePage() {
       </div>
 
       {/* Filters - Horizontal scrolling on mobile */}
-      <div className="flex-shrink-0 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-bg)' }}>
+      <div className="shrink-0 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-bg)' }}>
         <div className="px-4 py-2">
           <div className="scroll-x-container">
             {/* Type filter (not for hubs) */}
@@ -383,7 +383,7 @@ export default function ExchangePage() {
 
       {/* Bottom Action Bar - Safe area aware */}
       <div
-        className="sticky bottom-0 flex-shrink-0 p-3 border-t safe-bottom"
+        className="sticky bottom-0 shrink-0 p-3 border-t safe-bottom"
         style={{
           borderColor: 'var(--thamara-border)',
           background: 'var(--thamara-surface)',
@@ -527,7 +527,7 @@ function ListingCard({
       {/* Compact Header */}
       <div className="flex items-start gap-2 mb-2">
         <div
-          className="flex items-center justify-center w-8 h-8 rounded-md flex-shrink-0"
+          className="flex items-center justify-center w-8 h-8 rounded-md shrink-0"
           style={{
             background: 'var(--thamara-primary-100)',
             color: 'var(--thamara-primary-700)',
@@ -717,7 +717,7 @@ function CreateListingModal({
         onClick={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+        <div className="flex items-center justify-between p-4 border-b shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
             {t.exchange.createListing}
           </h2>
@@ -932,7 +932,7 @@ function MatchesDrawer({
         onClick={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)' }}>
+        <div className="flex items-center justify-between p-4 border-b shrink-0" style={{ borderColor: 'var(--thamara-border)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
             {t.exchange.recommendedMatches}
           </h2>
@@ -967,7 +967,7 @@ function MatchesDrawer({
                     <h3 className="text-sm font-bold flex-1" style={{ color: 'var(--thamara-text-primary)' }}>
                       {matchedListing.title}
                     </h3>
-                    <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                    <div className="flex items-center gap-1 shrink-0 ml-2">
                       <Sparkles size={14} style={{ color: 'var(--thamara-accent-600)' }} />
                       <span className="text-sm font-bold" style={{ color: 'var(--thamara-accent-600)' }}>
                         {match.score}%
@@ -1091,7 +1091,7 @@ function BundleGeneratorModal({
         onClick={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+        <div className="flex items-center justify-between p-4 border-b shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
             {t.exchange.generateBundleTitle}
           </h2>
@@ -1320,7 +1320,7 @@ function SafetyGuidanceModal({
         onClick={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b flex-shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
+        <div className="flex items-center justify-between p-4 border-b shrink-0" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
           <div className="flex items-center gap-2">
             <div
               className="flex items-center justify-center w-8 h-8 rounded-lg"
@@ -1347,7 +1347,7 @@ function SafetyGuidanceModal({
             <ul className="space-y-2">
               {data.content.map((item, i) => (
                 <li key={i} className="flex gap-2 text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
-                  <Check size={16} strokeWidth={2.5} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--thamara-success)' }} />
+                  <Check size={16} strokeWidth={2.5} className="shrink-0 mt-0.5" style={{ color: 'var(--thamara-success)' }} />
                   <span>{item}</span>
                 </li>
               ))}

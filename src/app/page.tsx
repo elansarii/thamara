@@ -87,6 +87,14 @@ export default function HomePage() {
   const cropName = CROP_NAMES[firstCrop.nameKey]?.[language] || firstCrop.nameKey;
   const cropReason = CROP_REASONS[firstCrop.reasonKey]?.[language] || firstCrop.reasonKey;
 
+  // Transform seasonal crops for display
+  const displayCrops = SEASONAL_CROPS.slice(0, 3).map(crop => ({
+    name: CROP_NAMES[crop.nameKey]?.[language] || crop.nameKey,
+    daysToHarvest: crop.daysToHarvest,
+    icon: crop.icon,
+    reason: CROP_REASONS[crop.reasonKey]?.[language] || crop.reasonKey,
+  }));
+
   return (
     <div className="pb-6 space-y-6">
       {/* Insights Widget - Horizontal Scrollable */}
@@ -127,7 +135,7 @@ export default function HomePage() {
               highlight={cropName}
               subtitle={t.home.daysToHarvest.replace('{days}', String(firstCrop.daysToHarvest))}
               action={cropReason}
-              crops={SEASONAL_CROPS.slice(0, 3)}
+              crops={displayCrops}
             />
 
             {/* Farmland Status Card */}
@@ -429,7 +437,7 @@ function ActionCard({
     >
       {/* Icon container with gradient */}
       <div
-        className={`w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br ${gradient} transition-transform duration-200 group-active:scale-95`}
+        className={`w-14 h-14 rounded-xl flex items-center justify-center bg-linear-to-br ${gradient} transition-transform duration-200 group-active:scale-95`}
         style={{
           boxShadow: '0 4px 10px -2px rgba(0, 0, 0, 0.2)'
         }}
@@ -516,7 +524,7 @@ function InsightCard({
 }) {
   return (
     <div
-      className="flex-shrink-0 w-44 p-3 rounded-xl border"
+      className="shrink-0 w-44 p-3 rounded-xl border"
       style={{
         background: 'var(--thamara-surface)',
         borderColor: urgent ? 'var(--thamara-info)' : 'var(--thamara-border)',
