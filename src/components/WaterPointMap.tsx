@@ -397,15 +397,14 @@ export default function WaterPointMap() {
                           {getWaterPointTypeLabel(point.type)}
                         </span>
                         <span
-                          className={`text-xs px-2 py-0.5 rounded font-medium ${
-                            point.status === "available"
+                          className={`text-xs px-2 py-0.5 rounded font-medium ${point.status === "available"
                               ? "bg-green-100 text-green-800"
                               : point.status === "limited"
-                              ? "bg-amber-100 text-amber-800"
-                              : point.status === "unavailable"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
+                                ? "bg-amber-100 text-amber-800"
+                                : point.status === "unavailable"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-gray-100 text-gray-800"
+                            }`}
                         >
                           {getStatusLabel(point.status)}
                         </span>
@@ -460,15 +459,14 @@ export default function WaterPointMap() {
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm text-gray-600">Status:</span>
               <span
-                className={`text-sm font-semibold px-2 py-1 rounded ${
-                  selectedWaterPoint.status === "available"
+                className={`text-sm font-semibold px-2 py-1 rounded ${selectedWaterPoint.status === "available"
                     ? "bg-green-100 text-green-800"
                     : selectedWaterPoint.status === "limited"
-                    ? "bg-amber-100 text-amber-800"
-                    : selectedWaterPoint.status === "unavailable"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
+                      ? "bg-amber-100 text-amber-800"
+                      : selectedWaterPoint.status === "unavailable"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-gray-100 text-gray-800"
+                  }`}
               >
                 {getStatusLabel(selectedWaterPoint.status)}
               </span>
@@ -485,13 +483,12 @@ export default function WaterPointMap() {
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className={`h-full ${
-                  selectedWaterPoint.reliabilityScore >= 80
+                className={`h-full ${selectedWaterPoint.reliabilityScore >= 80
                     ? "bg-green-500"
                     : selectedWaterPoint.reliabilityScore >= 60
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
-                }`}
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                  }`}
                 style={{ width: `${selectedWaterPoint.reliabilityScore}%` }}
               />
             </div>

@@ -264,21 +264,21 @@ export default function HomePage() {
       {/* Last Logged Plot Card */}
       <section
         className="rounded-2xl p-6 border transition-all hover:shadow-md mx-5"
-        style={{ 
-          background: 'var(--thamara-surface)', 
+        style={{
+          background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)',
           boxShadow: 'var(--thamara-shadow-sm)'
         }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 
+          <h2
             className="text-xl font-bold"
             style={{ color: 'var(--thamara-text-primary)' }}
           >
             {t.home.lastLoggedPlot}
           </h2>
-          <ClipboardCheck 
-            size={20} 
+          <ClipboardCheck
+            size={20}
             strokeWidth={2.5}
             style={{ color: 'var(--thamara-accent-500)' }}
           />
@@ -286,14 +286,14 @@ export default function HomePage() {
         {lastPlot ? (
           <div className="space-y-3">
             <div>
-              <div 
+              <div
                 className="text-lg font-semibold mb-1"
                 style={{ color: 'var(--thamara-text-primary)' }}
               >
                 {lastPlot.name || "Unnamed Plot"}
               </div>
               {lastPlot.areaM2 && (
-                <div 
+                <div
                   className="text-sm"
                   style={{ color: 'var(--thamara-text-secondary)' }}
                 >
@@ -307,7 +307,7 @@ export default function HomePage() {
             <Link
               href={ROUTES.ASSESSMENT}
               className="block w-full py-2.5 rounded-xl text-center text-sm font-semibold transition-all hover:opacity-80"
-              style={{ 
+              style={{
                 background: 'var(--thamara-accent-500)',
                 color: 'white'
               }}
@@ -317,7 +317,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="text-center py-4">
-            <p 
+            <p
               className="text-sm mb-3"
               style={{ color: 'var(--thamara-text-muted)' }}
             >
@@ -326,7 +326,7 @@ export default function HomePage() {
             <Link
               href={ROUTES.LOG_PLOT}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-80"
-              style={{ 
+              style={{
                 background: 'var(--thamara-accent-500)',
                 color: 'white'
               }}
@@ -341,21 +341,21 @@ export default function HomePage() {
       {/* My Impact Card - Enhanced visual hierarchy */}
       <section
         className="rounded-2xl p-6 border transition-all hover:shadow-md mx-5"
-        style={{ 
-          background: 'var(--thamara-surface)', 
+        style={{
+          background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)',
           boxShadow: 'var(--thamara-shadow-sm)'
         }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 
+          <h2
             className="text-xl font-bold"
             style={{ color: 'var(--thamara-text-primary)' }}
           >
             My Impact
           </h2>
-          <TrendingUp 
-            size={20} 
+          <TrendingUp
+            size={20}
             strokeWidth={2.5}
             style={{ color: 'var(--thamara-accent-500)' }}
           />
@@ -384,17 +384,17 @@ export default function HomePage() {
 
       {/* Offline Badge - Modern pill design */}
       <section className="flex justify-center">
-        <div 
+        <div
           className="inline-flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold"
-          style={{ 
-            background: 'var(--thamara-primary-50)', 
+          style={{
+            background: 'var(--thamara-primary-50)',
             color: 'var(--thamara-primary-700)',
             borderRadius: 'var(--thamara-radius-full)',
             border: '1.5px solid var(--thamara-primary-200)'
           }}
         >
-          <span 
-            className="w-2 h-2 rounded-full animate-pulse" 
+          <span
+            className="w-2 h-2 rounded-full animate-pulse"
             style={{ background: 'var(--thamara-accent-500)' }}
           />
           Offline-ready
@@ -454,13 +454,13 @@ function ActionCard({
 function ImpactStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="text-center">
-      <div 
+      <div
         className="text-2xl font-bold mb-1"
         style={{ color: 'var(--thamara-accent-600)' }}
       >
         {value}
       </div>
-      <div 
+      <div
         className="text-xs leading-tight"
         style={{ color: 'var(--thamara-text-muted)' }}
       >

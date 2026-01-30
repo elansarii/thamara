@@ -216,42 +216,42 @@ export default function DropsTab() {
         }}
       >
         <div className="overflow-hidden">
-        <div
-          className="px-5 py-4"
-          style={{
-            background: 'linear-gradient(135deg, var(--thamara-primary-600) 0%, var(--thamara-primary-700) 100%)',
-          }}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h1 className="text-xl font-bold text-white mb-1">
-                {t.drops.title}
-              </h1>
-              <p className="text-sm text-white/80">
-                {t.drops.subtitle}
-              </p>
+          <div
+            className="px-5 py-4"
+            style={{
+              background: 'linear-gradient(135deg, var(--thamara-primary-600) 0%, var(--thamara-primary-700) 100%)',
+            }}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h1 className="text-xl font-bold text-white mb-1">
+                  {t.drops.title}
+                </h1>
+                <p className="text-sm text-white/80">
+                  {t.drops.subtitle}
+                </p>
+              </div>
+              <div
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold"
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  borderRadius: 'var(--thamara-radius-full)',
+                  color: 'white',
+                }}
+              >
+                <Zap size={14} />
+                <span>No-Fridge Mode</span>
+              </div>
             </div>
-            <div
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold"
-              style={{
-                background: 'rgba(255,255,255,0.2)',
-                borderRadius: 'var(--thamara-radius-full)',
-                color: 'white',
-              }}
-            >
-              <Zap size={14} />
-              <span>No-Fridge Mode</span>
-            </div>
-          </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-4 gap-2">
-            <StatCard icon={Package} label="Total" value={stats.total} />
-            <StatCard icon={Timer} label={t.drops.active} value={stats.active} color="var(--thamara-accent-400)" />
-            <StatCard icon={AlertTriangle} label="Urgent" value={stats.urgent} color="var(--thamara-warning)" />
-            <StatCard icon={TrendingUp} label="kg Ready" value={stats.totalKg} />
+            {/* Stats Cards */}
+            <div className="grid grid-cols-4 gap-2">
+              <StatCard icon={Package} label="Total" value={stats.total} />
+              <StatCard icon={Timer} label={t.drops.active} value={stats.active} color="var(--thamara-accent-400)" />
+              <StatCard icon={AlertTriangle} label="Urgent" value={stats.urgent} color="var(--thamara-warning)" />
+              <StatCard icon={TrendingUp} label="kg Ready" value={stats.totalKg} />
+            </div>
           </div>
-        </div>
         </div>
       </div>
 

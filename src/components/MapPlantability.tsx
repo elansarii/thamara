@@ -69,7 +69,7 @@ export default function MapPlantability() {
         bottomNav.style.display = 'flex';
       }
     }
-    
+
     // Cleanup on unmount
     return () => {
       const bottomNav = document.getElementById('bottom-nav');
@@ -403,7 +403,7 @@ export default function MapPlantability() {
   // Toggle plantability layer visibility
   useEffect(() => {
     if (!map.current || !map.current.getLayer('plantability-fill')) return;
-    
+
     map.current.setLayoutProperty(
       'plantability-fill',
       'visibility',
@@ -775,13 +775,12 @@ export default function MapPlantability() {
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className={`h-full ${
-                  selectedSeedSource.reliabilityScore >= 80
+                className={`h-full ${selectedSeedSource.reliabilityScore >= 80
                     ? 'bg-green-500'
                     : selectedSeedSource.reliabilityScore >= 60
-                    ? 'bg-yellow-500'
-                    : 'bg-red-500'
-                }`}
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500'
+                  }`}
                 style={{ width: `${selectedSeedSource.reliabilityScore}%` }}
               />
             </div>
@@ -809,11 +808,10 @@ export default function MapPlantability() {
                 return crop ? (
                   <span
                     key={cropId}
-                    className={`text-xs px-2 py-1 rounded ${
-                      filterCropId === cropId
+                    className={`text-xs px-2 py-1 rounded ${filterCropId === cropId
                         ? 'bg-green-600 text-white'
                         : 'bg-gray-100 text-gray-700'
-                    }`}
+                      }`}
                   >
                     {crop.commonName}
                   </span>
@@ -891,15 +889,14 @@ export default function MapPlantability() {
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm text-gray-600">{t.map.status}:</span>
               <span
-                className={`text-sm font-semibold px-2 py-1 rounded ${
-                  selectedWaterPoint.status === "available"
+                className={`text-sm font-semibold px-2 py-1 rounded ${selectedWaterPoint.status === "available"
                     ? "bg-green-100 text-green-800"
                     : selectedWaterPoint.status === "limited"
-                    ? "bg-amber-100 text-amber-800"
-                    : selectedWaterPoint.status === "unavailable"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
+                      ? "bg-amber-100 text-amber-800"
+                      : selectedWaterPoint.status === "unavailable"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-gray-100 text-gray-800"
+                  }`}
               >
                 {getStatusLabel(selectedWaterPoint.status)}
               </span>
@@ -916,13 +913,12 @@ export default function MapPlantability() {
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className={`h-full ${
-                  selectedWaterPoint.reliabilityScore >= 70
+                className={`h-full ${selectedWaterPoint.reliabilityScore >= 70
                     ? "bg-green-500"
                     : selectedWaterPoint.reliabilityScore >= 40
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
-                }`}
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                  }`}
                 style={{ width: `${selectedWaterPoint.reliabilityScore}%` }}
               />
             </div>
