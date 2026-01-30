@@ -420,6 +420,7 @@ export default function ExchangePage() {
       {showCreateModal && (
         <CreateListingModal
           mode={mode}
+          modeConfigs={MODE_CONFIGS}
           defaultType={typeFilter}
           onClose={() => setShowCreateModal(false)}
           onCreate={handleCreateListing}
@@ -650,17 +651,23 @@ function ListingCard({
 // Create Listing Modal Component
 function CreateListingModal({
   mode,
+  modeConfigs,
   defaultType,
   onClose,
   onCreate,
 }: {
   mode: ListingMode;
+  modeConfigs: {
+    inputs: { label: string; icon: typeof Package; categories: { value: string; label: string; icon: typeof Package }[] };
+    labor: { label: string; icon: typeof Users; categories: { value: string; label: string; icon: typeof Users }[] };
+    hubs: { label: string; icon: typeof Building2; categories: { value: string; label: string; icon: typeof Building2 }[] };
+  };
   defaultType?: ListingType;
   onClose: () => void;
   onCreate: (data: Omit<Listing, 'id' | 'createdAt' | 'status'>) => void;
 }) {
   const [type, setType] = useState<ListingType>(defaultType || 'offer');
-  const [category, setCategory] = useState<string>(MODE_CONFIGS[mode].categories[1].value);
+  const [category, setCategory] = useState<string>(modeConfigs[mode].categories[1].value);
   const [title, setTitle] = useState('');
   const [quantity, setQuantity] = useState(10);
   const [unit, setUnit] = useState('kg');
@@ -757,7 +764,7 @@ function CreateListingModal({
                 color: 'var(--thamara-text-primary)',
               }}
             >
-              {MODE_CONFIGS[mode].categories.slice(1).map((cat) => (
+              {modeConfigs[mode].categories.slice(1).map((cat) => (
                 <option key={cat.value} value={cat.value}>
                   {cat.label}
                 </option>
