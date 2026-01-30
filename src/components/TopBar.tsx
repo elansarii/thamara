@@ -13,7 +13,7 @@ export default function TopBar() {
   return (
     <>
       <header
-        className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 border-b backdrop-blur-sm"
+        className="sticky top-0 left-0 right-0 flex items-center justify-between px-4 border-b backdrop-blur-sm flex-shrink-0"
         style={{
           height: 'calc(56px + var(--safe-area-inset-top))',
           paddingTop: 'var(--safe-area-inset-top)',
@@ -74,10 +74,10 @@ export default function TopBar() {
       <div
         className={`absolute top-0 h-full w-72 transform transition-transform duration-300 ease-out z-[200] ${isRTL ? 'right-0' : 'left-0'}`}
         style={{
-          transform: menuOpen 
-            ? 'translateX(0)' 
-            : isRTL 
-              ? 'translateX(100%)' 
+          transform: menuOpen
+            ? 'translateX(0)'
+            : isRTL
+              ? 'translateX(100%)'
               : 'translateX(-100%)',
           background: 'var(--thamara-surface)',
           boxShadow: menuOpen ? (isRTL ? '-4px 0 20px rgba(0,0,0,0.15)' : '4px 0 20px rgba(0,0,0,0.15)') : 'none',

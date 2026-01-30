@@ -45,16 +45,16 @@ export default function DropsTab() {
     quantityBand: [],
     search: '',
   });
-  
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedDropForMatch, setSelectedDropForMatch] = useState<HarvestDrop | null>(null);
   const { t, isRTL } = useLanguage();
-  
+
   // Load drops on mount
   useEffect(() => {
     setDrops(loadDrops());
   }, []);
-  
+
   // Apply filters and sorting
   const filteredDrops = useMemo(() => {
     return filterAndSortDrops(
@@ -63,7 +63,7 @@ export default function DropsTab() {
       sortBy
     );
   }, [drops, filters, searchQuery, sortBy]);
-  
+
   // Toggle filter
   const toggleFilter = <K extends keyof DropFilters>(
     key: K,
@@ -80,13 +80,13 @@ export default function DropsTab() {
       };
     });
   };
-  
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header */}
-      <div 
+      <div
         className="px-5 py-4 border-b"
-        style={{ 
+        style={{
           background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)'
         }}
@@ -98,11 +98,11 @@ export default function DropsTab() {
           {t.drops.subtitle}
         </p>
       </div>
-      
+
       {/* Controls */}
-      <div 
+      <div
         className="px-5 py-3 border-b space-y-3"
-        style={{ 
+        style={{
           background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)'
         }}
@@ -110,8 +110,8 @@ export default function DropsTab() {
         {/* Search and Sort */}
         <div className="flex gap-2">
           <div className="flex-1 relative">
-            <Search 
-              size={16} 
+            <Search
+              size={16}
               className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? 'right-3' : 'left-3'}`}
               style={{ color: 'var(--thamara-text-muted)' }}
             />
@@ -129,7 +129,7 @@ export default function DropsTab() {
               }}
             />
           </div>
-          
+
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as DropSortOption)}
@@ -146,7 +146,7 @@ export default function DropsTab() {
             <option value="largest">Largest Quantity</option>
           </select>
         </div>
-        
+
         {/* Filter Chips */}
         <div className="flex flex-wrap gap-2">
           {/* Status filters */}
@@ -178,7 +178,7 @@ export default function DropsTab() {
               </button>
             );
           })}
-          
+
           {/* Pickup filters */}
           {(['same_day', '24h', 'any'] as PickupPreference[]).map(pickup => {
             const pickupLabels = {
@@ -208,7 +208,7 @@ export default function DropsTab() {
               </button>
             );
           })}
-          
+
           {/* Quantity band filters */}
           {(['small', 'medium', 'large'] as QuantityBand[]).map(band => {
             const bandLabels = {
@@ -240,7 +240,7 @@ export default function DropsTab() {
           })}
         </div>
       </div>
-      
+
       {/* Drops List */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
         {filteredDrops.length === 0 ? (
@@ -268,11 +268,11 @@ export default function DropsTab() {
           ))
         )}
       </div>
-      
+
       {/* Sticky Create Button */}
-      <div 
+      <div
         className="px-5 py-4 border-t"
-        style={{ 
+        style={{
           background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)',
           boxShadow: 'var(--thamara-shadow-lg)'
@@ -292,7 +292,7 @@ export default function DropsTab() {
           <span>{t.drops.createDrop}</span>
         </button>
       </div>
-      
+
       {/* Modals */}
       {showCreateModal && (
         <CreateDropModal
@@ -304,7 +304,7 @@ export default function DropsTab() {
           }}
         />
       )}
-      
+
       {selectedDropForMatch && (
         <MatchPickupDrawer
           drop={selectedDropForMatch}
@@ -330,7 +330,7 @@ function DropCard({
   const priorityScore = calculateDropPriority(drop);
   const timeLabel = formatTimeUntilWindow(drop.windowStart);
   const quantityBand = getQuantityBand(drop.quantityMin, drop.quantityMax);
-  
+
   return (
     <div
       className="p-4 border transition-all hover:shadow-md"
@@ -361,7 +361,7 @@ function DropCard({
             </p>
           </div>
         </div>
-        
+
         {sortBy === 'ai_priority' && (
           <div
             className="flex items-center gap-1 px-2 py-1 text-xs font-bold"
@@ -369,8 +369,8 @@ function DropCard({
               background: priorityScore >= 70
                 ? 'var(--thamara-warning)'
                 : priorityScore >= 50
-                ? 'var(--thamara-accent-500)'
-                : 'var(--thamara-primary-300)',
+                  ? 'var(--thamara-accent-500)'
+                  : 'var(--thamara-primary-300)',
               color: 'white',
               borderRadius: 'var(--thamara-radius-md)',
             }}
@@ -380,7 +380,7 @@ function DropCard({
           </div>
         )}
       </div>
-      
+
       {/* Details */}
       <div className="space-y-2 mb-3">
         <div className="flex items-center gap-2 text-sm">
@@ -389,14 +389,14 @@ function DropCard({
             {new Date(drop.windowStart).toLocaleDateString()} - {new Date(drop.windowEnd).toLocaleDateString()}
           </span>
         </div>
-        
+
         <div className="flex items-center gap-2 text-sm">
           <Package size={14} style={{ color: 'var(--thamara-text-muted)' }} />
           <span style={{ color: 'var(--thamara-text-secondary)' }}>
             {drop.quantityMin}-{drop.quantityMax} {drop.unit}
           </span>
         </div>
-        
+
         <div className="flex items-center gap-2 text-sm">
           <MapPin size={14} style={{ color: 'var(--thamara-text-muted)' }} />
           <span style={{ color: 'var(--thamara-text-secondary)' }}>
@@ -404,7 +404,7 @@ function DropCard({
           </span>
         </div>
       </div>
-      
+
       {/* Badges */}
       <div className="flex flex-wrap gap-2 mb-3">
         <span
@@ -417,15 +417,15 @@ function DropCard({
         >
           No-Fridge Mode
         </span>
-        
+
         <span
           className="flex items-center gap-1 px-2 py-1 text-xs font-semibold"
           style={{
             background: drop.spoilageRisk === 'high'
               ? 'var(--thamara-error)'
               : drop.spoilageRisk === 'medium'
-              ? 'var(--thamara-warning)'
-              : 'var(--thamara-success)',
+                ? 'var(--thamara-warning)'
+                : 'var(--thamara-success)',
             color: 'white',
             borderRadius: 'var(--thamara-radius-md)',
           }}
@@ -433,7 +433,7 @@ function DropCard({
           <AlertTriangle size={12} />
           <span>AI Risk: {drop.spoilageRisk}</span>
         </span>
-        
+
         <span
           className="px-2 py-1 text-xs font-semibold capitalize"
           style={{
@@ -445,7 +445,7 @@ function DropCard({
           {drop.pickupPreference === 'same_day' ? 'Same-Day' : drop.pickupPreference === '24h' ? '24h Pickup' : 'Flexible'}
         </span>
       </div>
-      
+
       {/* Actions */}
       <div className="flex gap-2">
         <button
@@ -459,7 +459,7 @@ function DropCard({
         >
           Match Pickup
         </button>
-        
+
         {drop.status !== 'completed' && (
           <button
             onClick={() => onUpdateStatus('completed')}
@@ -498,15 +498,15 @@ function CreateDropModal({
     pickupPreference: 'same_day' as PickupPreference,
     notes: '',
   });
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const windowLengthHours = 
+
+    const windowLengthHours =
       (new Date(formData.windowEnd).getTime() - new Date(formData.windowStart).getTime()) / (1000 * 60 * 60);
-    
+
     const selectedCrop = CROPS.find(c => c.id === formData.cropType);
-    
+
     const drop: HarvestDrop = {
       id: generateDropId(),
       cropType: formData.cropType,
@@ -527,10 +527,10 @@ function CreateDropModal({
       notes: formData.notes,
       createdAt: new Date().toISOString(),
     };
-    
+
     onSave(drop);
   };
-  
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
@@ -559,7 +559,7 @@ function CreateDropModal({
             <X size={24} />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -585,7 +585,7 @@ function CreateDropModal({
               ))}
             </select>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -605,7 +605,7 @@ function CreateDropModal({
                 }}
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
                 Window End
@@ -625,7 +625,7 @@ function CreateDropModal({
               />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -647,7 +647,7 @@ function CreateDropModal({
                 }}
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
                 Max Quantity
@@ -668,7 +668,7 @@ function CreateDropModal({
                 }}
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
                 Unit
@@ -690,7 +690,7 @@ function CreateDropModal({
               </select>
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
               Location Label
@@ -710,7 +710,7 @@ function CreateDropModal({
               }}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
               Pickup Preference
@@ -731,7 +731,7 @@ function CreateDropModal({
               <option value="any">Flexible timing</option>
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
               Notes (optional)
@@ -750,7 +750,7 @@ function CreateDropModal({
               }}
             />
           </div>
-          
+
           <button
             type="submit"
             className="w-full py-3 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"

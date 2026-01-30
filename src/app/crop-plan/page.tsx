@@ -17,7 +17,7 @@ export default function CropPlanPage() {
   const router = useRouter();
   const { lastPlot } = usePlotStore();
   const { t, isRTL } = useLanguage();
-  
+
   // Input state
   const [plotAreaM2, setPlotAreaM2] = useState<number>(50);
   const [waterAccess, setWaterAccess] = useState<WaterAccess>('limited');
@@ -27,48 +27,48 @@ export default function CropPlanPage() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [offlineMode, setOfflineMode] = useState(false);
   const [usingLoggedPlot, setUsingLoggedPlot] = useState(false);
-  
+
   // Initialize with logged plot data if available
   useEffect(() => {
     if (lastPlot) {
       setUsingLoggedPlot(true);
       if (lastPlot.areaM2) setPlotAreaM2(lastPlot.areaM2);
-      
+
       // Map plot waterAccess to recommendation waterAccess
       if (lastPlot.waterAccess === 'none') setWaterAccess('none');
       else if (lastPlot.waterAccess === 'limited') setWaterAccess('limited');
       else if (lastPlot.waterAccess === 'reliable') setWaterAccess('reliable');
-      
+
       // Map plot salinity to recommendation salinityRisk
       if (lastPlot.salinity === 'low') setSalinityRisk('none');
       else if (lastPlot.salinity === 'medium') setSalinityRisk('some');
       else if (lastPlot.salinity === 'high') setSalinityRisk('strong');
     }
   }, [lastPlot]);
-  
+
   // Check online status
   useEffect(() => {
     setOfflineMode(!navigator.onLine);
-    
+
     const handleOnline = () => setOfflineMode(false);
     const handleOffline = () => setOfflineMode(true);
-    
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
-  
+
   // Calculate recommendations
   const handleCalculate = async () => {
     setIsCalculating(true);
-    
+
     // Simulate AI thinking for 2-3 seconds
     await new Promise(resolve => setTimeout(resolve, 2500));
-    
+
     const input: RecommendationInput = {
       plotAreaM2,
       waterAccess,
@@ -77,43 +77,43 @@ export default function CropPlanPage() {
       shadeOption: 'none',
       userPriority,
     };
-    
+
     const result = recommendCrops(input);
-    
+
     // Store results in sessionStorage and navigate to results page
     sessionStorage.setItem('thamara_crop_recommendations', JSON.stringify({
       topCrops: result.topCrops,
       alternatives: result.alternatives,
       plotAreaM2,
     }));
-    
+
     setIsCalculating(false);
     router.push('/crop-plan/results');
   };
-  
+
   return (
     <div className="flex flex-col h-full overflow-y-auto" style={{ background: 'var(--thamara-bg)' }}>
       {/* Loading Overlay */}
       {isCalculating && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex flex-col items-center justify-center"
           style={{ background: 'rgba(255, 255, 255, 0.95)' }}
         >
-          <Sparkles 
-            className="w-16 h-16 mb-4 animate-pulse" 
+          <Sparkles
+            className="w-16 h-16 mb-4 animate-pulse"
             style={{ color: 'var(--thamara-accent-500)' }}
           />
-          <Loader2 
-            className="w-12 h-12 animate-spin mb-4" 
+          <Loader2
+            className="w-12 h-12 animate-spin mb-4"
             style={{ color: 'var(--thamara-accent-500)' }}
           />
-          <p 
+          <p
             className="text-lg font-semibold mb-2"
             style={{ color: 'var(--thamara-text-primary)' }}
           >
             {t.guide.analyzing}
           </p>
-          <p 
+          <p
             className="text-sm"
             style={{ color: 'var(--thamara-text-secondary)' }}
           >
@@ -121,7 +121,7 @@ export default function CropPlanPage() {
           </p>
         </div>
       )}
-      
+
       {/* Header - Compact for mobile */}
       <div
         className="px-4 py-3 border-b"
@@ -161,7 +161,7 @@ export default function CropPlanPage() {
           </div>
         )}
       </div>
-      
+
       {/* Input Panel - Mobile optimized */}
       <div
         className="p-4 border-b space-y-3"
@@ -311,9 +311,9 @@ export default function CropPlanPage() {
           )}
         </button>
       </div>
-      
+
       {/* Attribution */}
-      <div 
+      <div
         className="px-5 py-4 text-xs mt-auto"
         style={{ color: 'var(--thamara-text-muted)' }}
       >

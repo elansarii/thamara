@@ -58,7 +58,7 @@ type SortOption = 'ai_match' | 'newest' | 'closest' | 'quantity';
 export default function ExchangePage() {
   const { lastPlot } = usePlotStore();
   const { t, isRTL } = useLanguage();
-  
+
   // Mode configs with translations
   const MODE_CONFIGS = useMemo(() => ({
     inputs: {
@@ -94,7 +94,7 @@ export default function ExchangePage() {
       ],
     },
   }), [t]);
-  
+
   // Mode & filters
   const [mode, setMode] = useState<ListingMode>('inputs');
   const [searchQuery, setSearchQuery] = useState('');
@@ -104,11 +104,11 @@ export default function ExchangePage() {
   const [trustFilter, setTrustFilter] = useState(false);
   const [urgencyFilter, setUrgencyFilter] = useState('any');
   const [sortBy, setSortBy] = useState<SortOption>('ai_match');
-  
+
   // Data
   const [listings, setListings] = useState<Listing[]>([]);
   const [bundles, setBundles] = useState<RequestBundle[]>([]);
-  
+
   // UI state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showMatchesDrawer, setShowMatchesDrawer] = useState(false);
@@ -116,7 +116,7 @@ export default function ExchangePage() {
   const [showBundleGenerator, setShowBundleGenerator] = useState(false);
   const [showSafetyGuidance, setShowSafetyGuidance] = useState(false);
   const [safetyCategory, setSafetyCategory] = useState<InputCategory>('fertilizer');
-  
+
   // Load data
   useEffect(() => {
     setListings(loadListings());
@@ -138,10 +138,10 @@ export default function ExchangePage() {
 
   // User context for matching
   const userContext: UserContext = useMemo(() => {
-    const sessionData = typeof window !== 'undefined' 
+    const sessionData = typeof window !== 'undefined'
       ? sessionStorage.getItem('thamara_crop_recommendations')
       : null;
-    
+
     let selectedCrop = undefined;
     if (sessionData) {
       try {
@@ -151,7 +151,7 @@ export default function ExchangePage() {
         // Ignore
       }
     }
-    
+
     return {
       selectedCrop,
       plotSize: lastPlot?.areaM2,
@@ -161,7 +161,7 @@ export default function ExchangePage() {
       distanceBand: 'near',
     };
   }, [lastPlot]);
-  
+
   // Filtered and sorted listings
   const displayedListings = useMemo(() => {
     const filtered = filterListings(listings, {
@@ -173,23 +173,23 @@ export default function ExchangePage() {
       urgency: urgencyFilter === 'any' ? undefined : urgencyFilter,
       mode,
     });
-    
+
     return sortListings(filtered, sortBy, userContext);
   }, [listings, mode, searchQuery, typeFilter, categoryFilter, distanceFilter, trustFilter, urgencyFilter, sortBy, userContext]);
-  
+
   // Handle create listing
   const handleCreateListing = (formData: Omit<Listing, 'id' | 'createdAt' | 'status'>) => {
     const newListing = addListing(formData);
     setListings(loadListings());
     setShowCreateModal(false);
   };
-  
+
   // Handle view matches
   const handleViewMatches = (listing: Listing) => {
     setSelectedListing(listing);
     setShowMatchesDrawer(true);
   };
-  
+
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--thamara-bg)' }}>
       {/* Sticky Header - Compact for mobile */}
@@ -232,7 +232,7 @@ export default function ExchangePage() {
           />
         </div>
       </div>
-      
+
       {/* Mode tabs - Full width segmented control */}
       <div className="flex-shrink-0 px-4 py-2 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
         <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'var(--thamara-bg-secondary)' }}>
@@ -263,7 +263,7 @@ export default function ExchangePage() {
           })}
         </div>
       </div>
-      
+
       {/* Filters - Horizontal scrolling on mobile */}
       <div className="flex-shrink-0 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-bg)' }}>
         <div className="px-4 py-2">
@@ -351,7 +351,7 @@ export default function ExchangePage() {
           </div>
         </div>
       </div>
-      
+
       {/* Listings - Compact */}
       <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
         {displayedListings.length === 0 ? (
@@ -379,7 +379,7 @@ export default function ExchangePage() {
           ))
         )}
       </div>
-      
+
       {/* Bottom Action Bar - Safe area aware */}
       <div
         className="sticky bottom-0 flex-shrink-0 p-3 border-t safe-bottom"
@@ -415,7 +415,7 @@ export default function ExchangePage() {
           </button>
         )}
       </div>
-      
+
       {/* Create Listing Modal */}
       {showCreateModal && (
         <CreateListingModal
@@ -425,7 +425,7 @@ export default function ExchangePage() {
           onCreate={handleCreateListing}
         />
       )}
-      
+
       {/* Matches Drawer */}
       {showMatchesDrawer && selectedListing && (
         <MatchesDrawer
@@ -438,7 +438,7 @@ export default function ExchangePage() {
           }}
         />
       )}
-      
+
       {/* Bundle Generator */}
       {showBundleGenerator && (
         <BundleGeneratorModal
@@ -451,7 +451,7 @@ export default function ExchangePage() {
           }}
         />
       )}
-      
+
       {/* Safety Guidance */}
       {showSafetyGuidance && (
         <SafetyGuidanceModal
@@ -477,7 +477,7 @@ function ListingCard({
 }) {
   const matchScore = computeMatchScore(listing, userContext);
   const isHub = listing.mode === 'hubs';
-  
+
   const getCategoryIcon = () => {
     switch (listing.category) {
       case 'seeds': return Leaf;
@@ -491,9 +491,9 @@ function ListingCard({
       default: return Building2;
     }
   };
-  
+
   const CategoryIcon = getCategoryIcon();
-  
+
   const getTrustBadge = () => {
     switch (listing.trust) {
       case 'verified_hub':
@@ -504,10 +504,10 @@ function ListingCard({
         return { label: 'Peer', color: 'var(--thamara-text-muted)', icon: Users };
     }
   };
-  
+
   const trustBadge = getTrustBadge();
   const TrustIcon = trustBadge.icon;
-  
+
   return (
     <div
       className="p-3 rounded-lg border"
@@ -527,7 +527,7 @@ function ListingCard({
         >
           <CategoryIcon size={16} strokeWidth={2.5} />
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
             <span
@@ -551,11 +551,11 @@ function ListingCard({
               <TrustIcon size={11} strokeWidth={2.5} style={{ color: trustBadge.color }} />
             </div>
           </div>
-          
+
           <h3 className="text-sm font-bold leading-tight mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
             {listing.title}
           </h3>
-          
+
           <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--thamara-text-secondary)' }}>
             <span className="font-semibold">
               {listing.quantity} {listing.unit}
@@ -574,7 +574,7 @@ function ListingCard({
           </div>
         </div>
       </div>
-      
+
       {/* Compact Details - Only show if important */}
       {(listing.notes || (isHub && listing.availableItems) || listing.dateTime) && (
         <div className="mb-2 space-y-1">
@@ -584,13 +584,13 @@ function ListingCard({
               <span>{listing.dateTime}</span>
             </div>
           )}
-          
+
           {listing.notes && !isHub && (
             <p className="text-xs leading-snug line-clamp-2" style={{ color: 'var(--thamara-text-secondary)' }}>
               {listing.notes}
             </p>
           )}
-          
+
           {isHub && listing.availableItems && (
             <div className="flex flex-wrap gap-1">
               {listing.availableItems.slice(0, 3).map((item, i) => (
@@ -614,7 +614,7 @@ function ListingCard({
           )}
         </div>
       )}
-      
+
       {/* Compact Actions */}
       <div className="flex gap-1.5">
         <button
@@ -628,7 +628,7 @@ function ListingCard({
           <Sparkles size={13} strokeWidth={2.5} />
           Matches
         </button>
-        
+
         {listing.category === 'fertilizer' && (
           <button
             onClick={() => onShowSafety(listing.category)}
@@ -666,10 +666,10 @@ function CreateListingModal({
   const [unit, setUnit] = useState('kg');
   const [urgency, setUrgency] = useState<'today' | 'week' | 'any'>('week');
   const [notes, setNotes] = useState('');
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     onCreate({
       type,
       mode,
@@ -684,7 +684,7 @@ function CreateListingModal({
       notes,
     });
   };
-  
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center"
@@ -741,7 +741,7 @@ function CreateListingModal({
               </button>
             </div>
           </div>
-          
+
           {/* Category */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -764,7 +764,7 @@ function CreateListingModal({
               ))}
             </select>
           </div>
-          
+
           {/* Title */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -784,7 +784,7 @@ function CreateListingModal({
               }}
             />
           </div>
-          
+
           {/* Quantity & Unit */}
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -824,7 +824,7 @@ function CreateListingModal({
               />
             </div>
           </div>
-          
+
           {/* Urgency */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -845,7 +845,7 @@ function CreateListingModal({
               <option value="any">Flexible</option>
             </select>
           </div>
-          
+
           {/* Notes */}
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
@@ -864,7 +864,7 @@ function CreateListingModal({
               }}
             />
           </div>
-          
+
           {/* Submit */}
           <button
             type="submit"
@@ -897,7 +897,7 @@ function MatchesDrawer({
 }) {
   const matches = getRankedMatches(allListings, userContext, listing.id);
   const topMatches = matches.slice(0, 5);
-  
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center"
@@ -935,7 +935,7 @@ function MatchesDrawer({
             topMatches.map((match) => {
               const matchedListing = allListings.find(l => l.id === match.listingId);
               if (!matchedListing) return null;
-              
+
               return (
                 <div
                   key={match.listingId}
@@ -956,13 +956,13 @@ function MatchesDrawer({
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-xs mb-2" style={{ color: 'var(--thamara-text-secondary)' }}>
                     <span className="font-semibold">{matchedListing.quantity} {matchedListing.unit}</span>
                     <span>•</span>
                     <span>{matchedListing.locationLabel}</span>
                   </div>
-                  
+
                   <div className="flex flex-wrap gap-1">
                     {match.topReasons.map((reason, i) => (
                       <span
@@ -1001,11 +1001,11 @@ function BundleGeneratorModal({
   const [plotSize, setPlotSize] = useState<'small' | 'medium' | 'large'>('medium');
   const [generated, setGenerated] = useState(false);
   const [bundle, setBundle] = useState<RequestBundleItem[]>([]);
-  
+
   const handleGenerate = () => {
     // Generate bundle based on crop and plot size
     const items: RequestBundleItem[] = [];
-    
+
     // Seeds
     items.push({
       category: 'seeds',
@@ -1013,7 +1013,7 @@ function BundleGeneratorModal({
       quantityRange: plotSize === 'small' ? '50-100g' : plotSize === 'medium' ? '100-250g' : '250-500g',
       priority: 'essential',
     });
-    
+
     // Soil amendment
     items.push({
       category: 'fertilizer',
@@ -1021,7 +1021,7 @@ function BundleGeneratorModal({
       quantityRange: plotSize === 'small' ? '10-20kg' : plotSize === 'medium' ? '20-40kg' : '40-80kg',
       priority: 'essential',
     });
-    
+
     // Irrigation
     items.push({
       category: 'irrigation',
@@ -1029,7 +1029,7 @@ function BundleGeneratorModal({
       quantityRange: '1 kit',
       priority: 'recommended',
     });
-    
+
     // Tools
     items.push({
       category: 'tools',
@@ -1037,11 +1037,11 @@ function BundleGeneratorModal({
       quantityRange: '1 set',
       priority: 'recommended',
     });
-    
+
     setBundle(items);
     setGenerated(true);
   };
-  
+
   const handleSave = () => {
     onSave({
       cropName,
@@ -1049,12 +1049,12 @@ function BundleGeneratorModal({
       items: bundle,
     });
   };
-  
+
   const handleCopy = () => {
     const text = `Request Bundle - ${cropName} (${plotSize} plot)\n\n${bundle.map(item => `${item.item}: ${item.quantityRange} [${item.priority}]`).join('\n')}`;
     navigator.clipboard.writeText(text);
   };
-  
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center"
@@ -1099,7 +1099,7 @@ function BundleGeneratorModal({
                   }}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--thamara-text-primary)' }}>
                   Plot Size
@@ -1121,7 +1121,7 @@ function BundleGeneratorModal({
                   ))}
                 </div>
               </div>
-              
+
               <button
                 onClick={handleGenerate}
                 className="w-full flex items-center justify-center gap-2 px-6 py-3 text-base font-bold rounded-xl shadow-lg transition-all"
@@ -1144,7 +1144,7 @@ function BundleGeneratorModal({
                   Generated request bundle
                 </p>
               </div>
-              
+
               <div className="space-y-2">
                 {bundle.map((item, i) => (
                   <div
@@ -1175,7 +1175,7 @@ function BundleGeneratorModal({
                   </div>
                 ))}
               </div>
-              
+
               <div className="flex gap-2">
                 <button
                   onClick={handleCopy}
@@ -1272,9 +1272,9 @@ function SafetyGuidanceModal({
       ],
     },
   };
-  
+
   const data = guidance[category];
-  
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center"
@@ -1324,7 +1324,7 @@ function SafetyGuidanceModal({
               ))}
             </ul>
           </div>
-          
+
           <div
             className="p-3 rounded-lg"
             style={{

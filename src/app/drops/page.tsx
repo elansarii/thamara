@@ -16,21 +16,21 @@ export default function DropsPage() {
   const [activeTab, setActiveTab] = useState<TabMode>('drops');
   const [showSeedButton, setShowSeedButton] = useState(true);
   const { t } = useLanguage();
-  
+
   const handleSeedDemo = () => {
     seedAllDemoData();
     setShowSeedButton(false);
     // Reload the page to show the new data
     window.location.reload();
   };
-  
+
   return (
     <div className="flex flex-col h-full" style={{ background: 'var(--thamara-bg)' }}>
       {/* Demo Seed Button */}
       {showSeedButton && (
-        <div 
+        <div
           className="px-5 pt-4 pb-2"
-          style={{ 
+          style={{
             background: 'var(--thamara-accent-50)',
             borderBottom: '1px solid var(--thamara-accent-200)'
           }}
@@ -50,18 +50,18 @@ export default function DropsPage() {
           </button>
         </div>
       )}
-      
+
       {/* Segmented Control for Tabs */}
-      <div 
+      <div
         className="px-5 pt-5 pb-3 border-b"
-        style={{ 
+        style={{
           background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)'
         }}
       >
-        <div 
+        <div
           className="flex gap-2 p-1"
-          style={{ 
+          style={{
             background: 'var(--thamara-bg-secondary)',
             borderRadius: 'var(--thamara-radius-lg)'
           }}
@@ -79,7 +79,7 @@ export default function DropsPage() {
             <Package size={18} strokeWidth={2.5} />
             <span>{t.drops.title}</span>
           </button>
-          
+
           <button
             onClick={() => setActiveTab('orgbridge')}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-all duration-200"
@@ -95,7 +95,7 @@ export default function DropsPage() {
           </button>
         </div>
       </div>
-      
+
       {/* Tab Content */}
       {activeTab === 'drops' ? <DropsTab /> : <OrgBridgeTab />}
     </div>

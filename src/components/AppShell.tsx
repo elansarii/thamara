@@ -18,16 +18,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="h-full flex flex-col relative" style={{ background: 'var(--thamara-bg)' }}>
+    <div className="h-full flex flex-col overflow-hidden" style={{ background: 'var(--thamara-bg)' }}>
       <TopBar />
 
-      {/* Main content area with scroll - Adjusted padding for new nav heights */}
+      {/* Main content area with scroll */}
       <main
         className="flex-1 overflow-y-auto scrollbar-hide"
         style={{
-          minHeight: 0,
-          paddingTop: 'calc(56px + var(--safe-area-inset-top))',
-          paddingBottom: 'calc(64px + var(--safe-area-inset-bottom))'
+          minHeight: 0
         }}
       >
         {children}
@@ -37,7 +35,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {isHome && (
         <Link
           href={FAB_ROUTE}
-          className="absolute right-4 w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-200 active:scale-95 group touch-target"
+          className="fixed right-4 w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-200 active:scale-95 group touch-target"
           style={{
             bottom: 'calc(80px + var(--safe-area-inset-bottom))',
             background: 'linear-gradient(135deg, var(--thamara-accent-500) 0%, var(--thamara-accent-600) 100%)',
