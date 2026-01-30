@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Map, BookOpen, Handshake, Droplets } from 'lucide-react';
+import { Map, BookOpen, Package, Handshake, Droplets } from 'lucide-react';
 import { BOTTOM_NAV_ITEMS } from '@/lib/routes';
 
 const iconMap = {
   Map,
   BookOpen,
+  Package,
   Handshake,
   Droplets,
 };

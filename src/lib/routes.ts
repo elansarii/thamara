@@ -23,6 +23,7 @@ export interface NavItem {
 export const BOTTOM_NAV_ITEMS: NavItem[] = [
   { id: 'map', label: 'Map', icon: 'Map', route: ROUTES.MAP },
   { id: 'guide', label: 'Guide', icon: 'BookOpen', route: ROUTES.CROP_PLAN },
+  { id: 'drops', label: 'Drops', icon: 'Package', route: ROUTES.DROPS },
   { id: 'exchange', label: 'Exchange', icon: 'Handshake', route: ROUTES.EXCHANGE },
   { id: 'water', label: 'Water', icon: 'Droplets', route: ROUTES.WATER },
 ];
