@@ -134,28 +134,18 @@ export default function DropsTab() {
   const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedDropForMatch, setSelectedDropForMatch] = useState<HarvestDrop | null>(null);
-  const [headerVisible, setHeaderVisible] = useState(true);
-  const lastScrollY = useRef(0);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { t, isRTL } = useLanguage();
 
-  // Handle scroll to hide/show header
+  // Simple scroll-based header collapse - hide when scrolled past 80px
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
 
     const handleScroll = () => {
-      const currentScrollY = scrollContainer.scrollTop;
-      const isScrollingDown = currentScrollY > lastScrollY.current;
-
-      // Only hide if scrolled more than 50px and scrolling down
-      if (currentScrollY > 50 && isScrollingDown) {
-        setHeaderVisible(false);
-      } else if (!isScrollingDown) {
-        setHeaderVisible(true);
-      }
-
-      lastScrollY.current = currentScrollY;
+      const scrollTop = scrollContainer.scrollTop;
+      setHeaderCollapsed(scrollTop > 80);
     };
 
     scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
@@ -220,12 +210,12 @@ export default function DropsTab() {
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header with Stats - Collapsible on scroll */}
       <div
-        className="transition-all duration-300 ease-out overflow-hidden"
+        className="grid transition-[grid-template-rows] duration-200 ease-out"
         style={{
-          maxHeight: headerVisible ? '200px' : '0px',
-          opacity: headerVisible ? 1 : 0,
+          gridTemplateRows: headerCollapsed ? '0fr' : '1fr',
         }}
       >
+        <div className="overflow-hidden">
         <div
           className="px-5 py-4"
           style={{
@@ -261,6 +251,7 @@ export default function DropsTab() {
             <StatCard icon={AlertTriangle} label="Urgent" value={stats.urgent} color="var(--thamara-warning)" />
             <StatCard icon={TrendingUp} label="kg Ready" value={stats.totalKg} />
           </div>
+        </div>
         </div>
       </div>
 
