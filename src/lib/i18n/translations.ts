@@ -93,6 +93,9 @@ interface TranslationSchema {
         subtitle: string;
         offer: string;
         request: string;
+        offers: string;
+        requests: string;
+        nearby: string;
         available: string;
         needed: string;
         inputs: string;
@@ -284,6 +287,9 @@ export const translations: Record<Language, TranslationSchema> = {
             subtitle: 'Trade seeds and resources',
             offer: 'Offer',
             request: 'Request',
+            offers: 'Offers',
+            requests: 'Requests',
+            nearby: 'Nearby',
             available: 'Available',
             needed: 'Needed',
             inputs: 'Inputs',
@@ -480,6 +486,9 @@ export const translations: Record<Language, TranslationSchema> = {
             subtitle: 'تبادل البذور والموارد',
             offer: 'عرض',
             request: 'طلب',
+            offers: 'العروض',
+            requests: 'الطلبات',
+            nearby: 'قريب',
             available: 'متوفر',
             needed: 'مطلوب',
             inputs: 'المدخلات',
