@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Map, BookOpen, Package, Handshake, Droplets } from 'lucide-react';
 import { BOTTOM_NAV_ITEMS } from '@/lib/routes';
+import { useLanguage } from '@/lib/i18n';
 
 const iconMap = {
   Map,
@@ -13,8 +14,18 @@ const iconMap = {
   Droplets,
 };
 
+// Map nav item ids to translation keys
+const navLabelKeys: Record<string, keyof typeof import('@/lib/i18n').translations.en.nav> = {
+  map: 'map',
+  guide: 'guide',
+  drops: 'drops',
+  exchange: 'exchange',
+  water: 'water',
+};
+
 export default function BottomNav() {
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   return (
     <nav
@@ -32,6 +43,8 @@ export default function BottomNav() {
       {BOTTOM_NAV_ITEMS.map((item) => {
         const Icon = iconMap[item.icon as keyof typeof iconMap];
         const isActive = pathname === item.route;
+        const labelKey = navLabelKeys[item.id];
+        const label = labelKey ? t.nav[labelKey] : item.label;
 
         return (
           <Link
@@ -79,7 +92,7 @@ export default function BottomNav() {
                   : 'var(--thamara-text-muted)',
               }}
             >
-              {item.label}
+              {label}
             </span>
           </Link>
         );

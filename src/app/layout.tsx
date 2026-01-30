@@ -6,6 +6,7 @@ import { PlotProvider } from "@/lib/plotStore";
 import PWARegister from "@/components/PWARegister";
 import InstallPrompt from "@/components/InstallPrompt";
 import DatabaseProvider from "@/components/DatabaseProvider";
+import { LanguageProvider } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Thamara - Farm Recovery & Coordination",
@@ -30,13 +31,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
-        <DatabaseProvider>
-          <PlotProvider>
-            <AppFrame>
-              <AppShell>{children}</AppShell>
-            </AppFrame>
-          </PlotProvider>
-        </DatabaseProvider>
+        <LanguageProvider>
+          <DatabaseProvider>
+            <PlotProvider>
+              <AppFrame>
+                <AppShell>{children}</AppShell>
+              </AppFrame>
+            </PlotProvider>
+          </DatabaseProvider>
+        </LanguageProvider>
         <PWARegister />
         <InstallPrompt />
       </body>

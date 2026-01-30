@@ -51,46 +51,49 @@ import {
   computeMatchScore,
 } from '@/lib/exchangeMatching';
 import { usePlotStore } from '@/lib/plotStore';
+import { useLanguage } from '@/lib/i18n';
 
 type SortOption = 'ai_match' | 'newest' | 'closest' | 'quantity';
 
-const MODE_CONFIGS = {
-  inputs: {
-    label: 'Inputs',
-    icon: Package,
-    categories: [
-      { value: 'all', label: 'All Inputs', icon: Package },
-      { value: 'seeds', label: 'Seeds', icon: Leaf },
-      { value: 'tools', label: 'Tools', icon: Wrench },
-      { value: 'fertilizer', label: 'Fertilizer', icon: Droplets },
-      { value: 'irrigation', label: 'Irrigation', icon: Droplets },
-    ],
-  },
-  labor: {
-    label: 'Labor & Transport',
-    icon: Users,
-    categories: [
-      { value: 'all', label: 'All Services', icon: Users },
-      { value: 'day_labor', label: 'Day Labor', icon: Users },
-      { value: 'harvest_help', label: 'Harvest Help', icon: Package },
-      { value: 'transport', label: 'Transport', icon: Truck },
-      { value: 'containers', label: 'Containers', icon: Box },
-    ],
-  },
-  hubs: {
-    label: 'Verified Hubs',
-    icon: Building2,
-    categories: [
-      { value: 'all', label: 'All Hubs', icon: Building2 },
-      { value: 'ngo_hub', label: 'NGO Hubs', icon: ShieldCheck },
-      { value: 'coop_hub', label: 'Co-op Hubs', icon: Users },
-      { value: 'supplier_hub', label: 'Suppliers', icon: Package },
-    ],
-  },
-};
-
 export default function ExchangePage() {
   const { lastPlot } = usePlotStore();
+  const { t, isRTL } = useLanguage();
+  
+  // Mode configs with translations
+  const MODE_CONFIGS = useMemo(() => ({
+    inputs: {
+      label: t.exchange.inputs,
+      icon: Package,
+      categories: [
+        { value: 'all', label: t.exchange.allInputs, icon: Package },
+        { value: 'seeds', label: t.exchange.seeds, icon: Leaf },
+        { value: 'tools', label: t.exchange.tools, icon: Wrench },
+        { value: 'fertilizer', label: t.exchange.fertilizer, icon: Droplets },
+        { value: 'irrigation', label: t.exchange.irrigation, icon: Droplets },
+      ],
+    },
+    labor: {
+      label: t.exchange.labor,
+      icon: Users,
+      categories: [
+        { value: 'all', label: t.exchange.allServices, icon: Users },
+        { value: 'day_labor', label: t.exchange.dayLabor, icon: Users },
+        { value: 'harvest_help', label: t.exchange.harvestHelp, icon: Package },
+        { value: 'transport', label: t.exchange.transport, icon: Truck },
+        { value: 'containers', label: t.exchange.containers, icon: Box },
+      ],
+    },
+    hubs: {
+      label: t.exchange.verifiedHubs,
+      icon: Building2,
+      categories: [
+        { value: 'all', label: t.exchange.allHubs, icon: Building2 },
+        { value: 'ngo_hub', label: t.exchange.ngoHubs, icon: ShieldCheck },
+        { value: 'coop_hub', label: t.exchange.coopHubs, icon: Users },
+        { value: 'supplier_hub', label: t.exchange.supplierHubs, icon: Package },
+      ],
+    },
+  }), [t]);
   
   // Mode & filters
   const [mode, setMode] = useState<ListingMode>('inputs');
@@ -193,7 +196,7 @@ export default function ExchangePage() {
       <div className="sticky top-0 z-10 flex-shrink-0 px-4 py-2.5 border-b" style={{ borderColor: 'var(--thamara-border)', background: 'var(--thamara-surface)' }}>
         <div className="flex items-center justify-between gap-2 mb-2">
           <h1 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
-            Exchange Hub
+            {t.nav.exchange}
           </h1>
           <div className="flex items-center gap-1.5">
             <span
@@ -203,7 +206,7 @@ export default function ExchangePage() {
                 color: 'var(--thamara-primary-700)',
               }}
             >
-              {displayedListings.length} items
+              {displayedListings.length} {t.drops.items}
             </span>
           </div>
         </div>
@@ -212,15 +215,15 @@ export default function ExchangePage() {
         <div className="relative">
           <Search
             size={18}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2"
+            className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2`}
             style={{ color: 'var(--thamara-text-muted)' }}
           />
           <input
             type="text"
-            placeholder={mode === 'inputs' ? 'Search seeds, tools...' : mode === 'labor' ? 'Search services...' : 'Search hubs...'}
+            placeholder={t.exchange.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border touch-target"
+            className={`w-full ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 text-sm rounded-lg border touch-target`}
             style={{
               background: 'var(--thamara-bg)',
               borderColor: 'var(--thamara-border)',
@@ -276,7 +279,7 @@ export default function ExchangePage() {
                     color: typeFilter === 'offer' ? 'white' : 'var(--thamara-text-secondary)',
                   }}
                 >
-                  Offers
+                  {t.exchange.offers}
                 </button>
                 <button
                   onClick={() => setTypeFilter(typeFilter === 'request' ? undefined : 'request')}
@@ -286,7 +289,7 @@ export default function ExchangePage() {
                     color: typeFilter === 'request' ? 'white' : 'var(--thamara-text-secondary)',
                   }}
                 >
-                  Requests
+                  {t.exchange.requests}
                 </button>
               </>
             )}
@@ -316,7 +319,7 @@ export default function ExchangePage() {
                 color: distanceFilter === 'near' ? 'white' : 'var(--thamara-text-secondary)',
               }}
             >
-              Nearby
+              {t.exchange.nearby}
             </button>
 
             <button

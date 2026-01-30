@@ -33,6 +33,7 @@ import {
 } from '@/lib/dropsAI';
 import { CROPS } from '@/data/crops';
 import MatchPickupDrawer from './MatchPickupDrawer';
+import { useLanguage } from '@/lib/i18n';
 
 export default function DropsTab() {
   const [drops, setDrops] = useState<HarvestDrop[]>([]);
@@ -47,6 +48,7 @@ export default function DropsTab() {
   
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedDropForMatch, setSelectedDropForMatch] = useState<HarvestDrop | null>(null);
+  const { t, isRTL } = useLanguage();
   
   // Load drops on mount
   useEffect(() => {
@@ -90,10 +92,10 @@ export default function DropsTab() {
         }}
       >
         <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--thamara-text-primary)' }}>
-          Drops
+          {t.drops.title}
         </h1>
         <p className="text-sm" style={{ color: 'var(--thamara-text-secondary)' }}>
-          Plan harvest pickup without refrigeration
+          {t.drops.subtitle}
         </p>
       </div>
       
@@ -110,15 +112,15 @@ export default function DropsTab() {
           <div className="flex-1 relative">
             <Search 
               size={16} 
-              className="absolute left-3 top-1/2 -translate-y-1/2"
+              className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? 'right-3' : 'left-3'}`}
               style={{ color: 'var(--thamara-text-muted)' }}
             />
             <input
               type="text"
-              placeholder="Search crops or locations..."
+              placeholder={t.drops.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 text-sm border outline-none"
+              className={`w-full py-2 text-sm border outline-none ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
               style={{
                 background: 'var(--thamara-bg)',
                 borderColor: 'var(--thamara-border)',
@@ -139,7 +141,7 @@ export default function DropsTab() {
               color: 'var(--thamara-text-primary)',
             }}
           >
-            <option value="ai_priority">AI Priority</option>
+            <option value="ai_priority">{t.drops.aiPriority}</option>
             <option value="soonest">Soonest Window</option>
             <option value="largest">Largest Quantity</option>
           </select>
@@ -148,73 +150,94 @@ export default function DropsTab() {
         {/* Filter Chips */}
         <div className="flex flex-wrap gap-2">
           {/* Status filters */}
-          {(['active', 'scheduled', 'completed'] as DropStatus[]).map(status => (
-            <button
-              key={status}
-              onClick={() => toggleFilter('status', status)}
-              className="px-3 py-1.5 text-xs font-semibold transition-all capitalize"
-              style={{
-                background: filters.status?.includes(status)
-                  ? 'var(--thamara-primary-100)'
-                  : 'var(--thamara-bg)',
-                color: filters.status?.includes(status)
-                  ? 'var(--thamara-primary-700)'
-                  : 'var(--thamara-text-secondary)',
-                border: `1px solid ${filters.status?.includes(status)
-                  ? 'var(--thamara-primary-300)'
-                  : 'var(--thamara-border)'}`,
-                borderRadius: 'var(--thamara-radius-full)',
-              }}
-            >
-              {status}
-            </button>
-          ))}
+          {(['active', 'scheduled', 'completed'] as DropStatus[]).map(status => {
+            const statusLabels = {
+              active: t.drops.active,
+              scheduled: t.drops.scheduled,
+              completed: t.drops.completed,
+            };
+            return (
+              <button
+                key={status}
+                onClick={() => toggleFilter('status', status)}
+                className="px-3 py-1.5 text-xs font-semibold transition-all capitalize"
+                style={{
+                  background: filters.status?.includes(status)
+                    ? 'var(--thamara-primary-100)'
+                    : 'var(--thamara-bg)',
+                  color: filters.status?.includes(status)
+                    ? 'var(--thamara-primary-700)'
+                    : 'var(--thamara-text-secondary)',
+                  border: `1px solid ${filters.status?.includes(status)
+                    ? 'var(--thamara-primary-300)'
+                    : 'var(--thamara-border)'}`,
+                  borderRadius: 'var(--thamara-radius-full)',
+                }}
+              >
+                {statusLabels[status]}
+              </button>
+            );
+          })}
           
           {/* Pickup filters */}
-          {(['same_day', '24h', 'any'] as PickupPreference[]).map(pickup => (
-            <button
-              key={pickup}
-              onClick={() => toggleFilter('pickupPreference', pickup)}
-              className="px-3 py-1.5 text-xs font-semibold transition-all capitalize"
-              style={{
-                background: filters.pickupPreference?.includes(pickup)
-                  ? 'var(--thamara-accent-100)'
-                  : 'var(--thamara-bg)',
-                color: filters.pickupPreference?.includes(pickup)
-                  ? 'var(--thamara-accent-700)'
-                  : 'var(--thamara-text-secondary)',
-                border: `1px solid ${filters.pickupPreference?.includes(pickup)
-                  ? 'var(--thamara-accent-300)'
-                  : 'var(--thamara-border)'}`,
-                borderRadius: 'var(--thamara-radius-full)',
-              }}
-            >
-              {pickup === 'same_day' ? 'Same-Day' : pickup === '24h' ? '24h' : 'Any Time'}
-            </button>
-          ))}
+          {(['same_day', '24h', 'any'] as PickupPreference[]).map(pickup => {
+            const pickupLabels = {
+              same_day: t.drops.sameDay,
+              '24h': t.drops.timeFilter24h,
+              any: t.drops.timeFilterAny,
+            };
+            return (
+              <button
+                key={pickup}
+                onClick={() => toggleFilter('pickupPreference', pickup)}
+                className="px-3 py-1.5 text-xs font-semibold transition-all capitalize"
+                style={{
+                  background: filters.pickupPreference?.includes(pickup)
+                    ? 'var(--thamara-accent-100)'
+                    : 'var(--thamara-bg)',
+                  color: filters.pickupPreference?.includes(pickup)
+                    ? 'var(--thamara-accent-700)'
+                    : 'var(--thamara-text-secondary)',
+                  border: `1px solid ${filters.pickupPreference?.includes(pickup)
+                    ? 'var(--thamara-accent-300)'
+                    : 'var(--thamara-border)'}`,
+                  borderRadius: 'var(--thamara-radius-full)',
+                }}
+              >
+                {pickupLabels[pickup]}
+              </button>
+            );
+          })}
           
           {/* Quantity band filters */}
-          {(['small', 'medium', 'large'] as QuantityBand[]).map(band => (
-            <button
-              key={band}
-              onClick={() => toggleFilter('quantityBand', band)}
-              className="px-3 py-1.5 text-xs font-semibold transition-all capitalize"
-              style={{
-                background: filters.quantityBand?.includes(band)
-                  ? 'var(--thamara-secondary-100)'
-                  : 'var(--thamara-bg)',
-                color: filters.quantityBand?.includes(band)
-                  ? 'var(--thamara-secondary-700)'
-                  : 'var(--thamara-text-secondary)',
-                border: `1px solid ${filters.quantityBand?.includes(band)
-                  ? 'var(--thamara-secondary-300)'
-                  : 'var(--thamara-border)'}`,
-                borderRadius: 'var(--thamara-radius-full)',
-              }}
-            >
-              {band}
-            </button>
-          ))}
+          {(['small', 'medium', 'large'] as QuantityBand[]).map(band => {
+            const bandLabels = {
+              small: t.drops.sizeSmall,
+              medium: t.drops.sizeMedium,
+              large: t.drops.sizeLarge,
+            };
+            return (
+              <button
+                key={band}
+                onClick={() => toggleFilter('quantityBand', band)}
+                className="px-3 py-1.5 text-xs font-semibold transition-all capitalize"
+                style={{
+                  background: filters.quantityBand?.includes(band)
+                    ? 'var(--thamara-secondary-100)'
+                    : 'var(--thamara-bg)',
+                  color: filters.quantityBand?.includes(band)
+                    ? 'var(--thamara-secondary-700)'
+                    : 'var(--thamara-text-secondary)',
+                  border: `1px solid ${filters.quantityBand?.includes(band)
+                    ? 'var(--thamara-secondary-300)'
+                    : 'var(--thamara-border)'}`,
+                  borderRadius: 'var(--thamara-radius-full)',
+                }}
+              >
+                {bandLabels[band]}
+              </button>
+            );
+          })}
         </div>
       </div>
       
@@ -224,10 +247,10 @@ export default function DropsTab() {
           <div className="text-center py-12">
             <Package size={48} className="mx-auto mb-4" style={{ color: 'var(--thamara-text-muted)' }} />
             <p className="text-sm font-medium mb-1" style={{ color: 'var(--thamara-text-secondary)' }}>
-              No harvest drops yet
+              {t.drops.noDrops}
             </p>
             <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>
-              Create your first drop to coordinate harvest pickup
+              {t.drops.noDropsDesc}
             </p>
           </div>
         ) : (
@@ -266,7 +289,7 @@ export default function DropsTab() {
           }}
         >
           <Plus size={20} strokeWidth={2.5} />
-          <span>Create Drop</span>
+          <span>{t.drops.createDrop}</span>
         </button>
       </div>
       

@@ -4,9 +4,11 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Menu, X, WifiOff, Wifi, Volume2, Settings, Bell, Globe, HelpCircle, Info } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 export default function TopBar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { language, toggleLanguage, t, isRTL } = useLanguage();
 
   return (
     <>
@@ -29,7 +31,7 @@ export default function TopBar() {
             background: 'var(--thamara-bg-secondary)',
             borderRadius: 'var(--thamara-radius-md)',
           }}
-          aria-label="Open menu"
+          aria-label={menuOpen ? t.app.close : t.menu.title}
         >
           <Menu size={22} strokeWidth={2} style={{ color: 'var(--thamara-text-primary)' }} />
         </button>
@@ -38,7 +40,7 @@ export default function TopBar() {
         <Link href="/" className="flex items-center justify-center cursor-pointer touch-target absolute left-1/2 transform -translate-x-1/2">
           <Image
             src="/thamara_logo.svg"
-            alt="Thamara"
+            alt={t.app.name}
             width={100}
             height={40}
             className="object-contain"
@@ -54,7 +56,7 @@ export default function TopBar() {
             color: 'var(--thamara-primary-700)',
             borderRadius: 'var(--thamara-radius-md)',
           }}
-          title="Offline mode"
+          title={t.app.offline}
         >
           <WifiOff size={18} strokeWidth={2.5} />
         </div>
@@ -70,11 +72,15 @@ export default function TopBar() {
 
       {/* Slide-out Menu */}
       <div
-        className="absolute top-0 left-0 h-full w-72 transform transition-transform duration-300 ease-out z-[200]"
+        className={`absolute top-0 h-full w-72 transform transition-transform duration-300 ease-out z-[200] ${isRTL ? 'right-0' : 'left-0'}`}
         style={{
-          transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transform: menuOpen 
+            ? 'translateX(0)' 
+            : isRTL 
+              ? 'translateX(100%)' 
+              : 'translateX(-100%)',
           background: 'var(--thamara-surface)',
-          boxShadow: menuOpen ? '4px 0 20px rgba(0,0,0,0.15)' : 'none',
+          boxShadow: menuOpen ? (isRTL ? '-4px 0 20px rgba(0,0,0,0.15)' : '4px 0 20px rgba(0,0,0,0.15)') : 'none',
         }}
       >
         {/* Menu Header */}
@@ -87,7 +93,7 @@ export default function TopBar() {
           }}
         >
           <span className="font-semibold text-lg" style={{ color: 'var(--thamara-text-primary)' }}>
-            Menu
+            {t.menu.title}
           </span>
           <button
             onClick={() => setMenuOpen(false)}
@@ -96,7 +102,7 @@ export default function TopBar() {
               background: 'var(--thamara-bg-secondary)',
               borderRadius: 'var(--thamara-radius-md)',
             }}
-            aria-label="Close menu"
+            aria-label={t.app.close}
           >
             <X size={22} strokeWidth={2} style={{ color: 'var(--thamara-text-primary)' }} />
           </button>
@@ -118,16 +124,18 @@ export default function TopBar() {
             >
               <Volume2 size={20} style={{ color: 'var(--thamara-text-on-accent)' }} />
             </div>
-            <div className="text-left">
-              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Read Aloud</p>
-              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>Listen to page content</p>
+            <div className={isRTL ? 'text-right' : 'text-left'}>
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>{t.menu.readAloud}</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>{t.menu.readAloudDesc}</p>
             </div>
           </button>
 
           {/* Language */}
           <button
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 active:scale-[0.98] hover:bg-gray-50"
-            onClick={() => setMenuOpen(false)}
+            onClick={() => {
+              toggleLanguage();
+            }}
           >
             <div
               className="flex items-center justify-center w-10 h-10 rounded-lg"
@@ -135,15 +143,15 @@ export default function TopBar() {
             >
               <Globe size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
             </div>
-            <div className="text-left flex-1">
-              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Language</p>
-              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>English</p>
+            <div className={`flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>{t.menu.language}</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>{t.menu.languageName}</p>
             </div>
             <span
               className="text-xs font-bold px-2 py-1 rounded"
-              style={{ background: 'var(--thamara-bg-secondary)', color: 'var(--thamara-text-secondary)' }}
+              style={{ background: 'var(--thamara-accent-100)', color: 'var(--thamara-accent-700)' }}
             >
-              EN
+              {language === 'en' ? 'EN' : 'عربي'}
             </span>
           </button>
 
@@ -158,9 +166,9 @@ export default function TopBar() {
             >
               <Bell size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
             </div>
-            <div className="text-left">
-              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Notifications</p>
-              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>Alerts & updates</p>
+            <div className={isRTL ? 'text-right' : 'text-left'}>
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>{t.menu.notifications}</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>{t.menu.notificationsDesc}</p>
             </div>
           </button>
 
@@ -177,9 +185,9 @@ export default function TopBar() {
             >
               <Settings size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
             </div>
-            <div className="text-left">
-              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Settings</p>
-              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>App preferences</p>
+            <div className={isRTL ? 'text-right' : 'text-left'}>
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>{t.menu.settings}</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>{t.menu.settingsDesc}</p>
             </div>
           </button>
 
@@ -194,9 +202,9 @@ export default function TopBar() {
             >
               <HelpCircle size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
             </div>
-            <div className="text-left">
-              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>Help & Support</p>
-              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>FAQs & tutorials</p>
+            <div className={isRTL ? 'text-right' : 'text-left'}>
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>{t.menu.help}</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>{t.menu.helpDesc}</p>
             </div>
           </button>
 
@@ -211,9 +219,9 @@ export default function TopBar() {
             >
               <Info size={20} style={{ color: 'var(--thamara-text-secondary)' }} />
             </div>
-            <div className="text-left">
-              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>About Thamara</p>
-              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>Version & info</p>
+            <div className={isRTL ? 'text-right' : 'text-left'}>
+              <p className="font-medium" style={{ color: 'var(--thamara-text-primary)' }}>{t.menu.about}</p>
+              <p className="text-xs" style={{ color: 'var(--thamara-text-muted)' }}>{t.menu.aboutDesc}</p>
             </div>
           </button>
         </div>
@@ -233,7 +241,7 @@ export default function TopBar() {
             >
               <WifiOff size={16} style={{ color: 'var(--thamara-primary-700)' }} />
               <span className="text-sm font-medium" style={{ color: 'var(--thamara-primary-700)' }}>
-                Offline Mode
+                {t.app.offline}
               </span>
             </div>
           </div>

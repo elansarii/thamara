@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Droplets, AlertTriangle, Calendar, Target, Sparkles, Loader2, CheckCircle2 } from 'lucide-react';
 import { recommendCrops } from '@/lib/recommender';
 import { usePlotStore } from '@/lib/plotStore';
+import { useLanguage } from '@/lib/i18n';
 import type {
   RecommendationInput,
   WaterAccess,
@@ -15,6 +16,7 @@ import type {
 export default function CropPlanPage() {
   const router = useRouter();
   const { lastPlot } = usePlotStore();
+  const { t, isRTL } = useLanguage();
   
   // Input state
   const [plotAreaM2, setPlotAreaM2] = useState<number>(50);
@@ -109,13 +111,13 @@ export default function CropPlanPage() {
             className="text-lg font-semibold mb-2"
             style={{ color: 'var(--thamara-text-primary)' }}
           >
-            AI is analyzing your conditions...
+            {t.guide.analyzing}
           </p>
           <p 
             className="text-sm"
             style={{ color: 'var(--thamara-text-secondary)' }}
           >
-            Finding the best crops for your plot
+            {t.guide.findingBest}
           </p>
         </div>
       )}
@@ -129,10 +131,10 @@ export default function CropPlanPage() {
         }}
       >
         <h1 className="text-lg font-bold" style={{ color: 'var(--thamara-text-primary)' }}>
-          Crop & Practice Plan
+          {t.nav.guide}
         </h1>
         <p className="text-sm" style={{ color: 'var(--thamara-text-secondary)' }}>
-          AI-powered recommendations for your land
+          {t.app.subtitle}
         </p>
         {usingLoggedPlot && (
           <div
@@ -143,7 +145,7 @@ export default function CropPlanPage() {
             }}
           >
             <CheckCircle2 size={14} className="flex-shrink-0" />
-            <span className="truncate">Using logged plot{lastPlot?.name ? `: ${lastPlot.name}` : ''}</span>
+            <span className="truncate">{t.app.usingLoggedPlot}{lastPlot?.name ? `: ${lastPlot.name}` : ''}</span>
           </div>
         )}
         {offlineMode && (
@@ -155,7 +157,7 @@ export default function CropPlanPage() {
             }}
           >
             <AlertTriangle size={14} />
-            Offline mode - cached data
+            {t.app.offlineData}
           </div>
         )}
       </div>
@@ -169,14 +171,14 @@ export default function CropPlanPage() {
         }}
       >
         <h2 className="font-semibold text-sm" style={{ color: 'var(--thamara-text-primary)' }}>
-          Your Conditions
+          {t.guide.yourConditions}
         </h2>
 
         {/* Plot Area */}
         <div className="space-y-1.5">
           <label className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
             <Target size={16} />
-            Plot Area (m²)
+            {t.guide.plotArea}
           </label>
           <input
             type="number"
@@ -196,7 +198,7 @@ export default function CropPlanPage() {
         <div className="space-y-1.5">
           <label className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
             <Droplets size={16} />
-            Water Access
+            {t.guide.waterAccess}
           </label>
           <select
             value={waterAccess}
@@ -208,9 +210,9 @@ export default function CropPlanPage() {
               color: 'var(--thamara-text-primary)'
             }}
           >
-            <option value="none">None (rainwater only)</option>
-            <option value="limited">Limited (occasional)</option>
-            <option value="reliable">Reliable (regular)</option>
+            <option value="none">{t.guide.none}</option>
+            <option value="limited">{t.guide.limited}</option>
+            <option value="reliable">{t.guide.reliable}</option>
           </select>
         </div>
 
@@ -218,7 +220,7 @@ export default function CropPlanPage() {
         <div className="space-y-1.5">
           <label className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
             <AlertTriangle size={16} />
-            Salinity Risk
+            {t.guide.salinityRisk}
           </label>
           <select
             value={salinityRisk}
@@ -230,9 +232,9 @@ export default function CropPlanPage() {
               color: 'var(--thamara-text-primary)'
             }}
           >
-            <option value="none">None (fresh)</option>
-            <option value="some">Some (moderate)</option>
-            <option value="strong">Strong (high)</option>
+            <option value="none">{t.guide.some}</option>
+            <option value="some">{t.guide.some}</option>
+            <option value="strong">{t.guide.strong}</option>
           </select>
         </div>
 
@@ -241,7 +243,7 @@ export default function CropPlanPage() {
           <div className="space-y-1.5">
             <label className="flex items-center gap-1.5 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
               <Calendar size={14} />
-              Harvest
+              {t.guide.targetHarvest}
             </label>
             <select
               value={targetHarvestWindowDays}
@@ -253,17 +255,17 @@ export default function CropPlanPage() {
                 color: 'var(--thamara-text-primary)'
               }}
             >
-              <option value="30">30 days</option>
-              <option value="45">45 days</option>
-              <option value="60">60 days</option>
-              <option value="90">90 days</option>
+              <option value="30">30 {t.units.days}</option>
+              <option value="45">45 {t.units.days}</option>
+              <option value="60">60 {t.units.days}</option>
+              <option value="90">90 {t.units.days}</option>
             </select>
           </div>
 
           <div className="space-y-1.5">
             <label className="flex items-center gap-1.5 text-sm font-medium" style={{ color: 'var(--thamara-text-secondary)' }}>
               <Sparkles size={14} />
-              Priority
+              {t.guide.priority}
             </label>
             <select
               value={userPriority}
@@ -275,9 +277,9 @@ export default function CropPlanPage() {
                 color: 'var(--thamara-text-primary)'
               }}
             >
-              <option value="max_calories">Max Calories</option>
-              <option value="min_water">Min Water</option>
-              <option value="balanced">Balanced</option>
+              <option value="max_calories">{t.guide.nutrition}</option>
+              <option value="min_water">{t.guide.lowWater}</option>
+              <option value="balanced">{t.guide.balanced}</option>
             </select>
           </div>
         </div>
@@ -298,13 +300,13 @@ export default function CropPlanPage() {
         >
           {isCalculating ? (
             <>
-              <Loader2 size={16} className="inline mr-2 animate-spin" />
-              Analyzing...
+              <Loader2 size={16} className={`inline ${isRTL ? 'ml-2' : 'mr-2'} animate-spin`} />
+              {t.guide.analyzing}
             </>
           ) : (
             <>
-              <Sparkles size={16} className="inline mr-2" />
-              Get Recommendations
+              <Sparkles size={16} className={`inline ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {t.guide.generatePlan}
             </>
           )}
         </button>

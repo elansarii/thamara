@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Package, Building2, Sparkles } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { seedAllDemoData } from '@/lib/demoSeeder';
+import { useLanguage } from '@/lib/i18n';
 
 // Dynamically import tabs to avoid SSR issues
 const DropsTab = dynamic(() => import('./DropsTab'), { ssr: false });
@@ -14,6 +15,7 @@ type TabMode = 'drops' | 'orgbridge';
 export default function DropsPage() {
   const [activeTab, setActiveTab] = useState<TabMode>('drops');
   const [showSeedButton, setShowSeedButton] = useState(true);
+  const { t } = useLanguage();
   
   const handleSeedDemo = () => {
     seedAllDemoData();
@@ -44,7 +46,7 @@ export default function DropsPage() {
             }}
           >
             <Sparkles size={18} strokeWidth={2.5} />
-            <span>Load Demo Data (4 Drops + 3 Cases)</span>
+            <span>{t.drops.loadDemo} (4 Drops + 3 Cases)</span>
           </button>
         </div>
       )}
@@ -75,7 +77,7 @@ export default function DropsPage() {
             }}
           >
             <Package size={18} strokeWidth={2.5} />
-            <span>Drops</span>
+            <span>{t.drops.title}</span>
           </button>
           
           <button
@@ -89,7 +91,7 @@ export default function DropsPage() {
             }}
           >
             <Building2 size={18} strokeWidth={2.5} />
-            <span>OrgBridge</span>
+            <span>{t.drops.orgBridge}</span>
           </button>
         </div>
       </div>
