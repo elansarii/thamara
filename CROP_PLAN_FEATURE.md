@@ -227,6 +227,27 @@ Resource ROI = yield_kg_per_m² / water_liters_per_m²_per_cycle
 - Connect to water monitoring
 - Show nearby demo plots with same crops
 
+## Integration with Drops Feature ✅ IMPLEMENTED
+
+The Crop Plan integrates with the Drops feature to enable end-to-end harvest coordination:
+
+### How Integration Works
+1. User completes crop plan with recommended crop selection
+2. Crop data is stored in session context
+3. When creating a harvest drop, crop information auto-fills
+4. Spoilage risk is calculated based on crop characteristics
+5. Buyer matching considers crop type for relevance scoring
+
+### Data Flow
+- **Crop Plan → Drops**: Crop type, expected harvest window, quantity estimates
+- **Drops → Exchange**: Surplus can be listed for exchange
+- **Drops → OrgBridge**: Harvest data informs bundle recommendations
+
+### Shared Context
+- Plot store provides location data
+- Crop selection persists for cross-feature use
+- Harvest timing aligns with crop maturity data
+
 ## Known Limitations (MVP)
 
 1. **Seed source data is demo**: Real deployment needs verified, up-to-date sources
@@ -234,7 +255,28 @@ Resource ROI = yield_kg_per_m² / water_liters_per_m²_per_cycle
 3. **No weather integration**: Recommendations don't consider forecast
 4. **Static yield estimates**: Doesn't account for soil quality variation
 5. **No historical tracking**: Can't learn from past successes/failures
-6. **English only**: Needs Arabic translation for primary users
+
+## Internationalization (i18n) ✅ IMPLEMENTED
+
+### Translation Support
+The Crop Plan feature is fully translated in both English and Arabic:
+
+- **Form Labels**: Plot area, water access, salinity risk, harvest window
+- **Crop Information**: Names, descriptions, practice recommendations
+- **Results Display**: ROI indicators, seed calculations, explanations
+- **Button Text**: All action buttons and navigation elements
+- **Error Messages**: Validation and offline status indicators
+
+### RTL Layout Support
+- Form fields properly aligned in Arabic mode
+- Crop cards layout adapts to RTL
+- Seed calculation results display correctly
+- Map integration respects text direction
+
+### Translation Keys Used
+- `guide.*` - Main guide page translations
+- `app.*` - Common UI elements
+- Crop names are translated inline in the crops database
 
 ## Files Changed/Added
 
@@ -271,5 +313,5 @@ Resource ROI = yield_kg_per_m² / water_liters_per_m²_per_cycle
 ---
 
 **Status**: ✅ MVP Complete - Ready for demo and user testing
-**Version**: 1.0.0
+**Version**: 1.1.0 (with i18n support)
 **Last Updated**: January 2026

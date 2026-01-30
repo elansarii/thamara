@@ -65,6 +65,46 @@ Food production capacity is severely reduced because farmland and assets are dam
 
 ---
 
+## Internationalization (i18n) & Accessibility
+
+### Multilingual Support ✅ IMPLEMENTED
+
+Thamara supports **English and Arabic** with full RTL (right-to-left) layout support:
+
+1. **Language Toggle**
+   - Accessible from hamburger menu
+   - Persisted in localStorage
+   - Instant switch without page reload
+
+2. **RTL Layout Support**
+   - Automatic text direction switching
+   - Mirrored navigation and UI elements
+   - Proper icon and button positioning
+
+3. **Translation Coverage**
+   - 1000+ translated strings
+   - All navigation labels
+   - Form fields and buttons
+   - Error messages and notifications
+   - Crop names and recommendations
+   - Exchange Hub listings
+   - Drops and OrgBridge features
+
+4. **Implementation Details**
+   - React Context for language state (`LanguageContext.tsx`)
+   - TypeScript-typed translation keys
+   - Dynamic `document.dir` attribute
+   - CSS logical properties for RTL
+
+### Accessibility Features
+
+- **Icon-First Design**: Minimal text dependency
+- **Touch Targets**: Minimum 44px for easy tapping
+- **High Contrast**: Clear visual hierarchy
+- **Low-Literacy Friendly**: Visual indicators over text
+
+---
+
 ## System Overview
 
 Thamara is organized into **four offline user modules** plus an **optional organization bridge**:
@@ -163,20 +203,65 @@ This is positioned as **water autonomy guidance**, not requiring constant connec
 
 ---
 
+### Tier P1.5 — Harvest Coordination (Drops)
+
+#### F7. Drops: No-Fridge Harvest-to-Market ✅ IMPLEMENTED
+
+**Goal:** Enable same-day pickup + pooling by publishing harvest windows and coordinating buyers/aggregators.
+
+**Features Implemented:**
+
+- **Harvest Drop Publishing**: Farmers create "drops" with crop type, quantity range, pickup window, and location
+- **Spoilage Risk Indicators**: AI calculates spoilage risk (low/medium/high) based on crop type and window timing
+- **Buyer Matching**: Smart matching with verified hubs, NGOs, and aggregators
+- **Priority Scoring**: AI-powered drop prioritization based on urgency and spoilage risk
+- **Status Tracking**: Active → Scheduled → Completed workflow
+- **Filtering & Search**: By status, pickup preference, quantity band
+
+**Drop Data Model:**
+- Crop type and common name
+- Harvest window (start/end times)
+- Quantity range with units
+- Location label
+- Pickup preference (same_day, 24h, any)
+- Spoilage risk level
+- Status and notes
+
+---
+
 ### Tier P2 — Scaling + ecosystem integration
 
-#### F9. OrgBridge (Donor/NGO Funding + Fulfillment)
+#### F9. OrgBridge (Donor/NGO Funding + Fulfillment) ✅ IMPLEMENTED
 
 **Goal:** Allow organizations to fund:
 
 - in-kind bundles (via verified suppliers), or
 - restricted vouchers/cash equivalents (via partners)
 
-Includes an audit-friendly fulfillment trail. :contentReference[oaicite:14]{index=14}
+Includes an audit-friendly fulfillment trail.
+
+**Features Implemented:**
+
+- **Funding Case Creation**: Create cases with farmer alias, bundle type, and supplier selection
+- **Bundle Templates**: Pre-configured bundles for different plot sizes and crop types
+- **AI Bundle Recommendations**: Intelligent suggestions based on plot data and crop plan
+- **Status Timeline Tracking**: Pending → Packed → Handed Off → Received
+- **Receipt Token Generation**: Unique tokens for audit trail verification
+- **Proof Flags**: Track assessment needs, ID verification, and plot confirmation
+- **Demo Suppliers**: Pre-loaded verified suppliers with trust scores
+
+**OrgBridge Data Model:**
+- Funding case ID and farmer alias
+- Bundle type (in_kind or voucher)
+- Supplier information
+- Bundle items with quantities
+- Budget estimate and currency
+- Status timeline with timestamps
+- Receipt tokens for verification
 
 #### F11. Season Review Coach
 
-**Goal:** After harvest, capture basic outcomes (yield/costs/constraints) and return simple next-step coaching using rule-based logic (avoid heavy AI dependency). :contentReference[oaicite:15]{index=15}
+**Goal:** After harvest, capture basic outcomes (yield/costs/constraints) and return simple next-step coaching using rule-based logic (avoid heavy AI dependency).
 
 ---
 
@@ -218,7 +303,23 @@ Includes an audit-friendly fulfillment trail. :contentReference[oaicite:14]{inde
 1. Org creates funded bundle (inputs)
 2. Supplier prepares bundle; receipt chain recorded
 3. Farmer confirms pickup; org sees fulfillment status later
+### Journey G — "I have harvest ready for pickup" (Drops) ✅ IMPLEMENTED
 
+1. User navigates to Drops tab
+2. Creates a harvest drop with crop, quantity, and pickup window
+3. System calculates spoilage risk and priority
+4. Buyers/aggregators view matched drops
+5. User updates status as pickup is scheduled/completed
+6. All data works offline, syncs when connected
+
+### Journey H — "Managing funded bundles" (OrgBridge) ✅ IMPLEMENTED
+
+1. NGO/org creates funding case for farmer
+2. Selects bundle template or customizes items
+3. Assigns verified supplier
+4. Tracks status through fulfillment lifecycle
+5. Generates receipt tokens for audit trail
+6. Farmer confirms receipt; status updates persist
 ---
 
 ## Offline & Data Model (Conceptual)
@@ -277,13 +378,17 @@ Aligned to SPS#1 suggested metrics:
 
 A static MVP must still demonstrate **core feasibility**:
 
-- Offline plot logging
-- Offline plantability result (status + confidence + explainability)
-- Offline crop recommendation and seed calculation
-- Offline water points browsing
-- Stubbed screens for P1/P2 features labeled “Unimplemented yet” (to show full roadmap)
+- ✅ Offline plot logging
+- ✅ Offline plantability result (status + confidence + explainability)
+- ✅ Offline crop recommendation and seed calculation
+- ✅ Offline water points browsing
+- ✅ Exchange Hub with AI-powered matching
+- ✅ Drops for harvest scheduling with spoilage risk AI
+- ✅ OrgBridge for NGO/donor funding with audit trail
+- ✅ Full Arabic/English multilingual support with RTL layout
+- ✅ Progressive Web App (PWA) installable on mobile devices
 
-This aligns to the hackathon’s emphasis on proving core functionality feasibility and clear demo flow. :contentReference[oaicite:20]{index=20}
+This aligns to the hackathon's emphasis on proving core functionality feasibility and clear demo flow.
 
 ---
 
@@ -291,8 +396,12 @@ This aligns to the hackathon’s emphasis on proving core functionality feasibil
 
 - **Plantability:** Practical status classification for “what can I do here now?” (not a lab-grade soil measurement).
 - **Agro Pack:** Offline regional bundle containing maps + overlays + guidance needed to operate without internet.
-- **No Fridge Mode:** Harvest-to-market coordination designed for minimal cold chain availability.
-
+- **No Fridge Mode:** Harvest-to-market coordination designed for minimal cold chain availability.- **Drops:** Harvest scheduling feature enabling farmers to publish pickup windows for same-day coordination.
+- **OrgBridge:** NGO/donor funding module with transparent fulfillment tracking and receipt tokens.
+- **Spoilage Risk:** AI-calculated indicator (low/medium/high) based on crop perishability and pickup timing.
+- **Bundle Template:** Pre-configured set of inputs (seeds, tools, fertilizer) for specific plot sizes and crop types.
+- **Receipt Token:** Unique identifier generated for audit trail verification in OrgBridge funding flows.
+- **RTL:** Right-to-left text direction used for Arabic language support.
 ---
 
 ## Sources

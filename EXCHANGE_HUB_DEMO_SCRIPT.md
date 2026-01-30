@@ -305,6 +305,67 @@ A: MVP has trust levels. Full product would add verification flows, reputation s
 
 ---
 
+## Drops Feature Demo (Bonus Section)
+
+### Scene: Harvest Scheduling
+**Action:**
+1. Navigate to "Drops" tab in bottom navigation
+2. View existing harvest drops with spoilage risk indicators
+3. Create new drop:
+   - Select crop: Lettuce
+   - Set quantity: 10-15 kg
+   - Set pickup window: Today 2PM - 6PM
+   - Add location label
+4. View AI-calculated spoilage risk (High for lettuce)
+5. Click "Match Buyers" to see verified hubs and aggregators
+
+**Talking Points:**
+- "Drops enables no-fridge harvest coordination"
+- "AI calculates spoilage risk based on crop perishability"
+- "Same-day pickup reduces food waste"
+- "Works entirely offline"
+
+---
+
+## OrgBridge Feature Demo (Bonus Section)
+
+### Scene: NGO Funding Flow
+**Action:**
+1. Navigate to "Drops" → "OrgBridge" tab
+2. Click "Create Funding Case"
+3. Enter farmer alias and select bundle type
+4. Choose bundle template (AI-recommended based on plot)
+5. Select verified supplier
+6. View status timeline: Pending → Packed → Handed Off → Received
+7. Show receipt token generation
+
+**Talking Points:**
+- "OrgBridge provides audit-friendly funding trail"
+- "NGOs can track bundle fulfillment"
+- "Receipt tokens enable verification"
+- "Fully transparent supply chain"
+
+---
+
+## Multilingual Demo (Bonus Section)
+
+### Scene: Arabic Language Switch
+**Action:**
+1. Open hamburger menu (top left)
+2. Tap "العربية" (Arabic) toggle
+3. Watch entire UI flip to RTL layout
+4. Navigate through all tabs in Arabic
+5. Create a listing with Arabic form labels
+6. Switch back to English to show instant toggle
+
+**Talking Points:**
+- "Full Arabic support for local population"
+- "RTL layout adapts automatically"
+- "1000+ translated strings"
+- "Language preference persists offline"
+
+---
+
 ## Conclusion
 
 Exchange Hub transforms Thamara from an advisory tool into a **complete food system recovery platform**. It demonstrates:
@@ -313,5 +374,6 @@ Exchange Hub transforms Thamara from an advisory tool into a **complete food sys
 - **User-centered design**: Fast workflows, explainable results, safety-first
 - **Scalability**: Clear path to NGO integration, sync, verification
 - **Innovation**: Deterministic "AI" that works offline with transparency
+- **Accessibility**: Full Arabic/English support with RTL layout
 
 This feature alone proves the hackathon team can build production-ready software for real crisis contexts.

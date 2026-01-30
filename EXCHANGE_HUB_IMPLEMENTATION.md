@@ -49,6 +49,8 @@ Top 3 reasons shown as chips for each match.
 - Uses plot data from plotStore (if available)
 - Enhances matching when user has context
 - Graceful degradation when no context exists
+- Connects with Drops feature for harvest-to-market flow
+- Links to OrgBridge for verified hub bundle requests
 
 ---
 
@@ -166,7 +168,32 @@ src/
 - Hub moderation dashboard
 - Donor portal for funding bundles
 - Analytics dashboard for NGOs
-- Multi-language support
+
+---
+
+## 🌐 Internationalization (i18n) Support
+
+### Implemented Features
+- ✅ Full Arabic translation for all Exchange Hub strings
+- ✅ RTL layout support with proper icon/button positioning
+- ✅ Dynamic text direction based on language selection
+- ✅ Translated filter chips, buttons, and modals
+- ✅ Localized placeholder text and error messages
+
+### Translation Coverage
+- Mode tabs (Inputs, Labor & Transport, Verified Hubs)
+- Category filters (Seeds, Tools, Fertilizer, etc.)
+- Listing cards and badges
+- Create listing form fields
+- Match drawer and explainability chips
+- Safety guidance cards
+- Bundle generator interface
+
+### RTL Considerations
+- Search icon position flips in RTL mode
+- Filter chip scroll direction adapts
+- Modal layouts properly mirrored
+- Drawer animations respect text direction
 
 ---
 

@@ -1,79 +1,62 @@
-# Thamara - Farm Recovery & Coordination Platform
+# Thamara - Farm Recovery App
 
-**An offline-first Progressive Web App for small farmers in Gaza to restart food production under severe constraints.**
+**Offline-first app helping farmers in Gaza restart food production.**
 
-Built for the LifeLines Hackathon 2026 - Problem Statement #1
-
----
-
-## 🔴 LIVE DEMO - TEST NOW
-
-### 🌐 **[Link](https://thamara-lifelines.netlify.app)**
-
-**📱 For full experience:** Open the link on your Android phone and install the PWA!
-
-**💻 Quick browser test:** Visit the link in Chrome/Edge - works immediately!
-
-**✈️ Test offline:** Use the app for 2 minutes, enable Airplane Mode, reopen - still works!
+LifeLines Hackathon 2026 | Team Gamma | Problem Statement #1
 
 ---
 
-## 🎯 What is Thamara?
+## 🌐 Live Demo
 
-Thamara is a mobile-first web application designed for **zero-connectivity environments** that helps farmers:
+**https://thamara-lifelines.netlify.app**
 
-- ✅ **Assess farmland plantability** - Check if land can be farmed after damage
-- ✅ **Get crop recommendations** - Find suitable crops for salinity, water constraints, and fast harvest
-- ✅ **Calculate seed needs** - Convert plot size to seed quantities
-- ✅ **Find water sources** - Locate and track reliability of water points
-- ✅ **Exchange resources** - Coordinate seeds, tools, labor, and transport
-- ✅ **Work completely offline** - All features work without internet after first visit
+### ⚠️ Get the Latest Version
 
-**Key Innovation:** Complete offline functionality with map tiles, agro-pack data, and local storage for a population with unreliable connectivity.
+Do ONE of these before testing:
+
+| Method | How |
+|--------|-----|
+| **Incognito (Recommended)** | Chrome/Edge: `Ctrl+Shift+N` (Win) or `Cmd+Shift+N` (Mac) |
+| **Clear Cache** | DevTools (F12) → Application → Storage → "Clear site data" |
 
 ---
 
-## 🚀 Quick Start for Judges
+## 🚀 Quick Start
 
-### Option 1: Use the Hosted Version (Recommended)
+### Online Demo
+1. Open demo link in **incognito mode**
+2. Browse all tabs (Map, Guide, Drops, Exchange, Water)
+3. On Android: Menu (⋮) → "Add to Home Screen"
 
-1. **Open the Netlify URL** in Chrome or Edge
-2. **Browse the app** - All features work immediately
-3. **Install on Android:**
-   - Open the URL on your Android phone
-   - Chrome will show "Add to Home Screen" banner
-   - Or tap Menu (⋮) → "Add to Home Screen"
-4. **Test offline:**
-   - Use the app for 2-3 minutes (visit all features)
-   - Enable Airplane Mode
-   - Reopen the app - everything still works!
+### Test Offline
+1. Visit all tabs while online (~2 min)
+2. Turn on **Airplane Mode**
+3. App still works!
 
-### Option 2: Run Locally (Alternative)
-
-If you prefer to run the app locally:
-
-**Prerequisites:**
-- Node.js 18+ installed
-- Modern web browser (Chrome/Edge recommended)
-
-**Installation:**
-
+### Run Locally
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Build for production
 npm run build
-
-# 3. Start the server
 npm start
+# Open http://localhost:3000
 ```
 
-The app will be available at **http://localhost:3000**
-
 ---
 
-## 📱 Key Features to Review
+## ✨ Features
+
+| Tab | What it does |
+|-----|-------------|
+| **Map** | Check if land is farmable, restorable, or damaged |
+| **Guide** | Get crop recommendations for your conditions |
+| **Drops** | Schedule harvest pickups (avoid spoilage) |
+| **Exchange** | Find/offer seeds, tools, labor, transport |
+| **Water** | Locate water sources with reliability scores |
+
+### Also Included
+- **OrgBridge**: NGO funding with audit trail (in Drops tab)
+- **Arabic**: Full Arabic + RTL support (menu → language toggle)
+- **Offline**: Everything works without internet## 📱 Key Features to Review
 
 ### 1. Plot Assessment & Plantability Map
 - Navigate to `/map`
@@ -190,62 +173,13 @@ The app will be available at **http://localhost:3000**
    - Network tab → Check "Offline" checkbox
    - Navigate through the app
    - Confirm all features work
-
-**What Should Work Offline:**
-- ✅ Map displays with cached tiles
-- ✅ Can log new plots (saved to localStorage)
-- ✅ Can create crop plans
-- ✅ Can browse exchange listings
-- ✅ Can view and add water points (IndexedDB)
-- ✅ All navigation and UI interactions
-
 ---
 
-## 📊 Demo Flow for Presentation
+## 🌍 Languages
 
-### Scenario: Farmer Returns to Damaged Land
-
-**Live at: [Link](https://thamara-lifelines.netlify.app)**
-
-1. **Open Map** (Click "Map" in bottom navigation)
-   - Show plantability overlay for Gaza region
-   - Click on a "Restorable" zone (amber/yellow color)
-   - Explain assessment: moderate damage, needs soil preparation
-
-2. **Log a Plot** (Click "Log plot here" button)
-   - Auto-fills location from map click
-   - Set constraints (water: limited, salinity: high)
-   - View assessment results with recommendations
-
-3. **Get Crop Recommendations** (Click "Guide" in bottom nav)
-   - Select "Limited water" and "High salinity"
-   - Choose "Fast harvest" (30-60 days)
-   - View recommended crops (e.g., Radish, Turnip, Spinach)
-   - Show why each crop fits the constraints
-
-4. **Calculate Seeds Needed**
-   - Select Radish from recommendations
-   - Enter plot size: 50 m²
-   - Get result: 25g seeds, 3cm spacing
-
-5. **Find Water Source** (Click "Water" in bottom nav)
-   - Show nearby water points on map
-   - Check reliability scores (color-coded circles)
-   - Explain community-verified status
-
-6. **Exchange Resources** (Click "Exchange" in bottom nav)
-   - Search for radish seeds in listings
-   - Show available suppliers with reliability scores
-   - Demonstrate listing details and contact info
-
-7. **Test Offline** (Enable Airplane Mode on phone)
-   - Repeat above steps
-   - Show everything works without internet
-   - Emphasize data persistence in localStorage/IndexedDB
-
-**Key Message:** All features demonstrated work completely offline after the first visit!
-
----
+Switch via hamburger menu (☰):
+- 🇬🇧 English (default)
+- 🇸🇦 العربية (Arabic with RTL)
 
 ## 🏗️ Technical Architecture
 
@@ -277,145 +211,45 @@ The app will be available at **http://localhost:3000**
 
 ---
 
-## 📁 Project Structure
+## 📁 Structure
 
 ```
-/src
-  /app              # Next.js pages (routes)
-    /map            # Plantability map
-    /crop-plan      # Crop recommender
-    /exchange       # Marketplace
-    /water          # Water point finder
-    /log-plot       # Plot logging form
-    /assessment     # Assessment results
-  /components       # React components
-  /lib              # Business logic
-    assessment.ts   # Plantability scoring
-    cropEnrichment.ts  # Crop recommendations
-    seedCalc.ts     # Seed calculations
-    waterPointsDb.ts   # Water points database
-    exchangeStorage.ts # Exchange listings
-  /data             # Static data
-    crops.ts        # 30+ crop database
-    seedSources.ts  # Seed supplier data
-
-/public
-  /agro-packs       # Offline data bundles
-    /demo-v1        # Gaza demo pack
-      manifest.json
-      plantability.geojson
-  sw.js             # Service worker
-  manifest.json     # PWA manifest
+src/
+  app/        # Pages: map, guide, drops, exchange, water
+  lib/        # Logic + i18n translations
+  data/       # Crop database
+public/
+  agro-packs/ # Offline map data
+  sw.js       # Service worker (offline)
 ```
 
 ---
 
-## 🎨 Design Principles
+## 🛠️ Tech
 
-1. **Offline-first by default** - All core actions work without internet
-2. **Minimum input, maximum output** - 30-60 second workflows
-3. **Defensible guidance** - Transparent scoring with confidence levels
-4. **Low-literacy friendly** - Icon-first, minimal text
-5. **Coordination over prediction** - Focus on connecting resources
+Next.js 16 • React 19 • TypeScript • MapLibre GL • IndexedDB • Service Workers
 
 ---
 
-## 📖 Additional Documentation
+## 📖 Docs
 
-- **PROJECT_DOCUMENTATION.md** - Detailed problem analysis and feature logic
-- **CROP_PLAN_FEATURE.md** - Crop recommendation system details
-- **EXCHANGE_HUB_IMPLEMENTATION.md** - Marketplace architecture
-
----
-
-## 🌍 Impact & Context
-
-### Problem Statement (SPS#1)
-Food production capacity is severely reduced because farmland and assets are damaged. Households cannot determine what production is possible given soil damage, salinity, water scarcity, and climate stress, and cannot access guidance or coordination channels reliably.
-
-### Operating Constraints
-- ❌ No reliable extension services
-- ❌ No internet + low battery + limited devices
-- ❌ High salinity + damaged soils + limited clean irrigation
-- ❌ Restricted movement and insecurity
-- ✅ Solution must work completely offline
-
-### Thamara's Approach
-Instead of requiring constant connectivity, Thamara packages expert guidance into offline "Agro Packs" that work on any phone with a browser. Farmers get immediate answers about plantability, crop selection, and resource coordination without waiting for network access or experts.
-
----
-
-## 🚢 Deployment
-
-### Live Deployment
-**Currently deployed on Netlify:** [Link](https://thamara-lifelines.netlify.app)
-
-### Deployment Details
-- Builds to static HTML/CSS/JS
-- No server required (JAMstack architecture)
-- Automatic deploys from Git repository
-- HTTPS enabled for PWA requirements
-- Service worker activated for offline functionality
-
-### Deploy Your Own Copy
-
-The app can be deployed to any static hosting:
-
-```bash
-# Build the app
-npm run build
-
-# Deploy to Netlify (if not already connected)
-# Option 1: Drag & drop the 'out' or '.next' folder to Netlify
-# Option 2: Connect GitHub repo to Netlify dashboard
-# Option 3: Use Netlify CLI
-npm install -g netlify-cli
-netlify deploy --prod
-```
+- [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) - Feature details
+- [CROP_PLAN_FEATURE.md](CROP_PLAN_FEATURE.md) - Crop logic
+- [EXCHANGE_HUB_IMPLEMENTATION.md](EXCHANGE_HUB_IMPLEMENTATION.md) - Marketplace
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Service Worker Not Working
-- **Cause:** Service workers only work in production mode
-- **Fix:** Always use `npm run build && npm start`, not `npm run dev`
-
-### Map Not Loading Offline
-- **Cause:** Tiles not cached yet
-- **Fix:** Pan around the map while online to cache tiles for that area
-
-### Features Not Working Offline
-- **Cause:** Page not visited while online
-- **Fix:** Visit each feature once while online to cache it
-
-### Android Install Not Showing
-- **Cause:** PWA requirements not met or already installed
-- **Fix:** Clear browser data and revisit, or check manifest is valid
-
----
-
-## 🏆 Hackathon Submission
-
-**Team:** Gamma
-**Hackathon:** LifeLines 2026
-**Problem Statement:** SPS#1 - Farm Recovery & Coordination
-
-**Key Innovations:**
-1. Complete offline functionality for zero-connectivity environments
-2. Transparent plantability assessment with confidence scoring
-3. Resource-efficient crop recommendations (water, salinity, speed)
-4. Peer-to-peer marketplace that works offline
-5. Mobile-first PWA installable on any Android device
-
----
-
-## 📄 License
-
-
+| Issue | Fix |
+|-------|-----|
+| Old version showing | Use incognito or clear cache |
+| Map not loading offline | Browse the map while online first |
+| Features not working offline | Visit each tab while online first |
+| Service worker issues | Use `npm run build && npm start`, not `npm run dev` |
 
 ---
 
 **Built with love for the farmers of Gaza**
 
-*Thamara (ثمرة) means "fruit" or "outcome" in Arabic - representing the harvest that comes from coordinated effort and resilient farming.*
+*Thamara (ثمرة) = "fruit" in Arabic*
