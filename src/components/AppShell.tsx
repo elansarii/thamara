@@ -18,7 +18,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="h-full flex flex-col overflow-hidden" style={{ background: 'var(--thamara-bg)' }}>
+    <div className="h-full flex flex-col overflow-hidden relative" style={{ background: 'var(--thamara-bg)' }}>
       <TopBar />
 
       {/* Main content area with scroll */}
