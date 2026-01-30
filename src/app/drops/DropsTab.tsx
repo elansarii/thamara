@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Search,
   Plus,
@@ -134,7 +134,33 @@ export default function DropsTab() {
   const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedDropForMatch, setSelectedDropForMatch] = useState<HarvestDrop | null>(null);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { t, isRTL } = useLanguage();
+
+  // Handle scroll to hide/show header
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      const currentScrollY = scrollContainer.scrollTop;
+      const isScrollingDown = currentScrollY > lastScrollY.current;
+
+      // Only hide if scrolled more than 50px and scrolling down
+      if (currentScrollY > 50 && isScrollingDown) {
+        setHeaderVisible(false);
+      } else if (!isScrollingDown) {
+        setHeaderVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Load drops on mount - auto-seed if empty
   useEffect(() => {
@@ -192,41 +218,49 @@ export default function DropsTab() {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Header with Stats */}
+      {/* Header with Stats - Collapsible on scroll */}
       <div
-        className="px-5 py-4"
+        className="transition-all duration-300 ease-out overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, var(--thamara-primary-600) 0%, var(--thamara-primary-700) 100%)',
+          maxHeight: headerVisible ? '200px' : '0px',
+          opacity: headerVisible ? 1 : 0,
         }}
       >
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h1 className="text-xl font-bold text-white mb-1">
-              Harvest Drops
-            </h1>
-            <p className="text-sm text-white/80">
-              Coordinate pickups without refrigeration
-            </p>
+        <div
+          className="px-5 py-4"
+          style={{
+            background: 'linear-gradient(135deg, var(--thamara-primary-600) 0%, var(--thamara-primary-700) 100%)',
+          }}
+        >
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h1 className="text-xl font-bold text-white mb-1">
+                Harvest Drops
+              </h1>
+              <p className="text-sm text-white/80">
+                Coordinate pickups without refrigeration
+              </p>
+            </div>
+            <div
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold"
+              style={{
+                background: 'rgba(255,255,255,0.2)',
+                borderRadius: 'var(--thamara-radius-full)',
+                color: 'white',
+              }}
+            >
+              <Zap size={14} />
+              <span>No-Fridge Mode</span>
+            </div>
           </div>
-          <div
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold"
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              borderRadius: 'var(--thamara-radius-full)',
-              color: 'white',
-            }}
-          >
-            <Zap size={14} />
-            <span>No-Fridge Mode</span>
-          </div>
-        </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-2">
-          <StatCard icon={Package} label="Total" value={stats.total} />
-          <StatCard icon={Timer} label="Active" value={stats.active} color="var(--thamara-accent-400)" />
-          <StatCard icon={AlertTriangle} label="Urgent" value={stats.urgent} color="var(--thamara-warning)" />
-          <StatCard icon={TrendingUp} label="kg Ready" value={stats.totalKg} />
+          {/* Stats Cards */}
+          <div className="grid grid-cols-4 gap-2">
+            <StatCard icon={Package} label="Total" value={stats.total} />
+            <StatCard icon={Timer} label="Active" value={stats.active} color="var(--thamara-accent-400)" />
+            <StatCard icon={AlertTriangle} label="Urgent" value={stats.urgent} color="var(--thamara-warning)" />
+            <StatCard icon={TrendingUp} label="kg Ready" value={stats.totalKg} />
+          </div>
         </div>
       </div>
 
@@ -351,7 +385,7 @@ export default function DropsTab() {
       </div>
 
       {/* Drops List */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
         {filteredDrops.length === 0 ? (
           <EmptyState onCreateDrop={() => setShowCreateModal(true)} />
         ) : (
