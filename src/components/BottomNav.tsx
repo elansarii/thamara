@@ -30,7 +30,7 @@ export default function BottomNav() {
   return (
     <nav
       id="bottom-nav"
-      className="sticky bottom-0 left-0 right-0 flex items-start justify-around border-t backdrop-blur-sm flex-shrink-0"
+      className="fixed bottom-0 left-0 right-0 flex items-start justify-around border-t backdrop-blur-sm"
       style={{
         height: 'calc(64px + var(--safe-area-inset-bottom))',
         paddingBottom: 'var(--safe-area-inset-bottom)',

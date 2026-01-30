@@ -25,7 +25,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <main
         className="flex-1 overflow-y-auto scrollbar-hide"
         style={{
-          minHeight: 0
+          minHeight: 0,
+          paddingBottom: 'calc(64px + var(--safe-area-inset-bottom))'
         }}
       >
         {children}
