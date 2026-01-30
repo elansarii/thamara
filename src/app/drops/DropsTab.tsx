@@ -351,7 +351,7 @@ export default function DropsTab() {
       </div>
 
       {/* Drops List */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 pb-24">
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
         {filteredDrops.length === 0 ? (
           <EmptyState onCreateDrop={() => setShowCreateModal(true)} />
         ) : (
@@ -384,9 +384,9 @@ export default function DropsTab() {
         )}
       </div>
 
-      {/* Sticky Create Button */}
+      {/* Create Button - Fixed at bottom of flex layout */}
       <div
-        className="absolute bottom-0 left-0 right-0 px-5 py-4 border-t"
+        className="flex-shrink-0 px-5 py-4 border-t"
         style={{
           background: 'var(--thamara-surface)',
           borderColor: 'var(--thamara-border)',
